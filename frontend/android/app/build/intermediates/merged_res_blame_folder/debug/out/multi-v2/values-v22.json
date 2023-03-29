@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.loginpage.app-mergeDebugResources-20:/values-v22/values-v22.xml",
+            "outputFile": "com.frontend.app-mergeDebugResources-20:/values-v22/values-v22.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\pethu\\.gradle\\caches\\transforms-3\\2df373b9327185da857aa9641682c512\\transformed\\appcompat-1.4.1\\res\\values-v22\\values-v22.xml",
+                    "source": "C:\\Users\\pethu\\.gradle\\caches\\transforms-3\\be9a285d7d94d789380b4b7ef5365ae2\\transformed\\appcompat-1.4.1\\res\\values-v22\\values-v22.xml",
                     "from": {
                         "startLines": "2,3,4,9",
                         "startColumns": "4,4,4,4",
