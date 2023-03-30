@@ -32,5 +32,8 @@
   },
   "jest": {
     "preset": "react-native"
-  }
+  },
+  "allowSyntheticDefaultImports": true,
+  "esModuleInterop": true
+  
 }

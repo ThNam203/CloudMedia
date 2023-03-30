@@ -1,10 +1,15 @@
-import {StyleSheet, Text, View, ImageBackground} from 'react-native';
-import React from 'react';
+import {StyleSheet, Text, View, ImageBackground, Modal} from 'react-native';
+import React, {useState} from 'react';
 import RectangleButton from '../components/ui/RectangleButton';
+import SignUpHrScreen from './SignUpHrScreen';
+import SignUpJobSeekerScreen from './SignUpJobSeeker';
+import LoginScreen from './LoginScreen';
 
 function FirstTimeUseScreen() {
-  function pressHandler() {}
-  function loginPressHandler() {}
+  const [modalHrVisible, setModalHrVisible] = useState(false);
+  const [modalJobSeekerVisible, setModalJobSeekerVisible] = useState(false);
+  const [modalLoginVisible, setModalLoginVisible] = useState(false);
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -24,7 +29,11 @@ function FirstTimeUseScreen() {
         </View>
 
         <View style={[styles.buttonContainer, {marginTop: 100}]}>
-          <RectangleButton style={styles.button} onPress={pressHandler}>
+          <RectangleButton
+            style={styles.button}
+            onPress={() => {
+              setModalHrVisible(true);
+            }}>
             <View style={styles.centering}>
               <Text style={[styles.textOut, {margin: 8}]}>
                 You are HR recruiter
@@ -42,7 +51,9 @@ function FirstTimeUseScreen() {
         <View style={styles.buttonContainer}>
           <RectangleButton
             style={[styles.button, {backgroundColor: 'white'}]}
-            onPress={pressHandler}>
+            onPress={() => {
+              setModalJobSeekerVisible(true);
+            }}>
             <View style={styles.centering}>
               <Text style={[styles.textOut, {color: 'black', margin: 8}]}>
                 You are job seeker
@@ -55,12 +66,47 @@ function FirstTimeUseScreen() {
           <Text style={styles.loginText}>
             Already have an account?{' '}
             <Text
-              onPress={loginPressHandler}
+              onPress={() => {
+                setModalLoginVisible(true);
+              }}
               style={[styles.loginText, {textDecorationLine: 'underline'}]}>
               Log in
             </Text>
           </Text>
         </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalHrVisible}
+          onRequestClose={() => {
+            setModalHrVisible(!modalHrVisible);
+          }}>
+          <View>
+            <SignUpHrScreen />
+          </View>
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalJobSeekerVisible}
+          onRequestClose={() => {
+            setModalJobSeekerVisible(!modalJobSeekerVisible);
+          }}>
+          <View>
+            <SignUpJobSeekerScreen />
+          </View>
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalLoginVisible}
+          onRequestClose={() => {
+            setModalLoginVisible(!modalLoginVisible);
+          }}>
+          <View>
+            <LoginScreen />
+          </View>
+        </Modal>
       </ImageBackground>
     </View>
   );
