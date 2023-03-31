@@ -93,9 +93,7 @@ function FirstTimeUseScreen() {
             onRequestClose={() => {
               setModalHrVisible(!modalHrVisible);
             }}>
-            <View>
-              <SignUpHrScreen />
-            </View>
+            <SignUpHrScreen />
           </Modal>
           <Modal
             animationType="slide"
@@ -104,9 +102,7 @@ function FirstTimeUseScreen() {
             onRequestClose={() => {
               setModalJobSeekerVisible(!modalJobSeekerVisible);
             }}>
-            <View>
-              <SignUpJobSeekerScreen />
-            </View>
+            <SignUpJobSeekerScreen />
           </Modal>
           <Modal
             animationType="slide"
@@ -115,9 +111,7 @@ function FirstTimeUseScreen() {
             onRequestClose={() => {
               setModalLoginVisible(!modalLoginVisible);
             }}>
-            <View>
-              <LoginScreen />
-            </View>
+            <LoginScreen />
           </Modal>
         </ImageBackground>
       </View>
