@@ -5,6 +5,6 @@ const router = express.Router()
 
 router.route('/signup').post(authController.signUpAsRecruiter)
 
-//router.route('/login').get(authController.)
+router.route('/login').post(authController.logInAsRecruiter)
 
 module.exports = router

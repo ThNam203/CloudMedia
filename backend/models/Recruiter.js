@@ -20,6 +20,9 @@ const recruiterSchema = new mongoose.Schema({
         min: [8, 'Password length must be longer than 8 characters'],
         select: false,
     },
+    lastPasswordChangedTime: {
+        type: Date,
+    },
     createdDate: {
         type: Date,
         default: Date.now(),
