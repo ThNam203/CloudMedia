@@ -5,7 +5,7 @@ import {
   View,
   ImageBackground,
   Modal,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useState} from 'react';
 import RectangleButton from '../components/ui/RectangleButton';
@@ -26,7 +26,6 @@ function FirstTimeUseScreen() {
   function closeModalJS() {
     setModalJobSeekerVisible(false);
   }
-
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -38,13 +37,13 @@ function FirstTimeUseScreen() {
             Everything about a job becomes easier
           </Text>
         </View>
+
         <View style={[styles.viewSurround, {marginTop: 30}]}>
           <Text style={styles.textOut}>
             {'              '}Employment process become faster than ever and
             getting a job is never easier than now
           </Text>
         </View>
-
         <View style={[styles.buttonContainer, {marginTop: 100}]}>
           <RectangleButton
             style={styles.button}
@@ -64,7 +63,6 @@ function FirstTimeUseScreen() {
             or
           </Text>
         </View>
-
         <View style={styles.buttonContainer}>
           <RectangleButton
             style={[styles.button, {backgroundColor: 'white'}]}
@@ -78,7 +76,6 @@ function FirstTimeUseScreen() {
             </View>
           </RectangleButton>
         </View>
-
         <View style={styles.lastView}>
           <Text style={styles.loginText}>
             Already have an account?{' '}
@@ -91,7 +88,6 @@ function FirstTimeUseScreen() {
             </Text>
           </Text>
         </View>
-
         <Modal
           animationType="slide"
           transparent={true}
@@ -99,11 +95,19 @@ function FirstTimeUseScreen() {
           onRequestClose={() => {
             setModalHrVisible(!modalHrVisible);
           }}>
-          <TouchableWithoutFeedback onPress={closeModalHr}>
-            <View style={{flex: 1}}>
-              <SignUpHrScreen />
-            </View>
-          </TouchableWithoutFeedback>
+          <TouchableOpacity
+            style={{flex: 1}}
+            activeOpacity={1}
+            onPressOut={closeModalHr}
+          />
+          <View style={{flex: 13}}>
+            <SignUpHrScreen
+              handleToLogin={() => {
+                closeModalHr();
+                setModalLoginVisible(true);
+              }}
+            />
+          </View>
         </Modal>
         <Modal
           animationType="slide"
@@ -112,11 +116,19 @@ function FirstTimeUseScreen() {
           onRequestClose={() => {
             setModalJobSeekerVisible(!modalJobSeekerVisible);
           }}>
-          <TouchableWithoutFeedback onPress={closeModalJS}>
-            <View style={{flex: 1}}>
-              <SignUpJobSeekerScreen />
-            </View>
-          </TouchableWithoutFeedback>
+          <TouchableOpacity
+            style={{flex: 1}}
+            activeOpacity={1}
+            onPressOut={closeModalJS}
+          />
+          <View style={{flex: 5}}>
+            <SignUpJobSeekerScreen
+              handleToLogin={() => {
+                closeModalJS();
+                setModalLoginVisible(true);
+              }}
+            />
+          </View>
         </Modal>
         <Modal
           animationType="slide"
@@ -125,11 +137,14 @@ function FirstTimeUseScreen() {
           onRequestClose={() => {
             setModalLoginVisible(!modalLoginVisible);
           }}>
-          <TouchableWithoutFeedback onPress={closeModalLogin}>
-            <View style={{flex: 1}}>
-              <LoginScreen />
-            </View>
-          </TouchableWithoutFeedback>
+          <TouchableOpacity
+            style={{flex: 4}}
+            activeOpacity={1}
+            onPressOut={closeModalLogin}
+          />
+          <View style={{flex: 7}}>
+            <LoginScreen handleToSignUp={() => closeModalLogin()} />
+          </View>
         </Modal>
       </ImageBackground>
     </View>

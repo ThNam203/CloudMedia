@@ -1,20 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
-function CustomFTG({
-  textTitle,
-  textQuestion1,
-  textQuestion2,
-}: {
-  textTitle: any;
-  textQuestion1: any;
-  textQuestion2: any;
-}) {
+function CustomFTG(props: any) {
   return (
     <View style={styles.container}>
       <View style={styles.firstView}>
         <View style={styles.line} />
-        <Text>{textTitle}</Text>
+        <Text>{props.textTitle}</Text>
         <View style={styles.line} />
       </View>
       <View style={styles.secondView}>
@@ -45,13 +37,14 @@ function CustomFTG({
       </View>
       <View style={styles.lastView}>
         <Text style={styles.textTitle}>
-          {textQuestion1}{' '}
+          {props.textQuestion1}{' '}
           <Text
+            onPress={props.handlePressQues2}
             style={[
               styles.textTitle,
               {color: '#416FDF', textDecorationLine: 'underline'},
             ]}>
-            {textQuestion2}
+            {props.textQuestion2}
           </Text>
         </Text>
       </View>
@@ -65,6 +58,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   line: {
+    margin: 10,
+    width: 90,
     borderBottomColor: 'black',
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
