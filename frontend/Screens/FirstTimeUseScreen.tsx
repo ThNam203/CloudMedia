@@ -1,121 +1,139 @@
+/* eslint-disable react-native/no-inline-styles */
 import 'react-native-gesture-handler';
-import {StyleSheet, Text, View, ImageBackground, Modal} from 'react-native';
-import React, {useRef, useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  Modal,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import React, {useState} from 'react';
 import RectangleButton from '../components/ui/RectangleButton';
 import SignUpHrScreen from './SignUpHrScreen';
 import SignUpJobSeekerScreen from './SignUpJobSeeker';
 import LoginScreen from './LoginScreen';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 function FirstTimeUseScreen() {
   const [modalHrVisible, setModalHrVisible] = useState(false);
   const [modalJobSeekerVisible, setModalJobSeekerVisible] = useState(false);
   const [modalLoginVisible, setModalLoginVisible] = useState(false);
-  const bottomSheetModalRef = useRef(null);
-  const snapPoints = ['48%'];
-  function handlePresentModal() {
-    bottomSheetModalRef.current?.present();
+  function closeModalLogin() {
+    setModalLoginVisible(false);
   }
+  function closeModalHr() {
+    setModalHrVisible(false);
+  }
+  function closeModalJS() {
+    setModalJobSeekerVisible(false);
+  }
+
   return (
-    <BottomSheetModalProvider>
-      <View style={styles.container}>
-        <ImageBackground
-          resizeMode={'stretch'}
-          style={styles.image}
-          source={require('../assets/images/xiao.png')}>
-          <View style={[styles.viewSurround, {marginTop: 100}]}>
-            <Text style={styles.title}>
-              Everything about a job becomes easier
-            </Text>
-          </View>
-          <View style={[styles.viewSurround, {marginTop: 30}]}>
-            <Text style={styles.textOut}>
-              {'              '}Employment process become faster than ever and
-              getting a job is never easier than now
-            </Text>
-          </View>
+    <View style={styles.container}>
+      <ImageBackground
+        resizeMode={'stretch'}
+        style={styles.image}
+        source={require('../assets/images/xiao.png')}>
+        <View style={[styles.viewSurround, {marginTop: 100}]}>
+          <Text style={styles.title}>
+            Everything about a job becomes easier
+          </Text>
+        </View>
+        <View style={[styles.viewSurround, {marginTop: 30}]}>
+          <Text style={styles.textOut}>
+            {'              '}Employment process become faster than ever and
+            getting a job is never easier than now
+          </Text>
+        </View>
 
-          <View style={[styles.buttonContainer, {marginTop: 100}]}>
-            <RectangleButton style={styles.button} onPress={handlePresentModal}>
-              <View style={styles.centering}>
-                <Text style={[styles.textOut, {margin: 8}]}>
-                  You are HR recruiter
-                </Text>
-              </View>
-            </RectangleButton>
-          </View>
-
-          <View style={{margin: 20}}>
-            <Text style={[styles.textOut, {textDecorationLine: 'underline'}]}>
-              or
-            </Text>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <RectangleButton
-              style={[styles.button, {backgroundColor: 'white'}]}
-              onPress={() => {
-                setModalJobSeekerVisible(true);
-              }}>
-              <View style={styles.centering}>
-                <Text style={[styles.textOut, {color: 'black', margin: 8}]}>
-                  You are job seeker
-                </Text>
-              </View>
-            </RectangleButton>
-          </View>
-
-          <View style={styles.lastView}>
-            <Text style={styles.loginText}>
-              Already have an account?{' '}
-              <Text
-                onPress={() => {
-                  setModalLoginVisible(true);
-                }}
-                style={[styles.loginText, {textDecorationLine: 'underline'}]}>
-                Log in
+        <View style={[styles.buttonContainer, {marginTop: 100}]}>
+          <RectangleButton
+            style={styles.button}
+            onPress={() => {
+              setModalHrVisible(true);
+            }}>
+            <View style={styles.centering}>
+              <Text style={[styles.textOut, {margin: 8}]}>
+                You are HR recruiter
               </Text>
-            </Text>
-          </View>
-
-          <BottomSheetModal
-            ref={bottomSheetModalRef}
-            index={0}
-            snapPoints={snapPoints}>
-            <View>
-              <Text>Hello</Text>
             </View>
-          </BottomSheetModal>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalHrVisible}
-            onRequestClose={() => {
-              setModalHrVisible(!modalHrVisible);
+          </RectangleButton>
+        </View>
+
+        <View style={{margin: 20}}>
+          <Text style={[styles.textOut, {textDecorationLine: 'underline'}]}>
+            or
+          </Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <RectangleButton
+            style={[styles.button, {backgroundColor: 'white'}]}
+            onPress={() => {
+              setModalJobSeekerVisible(true);
             }}>
-            <SignUpHrScreen />
-          </Modal>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalJobSeekerVisible}
-            onRequestClose={() => {
-              setModalJobSeekerVisible(!modalJobSeekerVisible);
-            }}>
-            <SignUpJobSeekerScreen />
-          </Modal>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalLoginVisible}
-            onRequestClose={() => {
-              setModalLoginVisible(!modalLoginVisible);
-            }}>
-            <LoginScreen />
-          </Modal>
-        </ImageBackground>
-      </View>
-    </BottomSheetModalProvider>
+            <View style={styles.centering}>
+              <Text style={[styles.textOut, {color: 'black', margin: 8}]}>
+                You are job seeker
+              </Text>
+            </View>
+          </RectangleButton>
+        </View>
+
+        <View style={styles.lastView}>
+          <Text style={styles.loginText}>
+            Already have an account?{' '}
+            <Text
+              onPress={() => {
+                setModalLoginVisible(true);
+              }}
+              style={[styles.loginText, {textDecorationLine: 'underline'}]}>
+              Log in
+            </Text>
+          </Text>
+        </View>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalHrVisible}
+          onRequestClose={() => {
+            setModalHrVisible(!modalHrVisible);
+          }}>
+          <TouchableWithoutFeedback onPress={closeModalHr}>
+            <View style={{flex: 1}}>
+              <SignUpHrScreen />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalJobSeekerVisible}
+          onRequestClose={() => {
+            setModalJobSeekerVisible(!modalJobSeekerVisible);
+          }}>
+          <TouchableWithoutFeedback onPress={closeModalJS}>
+            <View style={{flex: 1}}>
+              <SignUpJobSeekerScreen />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalLoginVisible}
+          onRequestClose={() => {
+            setModalLoginVisible(!modalLoginVisible);
+          }}>
+          <TouchableWithoutFeedback onPress={closeModalLogin}>
+            <View style={{flex: 1}}>
+              <LoginScreen />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </ImageBackground>
+    </View>
   );
 }
 export default FirstTimeUseScreen;
