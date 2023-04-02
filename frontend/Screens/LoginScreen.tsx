@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
+import CustomCheckBox from '../components/ui/CustomCheckbox';
+import CustomFTG from '../components/ui/CustomFGT';
 
 function LoginScreen() {
   return (
@@ -28,7 +29,8 @@ function LoginScreen() {
       </View>
       <View style={{marginTop: 15, width: 300, height: 25}}>
         <View style={styles.bottomContainer}>
-          <View>
+          <View style={{flexDirection: 'row'}}>
+            <CustomCheckBox />
             <Text
               style={[styles.fontText, {fontWeight: '400', color: '#808080'}]}>
               Remember me
@@ -66,7 +68,13 @@ function LoginScreen() {
           </Text>
         </Pressable>
       </View>
-      <View></View>
+      <View>
+        <CustomFTG
+          textTitle={'or sign in with'}
+          textQuestion1={'Don’t have an account?'}
+          textQuestion2={'Sign up'}
+        />
+      </View>
     </View>
   );
 }
@@ -74,11 +82,12 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: 'center',
-    marginTop: 200, // fix
+    marginTop: 300, // fix
     backgroundColor: '#ffffff',
-    height: 665,
-    borderRadius: 50,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
   },
   titleView: {
     justifyContent: 'center',
@@ -100,13 +109,14 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     padding: 10,
-    borderBottomColor: '#AFAFAF',
+    borderColor: '#AFAFAF',
     borderRadius: 15,
   },
   bottomContainer: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   fontText: {
     fontFamily: 'Roboto',
