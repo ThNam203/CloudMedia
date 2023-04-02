@@ -3,8 +3,8 @@ const authController = require('../controllers/authController')
 
 const router = express.Router()
 
-router.route('/signup').post(authController.signUpAsRecruiter)
-
-router.route('/login').post(authController.logInAsRecruiter)
+router.route('/signup').post(authController.signUp)
+router.route('/login').post(authController.logIn)
+router.route('/logout').post(authController.logOut)
 
 module.exports = router

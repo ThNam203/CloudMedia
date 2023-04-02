@@ -4,8 +4,8 @@
   "description": "WorkWise's API",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "start:prod": "node index.js"
+    "start": "NODE_ENV=production nodemon index.js",
+    "start:dev": "NODE_ENV=development node index.js"
   },
   "repository": {
     "type": "git",

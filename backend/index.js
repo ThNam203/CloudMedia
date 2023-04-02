@@ -1,17 +1,20 @@
-require('./config/index')
-require('./models/Mongoose')
+require('./utils/startServerScript')
 
 const express = require('express')
 
 const errorHandlers = require('./controllers/errorController')
-const authRouter = require('./routes/recruiterAuthRoutes')
+const authRouter = require('./routes/authRoutes')
 
 const app = express()
 
 app.use(express.json())
-app.use(express.urlencoded())
+app.use(
+    express.urlencoded({
+        extended: true,
+    })
+)
 
-app.use('/recruiter', authRouter)
+app.use('/', authRouter)
 
 app.use('*', errorHandlers.invalidUrlHandler)
 app.use(errorHandlers.globalErrorHandler)
