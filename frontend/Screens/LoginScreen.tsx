@@ -1,10 +1,24 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
+import React, {useState} from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Alert,
+} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
 
-function LoginScreen() {
+function LoginScreen(props: any) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = () => {
+    // logic
+    Alert.alert('test!!');
+  };
   return (
     <View style={styles.container}>
       <View style={styles.titleView}>
@@ -14,8 +28,8 @@ function LoginScreen() {
         <TextInput
           style={styles.input}
           placeholder="Email"
-          // onChangeText={text => setUsername(text)}
-          // value={username}
+          onChangeText={text => setUsername(text)}
+          value={username}
         />
       </View>
       <View style={styles.textInput}>
@@ -23,8 +37,8 @@ function LoginScreen() {
           style={styles.input}
           placeholder="Password"
           secureTextEntry={true}
-          // onChangeText={text => setPassword(text)}
-          // value={password}
+          onChangeText={text => setPassword(text)}
+          value={password}
         />
       </View>
       <View style={{marginTop: 15, width: 300, height: 25}}>
@@ -52,6 +66,7 @@ function LoginScreen() {
       </View>
       <View style={[styles.textInput, {overflow: 'hidden', borderRadius: 15}]}>
         <Pressable
+          onPress={handleLogin}
           style={styles.button}
           android_ripple={{color: '#613FC2', borderless: false}}>
           <Text
@@ -73,6 +88,7 @@ function LoginScreen() {
           textTitle={'or sign in with'}
           textQuestion1={'Don’t have an account?'}
           textQuestion2={'Sign up'}
+          handlePressQues2={props.handleToSignUp}
         />
       </View>
     </View>
@@ -84,7 +100,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 300, // fix
     backgroundColor: '#ffffff',
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,

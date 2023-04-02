@@ -12,7 +12,7 @@ import {
 import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 
-function SignUpJobSeeker() {
+function SignUpJobSeeker(props: any) {
   return (
     <View style={styles.container}>
       <View style={styles.titleView}>
@@ -101,6 +101,7 @@ function SignUpJobSeeker() {
           textTitle={'or sign up with'}
           textQuestion1={'Already have an account?'}
           textQuestion2={'Log in'}
+          handlePressQues2={props.handleToLogin}
         />
       </View>
     </View>
@@ -113,7 +114,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 140,
     backgroundColor: '#ffffff',
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
