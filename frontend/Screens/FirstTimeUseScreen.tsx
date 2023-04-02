@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-import 'react-native-gesture-handler';
 import {
   StyleSheet,
   Text,
