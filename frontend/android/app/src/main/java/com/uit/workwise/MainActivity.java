@@ -1,4 +1,4 @@
-package com.frontend;
+package com.uit.workwise;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
