@@ -73,8 +73,5 @@ exports.logOut = asyncCatch(async (req, res, next) => {
                 message: `Logout successfully`,
             },
         })
-    } else
-        return next(
-            new AppError('Missing or invalid authorization header', 400)
-        )
+    } else return next(new AppError('Missing or invalid authorization header', 400))
 })
