@@ -4,6 +4,7 @@ const express = require('express')
 
 const errorHandlers = require('./controllers/errorController')
 const authRouter = require('./routes/authRoutes')
+const usersRouter = require('./routes/usersRoutes')
 
 const app = express()
 
@@ -15,6 +16,7 @@ app.use(
 )
 
 app.use('/', authRouter)
+app.use('/user', usersRouter)
 
 app.use('*', errorHandlers.invalidUrlHandler)
 app.use(errorHandlers.globalErrorHandler)
