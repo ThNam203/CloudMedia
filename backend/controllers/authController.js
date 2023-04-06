@@ -5,8 +5,8 @@ const JWTBlacklist = require('../models/JWTBlacklist')
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 
-const getJWTToken = function (userEmail) {
-    return jwt.sign({ email: userEmail }, process.env.JWT_SECRET, {
+const getJWTToken = function (userId) {
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
         expiresIn: '7 days',
     })
 }
@@ -23,7 +23,7 @@ exports.signUp = asyncCatch(async (req, res, next) => {
 
     res.status(200).json({
         status: 'success',
-        data: `created a new user with email ${newUser.email}`,
+        data: `created a new user with id ${newUser.id}`,
     })
 })
 
@@ -73,5 +73,8 @@ exports.logOut = asyncCatch(async (req, res, next) => {
                 message: `Logout successfully`,
             },
         })
-    } else return next(new AppError('Missing or invalid authorization header', 400))
+    } else
+        return next(
+            new AppError('Missing or invalid authorization header', 400)
+        )
 })
