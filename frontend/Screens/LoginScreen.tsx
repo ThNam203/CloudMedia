@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Alert,
-} from 'react-native';
+import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
 
@@ -16,8 +9,31 @@ function LoginScreen(props: any) {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // logic
-    Alert.alert('test!!');
+    fetch('https://workwise.onrender.com/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: 'hthnam@gmail.com',
+        password: '12345678',
+      }),
+    })
+      .then(response => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          throw new Error('Login failed.');
+        }
+      })
+      .then(data => {
+        const jwtToken = data.data.jwtToken;
+        // do something with the JWT token
+        console.log(jwtToken);
+      })
+      .catch(error => {
+        console.error(error);
+      });
   };
   return (
     <View style={styles.container}>
