@@ -13,6 +13,23 @@ import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 
 function SignUpJobSeeker(props: any) {
+  const handleSignUp = () => {
+    fetch('https://workwise.onrender.com/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: 'Nam',
+        email: 'hthnam@gmail.com',
+        password: '12345678',
+      }),
+    })
+      .then(response => response.json)
+      .then(data => console.log(data))
+      .catch(error => console.log(error));
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titleView}>
@@ -80,6 +97,7 @@ function SignUpJobSeeker(props: any) {
       </View>
       <View style={[styles.textInput, {overflow: 'hidden', borderRadius: 15}]}>
         <Pressable
+          onPress={handleSignUp}
           style={styles.button}
           android_ripple={{color: '#613FC2', borderless: false}}>
           <Text
