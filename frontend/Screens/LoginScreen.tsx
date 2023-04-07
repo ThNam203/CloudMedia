@@ -9,7 +9,7 @@ function LoginScreen(props: any) {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    fetch('http://localhost:3000/login', {
+    fetch('https://workwise.onrender.com/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
