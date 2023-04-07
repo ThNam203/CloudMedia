@@ -15,8 +15,8 @@ function LoginScreen(props: any) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: 'hthnam@gmail.com',
-        password: '12345678',
+        email: username, // hthnam@gmail.com
+        password: password, // 12345678
       }),
     })
       .then(response => {

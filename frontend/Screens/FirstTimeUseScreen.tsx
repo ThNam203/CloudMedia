@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import RectangleButton from '../components/ui/RectangleButton';
-import SignUpHrScreen from './SignUpHrScreen';
+import SignUpHrScreen from './SignUpScreen';
 import SignUpJobSeekerScreen from './SignUpJobSeeker';
 import LoginScreen from './LoginScreen';
 
