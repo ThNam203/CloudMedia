@@ -8,10 +8,10 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
+import {Dropdown} from 'react-native-element-dropdown';
 
 function SignUpHrScreen(props: any) {
   const [name, setName] = useState('');
@@ -80,6 +80,27 @@ function SignUpHrScreen(props: any) {
       .then(data => console.log(data))
       .catch(error => console.log(error));
   };
+
+  const listboxData = [
+    {label: 'Being Idle', value: 'Being Idle'},
+    {label: 'Hiring', value: 'Hiring'},
+    {label: 'Open For Work', value: 'Open For Work'},
+  ];
+
+  const renderItem = item => {
+    return (
+      <View
+        style={{
+          padding: 17,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+        <Text style={{flex: 1, fontSize: 16}}>{item.label}</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titleView}>
@@ -161,7 +182,21 @@ function SignUpHrScreen(props: any) {
         </View>
       </View>
       <View style={styles.textInput}>
-        <TextInput style={styles.input} placeholder="Company name" />
+        <Dropdown
+          style={styles.dropdown}
+          placeholderStyle={{fontSize: 16}}
+          data={listboxData}
+          search={false}
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder="Being Idle"
+          value={userRole}
+          onChange={item => {
+            setUserRole(item.value);
+          }}
+          renderItem={renderItem}
+        />
       </View>
       <View style={styles.textInput}>
         {phoneWarning && (
@@ -268,7 +303,7 @@ const styles = StyleSheet.create({
 
     padding: 10,
     borderColor: '#AFAFAF',
-    borderRadius: 15,
+    borderRadius: 12,
   },
   bottomContainer: {
     flex: 1,
@@ -292,5 +327,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: -18,
     marginLeft: 10,
+  },
+  dropdown: {
+    height: 50,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 12,
+    borderColor: '#AFAFAF',
+    borderWidth: 1,
   },
 });

@@ -6,16 +6,15 @@ import {
   ImageBackground,
   Modal,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import React, {useState} from 'react';
 import RectangleButton from '../components/ui/RectangleButton';
 import SignUpHrScreen from './SignUpScreen';
-import SignUpJobSeekerScreen from './SignUpJobSeeker';
 import LoginScreen from './LoginScreen';
 
 function FirstTimeUseScreen() {
   const [modalHrVisible, setModalHrVisible] = useState(false);
-  const [modalJobSeekerVisible, setModalJobSeekerVisible] = useState(false);
   const [modalLoginVisible, setModalLoginVisible] = useState(false);
   function closeModalLogin() {
     setModalLoginVisible(false);
@@ -23,9 +22,7 @@ function FirstTimeUseScreen() {
   function closeModalHr() {
     setModalHrVisible(false);
   }
-  function closeModalJS() {
-    setModalJobSeekerVisible(false);
-  }
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -44,38 +41,18 @@ function FirstTimeUseScreen() {
             getting a job is never easier than now
           </Text>
         </View>
-        <View style={[styles.buttonContainer, {marginTop: 100}]}>
+        <View style={[styles.buttonContainer, {marginTop: 250}]}>
           <RectangleButton
             style={styles.button}
             onPress={() => {
               setModalHrVisible(true);
             }}>
             <View style={styles.centering}>
-              <Text style={[styles.textOut, {margin: 8}]}>
-                You are HR recruiter
-              </Text>
+              <Text style={[styles.textOut, {marginBottom: 10}]}>Sign up</Text>
             </View>
           </RectangleButton>
         </View>
 
-        <View style={{margin: 20}}>
-          <Text style={[styles.textOut, {textDecorationLine: 'underline'}]}>
-            or
-          </Text>
-        </View>
-        <View style={styles.buttonContainer}>
-          <RectangleButton
-            style={[styles.button, {backgroundColor: 'white'}]}
-            onPress={() => {
-              setModalJobSeekerVisible(true);
-            }}>
-            <View style={styles.centering}>
-              <Text style={[styles.textOut, {color: 'black', margin: 8}]}>
-                You are job seeker
-              </Text>
-            </View>
-          </RectangleButton>
-        </View>
         <View style={styles.lastView}>
           <Text style={styles.loginText}>
             Already have an account?{' '}
@@ -101,35 +78,17 @@ function FirstTimeUseScreen() {
             onPressOut={closeModalHr}
           />
           <View style={{flex: 13}}>
-            <SignUpHrScreen
-              handleToLogin={() => {
-                closeModalHr();
-                setModalLoginVisible(true);
-              }}
-            />
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
+              <SignUpHrScreen
+                handleToLogin={() => {
+                  closeModalHr();
+                  setModalLoginVisible(true);
+                }}
+              />
+            </ScrollView>
           </View>
         </Modal>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalJobSeekerVisible}
-          onRequestClose={() => {
-            setModalJobSeekerVisible(!modalJobSeekerVisible);
-          }}>
-          <TouchableOpacity
-            style={{flex: 1}}
-            activeOpacity={1}
-            onPressOut={closeModalJS}
-          />
-          <View style={{flex: 5}}>
-            <SignUpJobSeekerScreen
-              handleToLogin={() => {
-                closeModalJS();
-                setModalLoginVisible(true);
-              }}
-            />
-          </View>
-        </Modal>
+
         <Modal
           animationType="slide"
           transparent={true}
@@ -182,8 +141,8 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   button: {
-    width: 300,
-    height: 60,
+    width: 100,
+    height: 40,
   },
   lastView: {
     borderColor: 'white',
@@ -201,5 +160,7 @@ const styles = StyleSheet.create({
   },
   centering: {
     flex: 1,
+    alignSelf: 'center',
+    alignContent: 'center',
   },
 });
