@@ -25,6 +25,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         min: [10, 'Phone number must be longer or equal to 10 digits'],
     },
+    profileImagePath: {
+        type: String,
+    },
+    location: {
+        type: String,
+    },
+    company: {
+        type: String,
+    },
+    connections: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    },
     userRole: {
         type: String,
         enum: ['Hiring', 'Open For Work', 'Being Idle'],
@@ -39,6 +51,21 @@ const userSchema = new mongoose.Schema({
         select: false,
     },
 })
+
+userSchema.statics.createNewUser = function (req) {
+    return this.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        phoneNumber: req.body.phoneNumber,
+        profileImagePath: req.body.profileImagePath,
+        location: req.body.location,
+        company: req.body.company,
+        connections: req.body.connections,
+        userRole: req.body.userRole,
+        createdDate: req.body.createdDate,
+    })
+}
 
 userSchema.methods.checkPassword = async function (
     comingPassword,

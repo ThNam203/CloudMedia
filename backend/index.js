@@ -2,7 +2,7 @@ require('./utils/startServerScript')
 
 const express = require('express')
 
-const errorHandlers = require('./controllers/errorController')
+const errorHandlers = require('./controllers/errorController/errorController')
 const authRouter = require('./routes/authRoutes')
 const usersRouter = require('./routes/usersRoutes')
 

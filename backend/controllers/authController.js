@@ -5,21 +5,27 @@ const JWTBlacklist = require('../models/JWTBlacklist')
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 
-const getJWTToken = function (userId) {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const getJWTToken = (userId) =>
+    jwt.sign({ id: userId }, process.env.JWT_SECRET, {
         expiresIn: '7 days',
     })
+
+const verifyAndGetJWTToken = (req, next) => {
+    if (
+        !req.headers.authorization ||
+        !req.headers.authorization.startsWith('Bearer')
+    )
+        return next(new AppError('Missing authorization header', 401))
+
+    const token = req.headers.authorization.split(' ')[1]
+    if (!token) next(new AppError('Missing JWT token', 401))
+
+    jwt.verify(token, process.env.JWT_SECRET)
+    return token
 }
 
 exports.signUp = asyncCatch(async (req, res, next) => {
-    const newUser = await User.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        isRecruiter: req.body.isRecruiter,
-        phoneNumber: req.body.phoneNumber,
-        createdDate: req.body.createdDate,
-    })
+    const newUser = await User.createNewUser(req)
 
     res.status(200).json({
         status: 'success',
@@ -39,7 +45,7 @@ exports.logIn = asyncCatch(async (req, res, next) => {
     if (!(await freshUser.checkPassword(password, freshUser.password)))
         next(new AppError('Wrong password', 400))
 
-    const jwtToken = getJWTToken(freshUser.email)
+    const jwtToken = getJWTToken(freshUser.id)
     res.status(200).json({
         status: 'success',
         data: {
@@ -49,32 +55,31 @@ exports.logIn = asyncCatch(async (req, res, next) => {
 })
 
 exports.logOut = asyncCatch(async (req, res, next) => {
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')
-    ) {
-        const token = req.headers.authorization.split(' ')[1]
+    const token = verifyAndGetJWTToken(req, next)
 
-        const freshToken = await JWTBlacklist.findOne({ jwtData: token })
+    const freshToken = await JWTBlacklist.findOne({ jwtData: token })
 
-        if (freshToken)
-            return next(
-                new AppError(
-                    'Invalid request! Already logged out the user with this token',
-                    400
-                )
-            )
-
-        await JWTBlacklist.create({ jwtData: token })
-
-        res.status(200).json({
-            status: 'success',
-            data: {
-                message: `Logout successfully`,
-            },
-        })
-    } else
+    if (freshToken)
         return next(
-            new AppError('Missing or invalid authorization header', 400)
+            new AppError(
+                'Invalid request! Already logged out the user with this token',
+                400
+            )
         )
+
+    await JWTBlacklist.create({ jwtData: token })
+    const tokenData = jwt.decode(token)
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            message: `Logged out user with id ${tokenData.id}`,
+        },
+    })
 })
+
+// exports.changePassword = asyncCatch(async (req, res, next) => {
+//     const token = verifyAndGetJWTToken(req, next)
+//     const oldPassword = req.body.oldPassword
+
+// })
