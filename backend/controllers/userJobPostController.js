@@ -30,6 +30,11 @@ exports.createNewJobPost = asyncCatch(async (req, res, next) => {
         return next(new AppError('Unable to create a new job post', 500))
 
     const user = await User.findById(userId)
+    if (!user)
+        return next(
+            new AppError('Invalid user or missing user posting this job', 400)
+        )
+
     user.jobPosts.push(newJobPost.id)
     await user.save()
 

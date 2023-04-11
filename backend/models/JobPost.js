@@ -5,11 +5,9 @@ const companySchema = new mongoose.Schema(
         name: {
             type: String,
             required: true,
-            min: [1, 'Company name must not be empty'],
         },
         logoUrl: {
             type: String,
-            required: true,
         },
         linkToWebsite: {
             type: String,
@@ -24,31 +22,29 @@ const jobRequirementsSchema = new mongoose.Schema(
     {
         education: {
             type: String,
-            min: [1, 'Education must not be empty'],
         },
         experience: {
             type: String,
-            min: [1, 'Experience must not be empty'],
         },
         languageProficiency: {
             type: String,
-            min: [1, 'Language proficiency must not be empty'],
+        },
+        salary: {
+            type: String,
         },
         certifications: {
             type: String,
-            min: [1, 'Certifications must not be empty'],
         },
         interpersonalSkills: {
             type: String,
-            min: [1, 'Interpersonal must not be empty'],
         },
         availability: {
             type: String,
-            min: [1, 'Availability must not be empty'],
         },
     },
     {
         _id: false,
+        required: true,
     }
 )
 
@@ -69,18 +65,31 @@ const jobPostSchema = new mongoose.Schema({
         min: [20, 'Job description must be at least 20 characters'],
     },
     company: companySchema,
-    location: {
+    workplaceType: {
+        type: String,
+        enum: ['On-site', 'Hybrid', 'Remote'],
+        required: true,
+    },
+    employeeLocation: {
         type: String,
         required: true,
     },
-    salary: {
+    jobType: {
         type: String,
+        enum: [
+            'Full-time',
+            'Part-time',
+            'Contract',
+            'Temporary',
+            'Other',
+            'Volunteer',
+            'Internship',
+        ],
         required: true,
     },
     requirements: jobRequirementsSchema,
     deadline: {
         type: Date,
-        required: true,
     },
 })
 
@@ -92,8 +101,9 @@ jobPostSchema.statics.createNewJobPost = async function (req) {
         title: body.title,
         description: body.description,
         company: body.company,
-        location: body.location,
-        salary: body.salary,
+        workplaceType: body.workplaceType,
+        employeeLocation: body.employeeLocation,
+        jobType: body.jobType,
         requirements: body.requirements,
         deadline: body.deadline,
     })
