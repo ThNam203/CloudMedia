@@ -10,7 +10,7 @@ const getJWTToken = (userId) =>
         expiresIn: '7 days',
     })
 
-const verifyAndGetJWTToken = (req, next) => {
+const verifyAndGetJWTToken = async (req, next) => {
     if (
         !req.headers.authorization ||
         !req.headers.authorization.startsWith('Bearer')
@@ -18,7 +18,13 @@ const verifyAndGetJWTToken = (req, next) => {
         return next(new AppError('Missing authorization header', 401))
 
     const token = req.headers.authorization.split(' ')[1]
-    if (!token) next(new AppError('Missing JWT token', 401))
+    if (!token) return next(new AppError('Missing JWT token', 401))
+
+    const freshToken = await JWTBlacklist.findOne({ jwtData: token })
+    if (freshToken)
+        return next(
+            new AppError('Invalid request, this token is already revoked', 401)
+        )
 
     jwt.verify(token, process.env.JWT_SECRET)
     return token
@@ -37,13 +43,13 @@ exports.logIn = asyncCatch(async (req, res, next) => {
     const { email, password } = req.body
 
     if (!email || !password)
-        next(new AppError('Missing email or password', 400))
+        return next(new AppError('Missing email or password', 400))
 
     const freshUser = await User.findOne({ email }).select('+password')
-    if (!freshUser) next(new AppError('Email not found', 400))
+    if (!freshUser) return next(new AppError('Email not found', 400))
 
     if (!(await freshUser.checkPassword(password, freshUser.password)))
-        next(new AppError('Wrong password', 400))
+        return next(new AppError('Wrong password', 400))
 
     const jwtToken = getJWTToken(freshUser.id)
     res.status(200).json({
@@ -54,18 +60,14 @@ exports.logIn = asyncCatch(async (req, res, next) => {
     })
 })
 
+exports.isUser = asyncCatch(async (req, res, next) => {
+    const token = verifyAndGetJWTToken(req, next)
+    if (!token) return next(new AppError('Invalid token', 401))
+    next()
+})
+
 exports.logOut = asyncCatch(async (req, res, next) => {
     const token = verifyAndGetJWTToken(req, next)
-
-    const freshToken = await JWTBlacklist.findOne({ jwtData: token })
-
-    if (freshToken)
-        return next(
-            new AppError(
-                'Invalid request! Already logged out the user with this token',
-                400
-            )
-        )
 
     await JWTBlacklist.create({ jwtData: token })
     const tokenData = jwt.decode(token)

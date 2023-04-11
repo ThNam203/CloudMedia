@@ -1,8 +1,8 @@
 const express = require('express')
 const usersController = require('../controllers/usersController')
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
 
-router.route('/:id').get(usersController.getUserById)
+router.route('').get(usersController.getUserById)
 
 module.exports = router

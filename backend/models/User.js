@@ -3,6 +3,25 @@ const validator = require('validator')
 const bcrypt = require('bcrypt')
 const AppError = require('../utils/AppError')
 
+const companySchema = new mongoose.Schema(
+    {
+        logoUrl: {
+            type: String,
+        },
+        name: {
+            type: String,
+            min: [1, 'Company name must not be empty'],
+            required: true,
+        },
+        linkToWebsite: {
+            type: String,
+        },
+    },
+    {
+        _id: false,
+    }
+)
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -31,9 +50,7 @@ const userSchema = new mongoose.Schema({
     location: {
         type: String,
     },
-    company: {
-        type: String,
-    },
+    company: companySchema,
     connections: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     },
@@ -41,6 +58,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Hiring', 'Open For Work', 'Being Idle'],
         default: 'Being Idle',
+    },
+    jobPosts: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'JobPost' }],
+    },
+    socialPosts: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SocialPost' }],
     },
     createdDate: {
         type: Date,
@@ -63,6 +86,8 @@ userSchema.statics.createNewUser = function (req) {
         company: req.body.company,
         connections: req.body.connections,
         userRole: req.body.userRole,
+        jobPosts: req.body.jobPosts,
+        socialPosts: req.body.socialPosts,
         createdDate: req.body.createdDate,
     })
 }

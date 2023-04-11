@@ -5,6 +5,7 @@ const express = require('express')
 const errorHandlers = require('./controllers/errorController/errorController')
 const authRouter = require('./routes/authRoutes')
 const usersRouter = require('./routes/usersRoutes')
+const jobPostRouter = require('./routes/jobPostRoutes')
 
 const app = express()
 
@@ -16,7 +17,8 @@ app.use(
 )
 
 app.use('/', authRouter)
-app.use('/user', usersRouter)
+app.use('/:user_id/jobpost', jobPostRouter)
+app.use('/:user_id', usersRouter)
 
 app.use('*', errorHandlers.invalidUrlHandler)
 app.use(errorHandlers.globalErrorHandler)
