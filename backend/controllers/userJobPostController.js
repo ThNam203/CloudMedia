@@ -62,10 +62,15 @@ exports.updateJobPostById = asyncCatch(async (req, res, next) => {
     const excludeFiels = ['id', 'author']
     excludeFiels.forEach((field) => delete jobPostBody[field])
 
-    const updatedPost = await this.findByIdAndUpdate(jobPostId, jobPostBody, {
-        new: true,
-        runValidators: true,
-    })
+    const updatedPost = await JobPost.findByIdAndUpdate(
+        jobPostId,
+        jobPostBody,
+        {
+            new: true,
+            runValidators: true,
+        }
+    )
+
     if (!updatedPost)
         return next(new AppError('Unable to update job post', 500))
 
@@ -78,7 +83,13 @@ exports.updateJobPostById = asyncCatch(async (req, res, next) => {
 exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
     const { job_post_id: jobPostId } = req.params
 
-    await JobPost.findByIdAndDelete(jobPostId)
+    const deletedPost = await JobPost.findByIdAndDelete(jobPostId)
+    if (!deletedPost)
+        return next(new AppError('Invalid job post id or already removed', 400))
+
+    const author = await User.findById(deletedPost.author)
+    const deleteIndex = author.jobPosts.indexOf(jobPostId)
+    author.jobPosts.splice(deleteIndex, 1)
 
     res.status(200).json({
         status: 'success',
