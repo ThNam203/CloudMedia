@@ -5,21 +5,6 @@ const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 const User = require('../models/User')
 
-exports.isOwner = asyncCatch(async (req, res, next) => {
-    const jwtToken = req.headers.authorization.split(' ')[1]
-    const { id: userId } = jwt.decode(jwtToken)
-    const { user_id: idParam } = req.params
-    if (userId !== idParam)
-        return next(
-            new AppError(
-                `Authorization header and user's id is not match together`,
-                400
-            )
-        )
-
-    next()
-})
-
 exports.createNewJobPost = asyncCatch(async (req, res, next) => {
     const userId = req.params.user_id
     req.body.author = userId
@@ -59,9 +44,6 @@ exports.updateJobPostById = asyncCatch(async (req, res, next) => {
     const { body: jobPostBody } = req
     const { job_post_id: jobPostId } = req.params
 
-    const excludeFiels = ['id', 'author']
-    excludeFiels.forEach((field) => delete jobPostBody[field])
-
     const updatedPost = await JobPost.findByIdAndUpdate(
         jobPostId,
         jobPostBody,
@@ -86,10 +68,6 @@ exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
     const deletedPost = await JobPost.findByIdAndDelete(jobPostId)
     if (!deletedPost)
         return next(new AppError('Invalid job post id or already removed', 400))
-
-    const author = await User.findById(deletedPost.author)
-    const deleteIndex = author.jobPosts.indexOf(jobPostId)
-    author.jobPosts.splice(deleteIndex, 1)
 
     res.status(200).json({
         status: 'success',

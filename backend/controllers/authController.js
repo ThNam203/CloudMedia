@@ -66,6 +66,22 @@ exports.isUser = asyncCatch(async (req, res, next) => {
     next()
 })
 
+// check if :user_id is the same as the jwt token
+exports.isOwnerOfThePath = asyncCatch(async (req, res, next) => {
+    const jwtToken = req.headers.authorization.split(' ')[1]
+    const { id: userId } = jwt.decode(jwtToken)
+    const { user_id: idParam } = req.params
+    if (userId !== idParam)
+        return next(
+            new AppError(
+                `Authorization header and user's id is not match together`,
+                400
+            )
+        )
+
+    next()
+})
+
 exports.logOut = asyncCatch(async (req, res, next) => {
     const token = verifyAndGetJWTToken(req, next)
 

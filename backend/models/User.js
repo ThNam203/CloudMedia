@@ -7,14 +7,17 @@ const companySchema = new mongoose.Schema(
     {
         logoUrl: {
             type: String,
+            trim: true,
         },
         name: {
             type: String,
             min: [1, 'Company name must not be empty'],
             required: true,
+            trim: true,
         },
         linkToWebsite: {
             type: String,
+            trim: true,
         },
     },
     {
@@ -26,6 +29,7 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Missing name property'],
+        trim: true,
     },
     email: {
         type: String,
@@ -33,6 +37,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         index: true,
         validator: [validator.isEmail, 'Email is invalid'],
+        trim: true,
     },
     password: {
         type: String,
@@ -43,12 +48,15 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         min: [10, 'Phone number must be longer or equal to 10 digits'],
+        trim: true,
     },
     profileImagePath: {
         type: String,
+        trim: true,
     },
     location: {
         type: String,
+        trim: true,
     },
     company: companySchema,
     connections: {
@@ -58,6 +66,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Hiring', 'Open For Work', 'Being Idle'],
         default: 'Being Idle',
+        trim: true,
     },
     jobPosts: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'JobPost' }],

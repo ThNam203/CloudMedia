@@ -9,7 +9,7 @@ router
     .get(authController.isUser, userJobPostController.getAllJobPosts)
     .post(
         authController.isUser,
-        userJobPostController.isOwner,
+        authController.isOwnerOfThePath,
         userJobPostController.createNewJobPost
     )
 
@@ -17,12 +17,12 @@ router
     .route('/:job_post_id')
     .patch(
         authController.isUser,
-        userJobPostController.isOwner,
+        authController.isOwnerOfThePath,
         userJobPostController.updateJobPostById
     )
     .delete(
         authController.isUser,
-        userJobPostController.isOwner,
+        authController.isOwnerOfThePath,
         userJobPostController.deleteJobPostById
     )
 
