@@ -95,6 +95,7 @@ android {
 
     namespace "com.uit.workwise"
     defaultConfig {
+        vectorDrawables.useSupportLibrary = true
         applicationId "com.uit.workwise"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
