@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -13,25 +13,30 @@ import ImagePicker from 'react-native-image-crop-picker';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 function ProfileScreen() {
+  const [imgAvatar, setImgAvatar] = useState('');
+
   const takePhotoFromCamera = () => {
     ImagePicker.openCamera({
-      width: 300,
-      height: 400,
+      height: 140,
+      width: 140,
       cropping: true,
     })
       .then(image => {
         console.log(image);
+        setImgAvatar(image.path);
       })
       .catch(err => console.log(err));
   };
   const choosePhotoFromLibrary = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
+      height: 140,
+      width: 140,
       cropping: true,
+      cropperCircleOverlay: true,
     })
       .then(image => {
         console.log(image);
+        setImgAvatar(image.path);
       })
       .catch(err => console.log(err));
   };
@@ -51,7 +56,11 @@ function ProfileScreen() {
         }}>
         <View style={styles.avatarContainer}>
           <Image
-            source={require('../assets/images/Spiderman.jpg')}
+            source={
+              imgAvatar === ''
+                ? require('../assets/images/Spiderman.jpg')
+                : {uri: imgAvatar}
+            }
             style={styles.avatarImage}
           />
           <View style={styles.buttonAddImageOuter}>
