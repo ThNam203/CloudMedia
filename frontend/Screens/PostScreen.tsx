@@ -1,10 +1,10 @@
 import {View, Text} from 'react-native';
 import React from 'react';
 
-export default function JobsScreen({navigation}: any) {
+export default function PostScreen({navigation}: any) {
   return (
     <View>
-      <Text>JobsScreen</Text>
+      <Text>PostScreen</Text>
     </View>
   );
 }

@@ -1,12 +1,14 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import FirstTimeUseScreen from './Screens/FirstTimeUseScreen';
-import ProfileScreen from './Screens/ProfileScreen';
-import StillHiringScreen from './Screens/StillHiringScreen';
+import {SafeAreaView, StyleSheet} from 'react-native';
+import BottomTabs from './Navigations/BottomTabs';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 const App = () => {
-  let screen = <StillHiringScreen />;
-  return <View style={styles.container}>{screen}</View>;
+  return (
+    <SafeAreaProvider>
+      <BottomTabs />
+    </SafeAreaProvider>
+  );
 };
 export default App;
 const styles = StyleSheet.create({
