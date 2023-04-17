@@ -26,6 +26,21 @@ exports.uploadProfileImage = multer({
     }),
 })
 
+exports.updateProfileImage = asyncCatch(async (req, res, next) => {
+    if (!req.file || !req.file.location)
+        return next(new AppError('Unable to upload profile image', 500))
+
+    const userId = req.params.user_id
+    const user = await User.findById(userId)
+    user.profileImagePath = req.file.location
+    await user.save()
+
+    res.status(200).json({
+        status: 'success',
+        data: req.file.location,
+    })
+})
+
 exports.getUserById = asyncCatch(async (req, res, next) => {
     const { user_id: userId } = req.params
     const user = await User.findById(userId)
@@ -48,20 +63,5 @@ exports.updateUserById = asyncCatch(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         data: updatedUser,
-    })
-})
-
-exports.updateProfileImage = asyncCatch(async (req, res, next) => {
-    if (!req.file || !req.file.location)
-        return next(new AppError('Unable to upload profile image', 500))
-
-    const userId = req.params.user_id
-    const user = await User.findById(userId)
-    user.profileImagePath = req.file.location
-    await user.save()
-
-    res.status(200).json({
-        status: 'success',
-        message: req.file.location,
     })
 })
