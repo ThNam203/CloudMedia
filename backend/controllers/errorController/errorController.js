@@ -55,6 +55,8 @@ exports.globalErrorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500
     err.message = err.message || 'Internal server error'
 
+    console.log(err)
+
     if (process.env.NODE_ENV === 'development')
         sendErrorInDevelopmentEnv(err, res)
     else sendErrorInProductionEnv(err, res)
