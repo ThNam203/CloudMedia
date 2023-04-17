@@ -1,12 +1,12 @@
 const uuid = require('uuid')
-const { S3Client } = require('@aws-sdk/client-s3')
+const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 const multerS3 = require('multer-s3')
 const multer = require('multer')
 const User = require('../models/User')
 const asyncCatch = require('../utils/asyncCatch')
 const AppError = require('../utils/AppError')
 
-const s3 = new S3Client({
+const s3Client = new S3Client({
     region: 'ap-southeast-1',
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -14,9 +14,18 @@ const s3 = new S3Client({
     },
 })
 
+const deleteOldProfileImage = (path) => {
+    const command = new DeleteObjectCommand({
+        Bucket: 'workwise',
+        Key: path.substring(path.lastIndexOf('/') + 1, path.length()),
+    })
+
+    s3Client.send(command).catch(() => {})
+}
+
 exports.uploadProfileImage = multer({
     storage: multerS3({
-        s3: s3,
+        s3: s3Client,
         bucket: 'workwise',
         acl: 'public-read',
         contentType: multerS3.AUTO_CONTENT_TYPE,
@@ -32,6 +41,8 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
 
     const userId = req.params.user_id
     const user = await User.findById(userId)
+    if (user.profileImagePath) deleteOldProfileImage(user.profileImagePath)
+
     user.profileImagePath = req.file.location
     await user.save()
 

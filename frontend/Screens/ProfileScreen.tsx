@@ -12,6 +12,7 @@ import {
 import ImagePicker from 'react-native-image-crop-picker';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
+
 function ProfileScreen() {
   const takePhotoFromCamera = () => {
     ImagePicker.openCamera({
