@@ -13,4 +13,13 @@ router
         usersController.updateUserById
     )
 
+router
+    .route('/profile-image')
+    .post(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        usersController.uploadProfileImage.single('profile-image'),
+        usersController.updateProfileImage
+    )
+
 module.exports = router
