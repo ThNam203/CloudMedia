@@ -28,6 +28,8 @@ export default {
   redAlpha: 'rgba(255, 84, 84, 0.15)',
   greenAlpha: 'rgba(96, 197, 168, 0.15)',
   purpleAlpha: 'rgba(146, 6, 228, 0.15)',
+  irisBlue: 'rgba(0, 181, 204, 1)',
+  moodyBlue: 'rgba(132, 140, 2071 ,1)',
 
   // bags background colors
   bag1Bg: '#ea7a72',
