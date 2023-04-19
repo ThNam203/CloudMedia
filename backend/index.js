@@ -1,6 +1,8 @@
 require('./utils/startServerScript')
 
 const express = require('express')
+const http = require('http')
+const socketIO = require('socket.io')
 
 const errorHandlers = require('./controllers/errorController/errorController')
 const authRouter = require('./routes/authRoutes')
@@ -9,6 +11,16 @@ const jobPostRouter = require('./routes/jobPostRoutes')
 const userJobPostController = require('./controllers/userJobPostController')
 
 const app = express()
+const server = http.createServer(app)
+const io = socketIO(server)
+
+io.on('connection', (socket) => {
+    console.log(`a user connected with id ${socket.id}`)
+
+    socket.on('clientSendMessage', (newMessage) => {
+        io.emit('serverSendMessage', newMessage)
+    })
+})
 
 app.use(express.json())
 app.use(
@@ -25,6 +37,8 @@ app.use('/:user_id', usersRouter)
 app.use('*', errorHandlers.invalidUrlHandler)
 app.use(errorHandlers.globalErrorHandler)
 
-app.listen(process.env.SERVER_PORT, () => {
+server.listen(process.env.SERVER_PORT, () => {
     console.log(`Server running on port ${process.env.SERVER_PORT}`)
 })
+
+module.exports = http

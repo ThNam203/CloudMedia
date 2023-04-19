@@ -50,7 +50,7 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
 })
 
 exports.getUserById = asyncCatch(async (req, res, next) => {
-    const { user_id: userId } = req.params
+    const { userId } = req.params
     const user = await User.findById(userId)
     if (!user) return next(new AppError('No user found!', 400))
 
@@ -58,7 +58,7 @@ exports.getUserById = asyncCatch(async (req, res, next) => {
 })
 
 exports.updateUserById = asyncCatch(async (req, res, next) => {
-    const { user_id: userId } = req.params
+    const { userId } = req.params
     const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
         new: true,
         runValidators: true,
