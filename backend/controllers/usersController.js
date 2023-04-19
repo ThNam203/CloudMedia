@@ -46,10 +46,7 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
     user.profileImagePath = req.file.location
     await user.save()
 
-    res.status(200).json({
-        status: 'success',
-        data: req.file.location,
-    })
+    res.status(200).json({ imagePath: req.file.location })
 })
 
 exports.getUserById = asyncCatch(async (req, res, next) => {
@@ -57,10 +54,7 @@ exports.getUserById = asyncCatch(async (req, res, next) => {
     const user = await User.findById(userId)
     if (!user) return next(new AppError('No user found!', 400))
 
-    res.status(200).json({
-        status: 'success',
-        data: user,
-    })
+    res.status(200).json(user)
 })
 
 exports.updateUserById = asyncCatch(async (req, res, next) => {
@@ -71,8 +65,5 @@ exports.updateUserById = asyncCatch(async (req, res, next) => {
     })
     if (!updatedUser) return next(new AppError('No user found!', 400))
 
-    res.status(200).json({
-        status: 'success',
-        data: updatedUser,
-    })
+    res.status(200).json(updatedUser)
 })

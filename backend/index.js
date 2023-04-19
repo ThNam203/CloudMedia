@@ -6,6 +6,7 @@ const errorHandlers = require('./controllers/errorController/errorController')
 const authRouter = require('./routes/authRoutes')
 const usersRouter = require('./routes/usersRoutes')
 const jobPostRouter = require('./routes/jobPostRoutes')
+const userJobPostController = require('./controllers/userJobPostController')
 
 const app = express()
 
@@ -17,6 +18,7 @@ app.use(
 )
 
 app.use('/', authRouter)
+app.get('/jobpost/:jobPostId', userJobPostController.getAJobPostUsingItsId)
 app.use('/:user_id/jobpost', jobPostRouter)
 app.use('/:user_id', usersRouter)
 
