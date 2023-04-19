@@ -13,7 +13,7 @@ import RectangleButton from '../components/ui/RectangleButton';
 import SignUpHrScreen from './SignUpScreen';
 import LoginScreen from './LoginScreen';
 
-function FirstTimeUseScreen() {
+function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
   const [modalLoginVisible, setModalLoginVisible] = useState(false);
   function closeModalLogin() {
@@ -22,6 +22,10 @@ function FirstTimeUseScreen() {
   function closeModalHr() {
     setModalHrVisible(false);
   }
+
+  const navigateToMain = () => {
+    navigation.replace('main');
+  };
 
   return (
     <View style={styles.container}>
@@ -102,7 +106,10 @@ function FirstTimeUseScreen() {
             onPressOut={closeModalLogin}
           />
           <View style={{flex: 7}}>
-            <LoginScreen handleToSignUp={() => closeModalLogin()} />
+            <LoginScreen
+              handleToSignUp={closeModalLogin}
+              handleNavigate={navigateToMain}
+            />
           </View>
         </Modal>
       </ImageBackground>

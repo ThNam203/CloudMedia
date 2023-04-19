@@ -12,6 +12,7 @@ import {
 import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
+import {user_signup} from '../api/user_api';
 
 function SignUpHrScreen(props: any) {
   const [name, setName] = useState('');
@@ -56,21 +57,15 @@ function SignUpHrScreen(props: any) {
       return;
     }
 
-    fetch('https://workwise.onrender.com/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        phoneNumber,
-        userRole,
-        createdDate: new Date(),
-      }),
+    user_signup({
+      name,
+      email,
+      password,
+      phoneNumber,
+      userRole,
+      createdDate: new Date(),
     })
-      .then(response => {
+      .then((response: any) => {
         if (response.status === 200) {
           return response.json();
         } else {
@@ -87,7 +82,7 @@ function SignUpHrScreen(props: any) {
     {label: 'Open For Work', value: 'Open For Work'},
   ];
 
-  const renderItem = item => {
+  const renderItem = (item: any) => {
     return (
       <View
         style={{

@@ -3,37 +3,36 @@ import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
+import {user_login} from '../api/user_api';
+import {nameStorage, storeData} from '../reducers/AsyncStorage';
 
 function LoginScreen(props: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    fetch('https://workwise.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: username, // hthnam@gmail.com
-        password: password, // 12345678
-      }),
-    })
-      .then(response => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          throw new Error('Login failed.');
-        }
-      })
-      .then(data => {
-        const jwtToken = data.data.jwtToken;
-        // do something with the JWT token
-        console.log(jwtToken);
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    props.handleNavigate();
+    // user_login({
+    //   email: 'hthnam@gmail.com',
+    //   password: '12345678',
+    // })
+    //   .then((response: any) => {
+    //     if (response.status === 200) {
+    //       return response.json();
+    //     } else {
+    //       throw new Error('Login failed.');
+    //     }
+    //   })
+    //   .then(data => {
+    //     const jwtToken = data.data.jwtToken;
+    //     // do something with the JWT token
+    //     // storeData(jwtToken, nameStorage.jwtToken);
+    //     console.log(jwtToken);
+    //     props.handleNavigate();
+    //   })
+    //   .catch(error => {
+    //     console.error(error);
+    //   });
   };
   return (
     <View style={styles.container}>

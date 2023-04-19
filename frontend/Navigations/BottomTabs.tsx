@@ -8,7 +8,6 @@ import NetworkScreen from '../Screens/NetworkScreen';
 import PostScreen from '../Screens/PostScreen';
 import JobsScreen from '../Screens/JobsScreen';
 import NotificationsScreen from '../Screens/NotificationsScreen';
-import {NavigationContainer} from '@react-navigation/native';
 import Colors from '../constants/Colors';
 import * as Animatable from 'react-native-animatable';
 
@@ -59,7 +58,7 @@ const TabArr = [
 
 const Tab = createBottomTabNavigator();
 
-const TabButton = props => {
+const TabButton = (props: any) => {
   const {item, onPress, accessibilityState} = props;
   const focused = accessibilityState.selected;
   const viewRef = useRef(null);
@@ -96,31 +95,29 @@ const TabButton = props => {
 
 export default function AnimTab1() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: {
-            height: 60,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-          },
-        }}>
-        {TabArr.map((item, index) => {
-          return (
-            <Tab.Screen
-              key={index}
-              name={item.route}
-              component={item.component}
-              options={{
-                tabBarShowLabel: false,
-                tabBarButton: props => <TabButton {...props} item={item} />,
-              }}
-            />
-          );
-        })}
-      </Tab.Navigator>
-    </NavigationContainer>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          height: 60,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+        },
+      }}>
+      {TabArr.map((item, index) => {
+        return (
+          <Tab.Screen
+            key={index}
+            name={item.route}
+            component={item.component}
+            options={{
+              tabBarShowLabel: false,
+              tabBarButton: props => <TabButton {...props} item={item} />,
+            }}
+          />
+        );
+      })}
+    </Tab.Navigator>
   );
 }
 

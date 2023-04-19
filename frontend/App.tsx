@@ -1,18 +1,16 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
-import BottomTabs from './Navigations/BottomTabs';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Provider} from 'react-redux';
+import {Store} from './reducers/Store';
+import {NavigationContainer} from '@react-navigation/native';
+import Routers from './Navigations/Routers';
 
 const App = () => {
   return (
-    <SafeAreaProvider>
-      <BottomTabs />
-    </SafeAreaProvider>
+    <Provider store={Store}>
+      <NavigationContainer>
+        <Routers />
+      </NavigationContainer>
+    </Provider>
   );
 };
 export default App;
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
