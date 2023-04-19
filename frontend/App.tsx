@@ -5,7 +5,7 @@ import ProfileScreen from './Screens/ProfileScreen';
 import ChatScreen from './Screens/chatScreens/ChatScreen';
 
 const App = () => {
-  //let screen = <ProfileScreen />;
+  let screen = <ProfileScreen />;
   //return <View style={styles.container}>{screen}</View>;
   return <ChatScreen />;
 };

@@ -39,7 +39,7 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
     if (!req.file || !req.file.location)
         return next(new AppError('Unable to upload profile image', 500))
 
-    const userId = req.params.user_id
+    const { userId } = req.params
     const user = await User.findById(userId)
     if (user.profileImagePath) deleteOldProfileImage(user.profileImagePath)
 

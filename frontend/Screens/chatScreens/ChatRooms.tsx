@@ -1,83 +1,76 @@
 import React from 'react';
 import {
   View,
-  Text,
-  Pressable,
-  SafeAreaView,
   FlatList,
+  Image,
+  Text,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
-import ChatUserComponent from '../../components/ui/ChatRoomUserComponent';
+const userList = [
+  {
+    id: 1,
+    name: 'John Doe',
+    image: 'https://reactnative.dev/img/tiny_logo.png',
+  },
+  {
+    id: 2,
+    name: 'Jane Smith',
+    image: 'https://reactnative.dev/img/tiny_logo.png',
+  },
+  {
+    id: 3,
+    name: 'Alex Johnson',
+    image: 'https://reactnative.dev/img/tiny_logo.png',
+  },
+];
 
 const ChatRooms = () => {
-  const rooms = ['1', '2', '3'];
+  const navigation = useNavigation();
+
+  const renderItem = ({item}: any) => (
+    <TouchableOpacity
+      style={styles.userContainer}
+      onPress={() => {
+        navigation.navigate('ChatRoom', {user: item});
+      }}>
+      <Image source={{uri: item.image}} style={styles.userImage} />
+      <Text style={styles.userName}>{item.name}</Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <SafeAreaView style={styles.chatscreen}>
-      <View style={styles.chattopContainer}>
-        <View style={styles.chatheader}>
-          <Text style={styles.chatheading}>Chats</Text>
-
-          {/* 👇🏻 Logs "ButtonPressed" to the console when the icon is clicked */}
-          <Pressable onPress={() => console.log('Button Pressed!')}></Pressable>
-        </View>
-      </View>
-
-      <View style={styles.chatlistContainer}>
-        {rooms.length > 0 ? (
-          <FlatList
-            data={rooms}
-            renderItem={() => <ChatUserComponent />}
-            keyExtractor={item => item}
-          />
-        ) : (
-          <View style={styles.chatemptyContainer}>
-            <Text style={styles.chatemptyText}>No rooms created!</Text>
-            <Text>Click the icon above to create a Chat room</Text>
-          </View>
-        )}
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <FlatList
+        data={userList}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  chatscreen: {
-    backgroundColor: '#F7F7F7',
+  container: {
     flex: 1,
-    padding: 10,
-    position: 'relative',
+    padding: 16,
   },
-  chattopContainer: {
-    backgroundColor: '#F7F7F7',
-    height: 70,
-    width: '100%',
-    padding: 20,
-    justifyContent: 'center',
-    marginBottom: 15,
-    elevation: 2,
-  },
-  chatheader: {
+  userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    marginBottom: 16,
   },
-  chatheading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'green',
+  userImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 8,
   },
-  chatlistContainer: {
-    paddingHorizontal: 10,
+  userName: {
+    fontSize: 16,
   },
-  chatemptyContainer: {
-    width: '100%',
-    height: '80%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chatemptyText: {fontWeight: 'bold', fontSize: 24, paddingBottom: 30},
 });
 
 export default ChatRooms;
