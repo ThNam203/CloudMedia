@@ -23,21 +23,24 @@ exports.createNewJobPost = asyncCatch(async (req, res, next) => {
     user.jobPosts.push(newJobPost.id)
     await user.save()
 
-    return res.status(200).json({
-        status: 'success',
-        data: newJobPost,
-    })
+    res.status(200).json(newJobPost)
 })
 
-exports.getAllJobPosts = asyncCatch(async (req, res, next) => {
+exports.getAllJobPostsOfAUser = asyncCatch(async (req, res, next) => {
     const { user_id: userId } = req.params
+    const user = await User.findById(userId)
+    if (!user) return next(new AppError('Unable to find this user', 400))
+    const jobPosts = await JobPost.find({ author: userId })
 
-    const freshJobPost = await JobPost.find({ author: userId })
+    res.status(200).json(jobPosts)
+})
 
-    return res.status(200).json({
-        status: 'success',
-        data: freshJobPost,
-    })
+exports.getAJobPostUsingItsId = asyncCatch(async (req, res, next) => {
+    const { jobPostId } = req.params
+    const jobPost = await JobPost.findById(jobPostId)
+    if (!jobPost) return next(new AppError('Unable to find the job post', 400))
+
+    res.status(200).json(jobPost)
 })
 
 exports.updateJobPostById = asyncCatch(async (req, res, next) => {
@@ -56,10 +59,7 @@ exports.updateJobPostById = asyncCatch(async (req, res, next) => {
     if (!updatedPost)
         return next(new AppError('Unable to update job post', 500))
 
-    res.status(200).json({
-        status: 'success',
-        body: updatedPost,
-    })
+    res.status(200).json(updatedPost)
 })
 
 exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
@@ -69,10 +69,5 @@ exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
     if (!deletedPost)
         return next(new AppError('Invalid job post id or already removed', 400))
 
-    res.status(200).json({
-        status: 'success',
-        data: {
-            message: `Successfully deleted job post with id ${jobPostId}`,
-        },
-    })
+    res.status(204).end()
 })

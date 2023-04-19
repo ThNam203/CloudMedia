@@ -32,11 +32,8 @@ const verifyAndGetJWTToken = async (req, next) => {
 
 exports.signUp = asyncCatch(async (req, res, next) => {
     const newUser = await User.createNewUser(req)
-
-    res.status(200).json({
-        status: 'success',
-        data: `created a new user with id ${newUser.id}`,
-    })
+    if (!newUser) return next(new AppError('Unable to create new user', 500))
+    res.status(200).end()
 })
 
 exports.logIn = asyncCatch(async (req, res, next) => {
@@ -52,12 +49,7 @@ exports.logIn = asyncCatch(async (req, res, next) => {
         return next(new AppError('Wrong password', 400))
 
     const jwtToken = getJWTToken(freshUser.id)
-    res.status(200).json({
-        status: 'success',
-        data: {
-            jwtToken: jwtToken,
-        },
-    })
+    res.status(200).json(jwtToken)
 })
 
 exports.isUser = asyncCatch(async (req, res, next) => {
@@ -85,15 +77,11 @@ exports.isOwnerOfThePath = asyncCatch(async (req, res, next) => {
 exports.logOut = asyncCatch(async (req, res, next) => {
     const token = verifyAndGetJWTToken(req, next)
 
-    await JWTBlacklist.create({ jwtData: token })
-    const tokenData = jwt.decode(token)
+    const jwtBlacklist = await JWTBlacklist.create({ jwtData: token })
+    if (jwtBlacklist)
+        return next(new AppError('Unable to logout, try again', 500))
 
-    res.status(200).json({
-        status: 'success',
-        data: {
-            message: `Logged out user with id ${tokenData.id}`,
-        },
-    })
+    res.status(204).end()
 })
 
 // exports.changePassword = asyncCatch(async (req, res, next) => {
