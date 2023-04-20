@@ -3,33 +3,37 @@ import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
+import {user_login} from '../api/user_api';
+import {nameStorage, storeData} from '../reducers/AsyncStorage';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {setToken} from '../reducers/Token_reducer';
 
 function LoginScreen(props: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  // const token = useSelector((state: RootState) => state.token);
+  const dispatch = useDispatch();
 
   const handleLogin = () => {
-    fetch('https://workwise.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: username, // hthnam@gmail.com
-        password: password, // 12345678
-      }),
+    user_login({
+      email: username,
+      password: password,
     })
-      .then(response => {
+      .then((response: any) => {
         if (response.status === 200) {
-          return response.json();
+          return response.data;
         } else {
           throw new Error('Login failed.');
         }
       })
       .then(data => {
-        const jwtToken = data.data.jwtToken;
         // do something with the JWT token
+        const jwtToken = data;
+        storeData(jwtToken, nameStorage.jwtToken);
+        dispatch(setToken(jwtToken));
         console.log(jwtToken);
+        props.handleNavigate();
       })
       .catch(error => {
         console.error(error);

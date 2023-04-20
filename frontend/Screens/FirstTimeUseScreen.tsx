@@ -13,7 +13,7 @@ import RectangleButton from '../components/ui/RectangleButton';
 import SignUpHrScreen from './SignUpScreen';
 import LoginScreen from './LoginScreen';
 
-function FirstTimeUseScreen() {
+function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
   const [modalLoginVisible, setModalLoginVisible] = useState(false);
   function closeModalLogin() {
@@ -22,6 +22,10 @@ function FirstTimeUseScreen() {
   function closeModalHr() {
     setModalHrVisible(false);
   }
+
+  const navigateToMain = () => {
+    navigation.replace('main');
+  };
 
   return (
     <View style={styles.container}>
@@ -80,6 +84,7 @@ function FirstTimeUseScreen() {
           <View style={{flex: 13}}>
             <ScrollView contentContainerStyle={{flexGrow: 1}}>
               <SignUpHrScreen
+                handleCloseModal={setModalHrVisible}
                 handleToLogin={() => {
                   closeModalHr();
                   setModalLoginVisible(true);
@@ -102,7 +107,13 @@ function FirstTimeUseScreen() {
             onPressOut={closeModalLogin}
           />
           <View style={{flex: 7}}>
-            <LoginScreen handleToSignUp={() => closeModalLogin()} />
+            <LoginScreen
+              handleToSignUp={() => {
+                closeModalLogin();
+                setModalHrVisible(true);
+              }}
+              handleNavigate={navigateToMain}
+            />
           </View>
         </Modal>
       </ImageBackground>
@@ -141,7 +152,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   button: {
-    width: 100,
+    width: 200,
     height: 40,
   },
   lastView: {

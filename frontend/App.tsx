@@ -1,15 +1,16 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import FirstTimeUseScreen from './Screens/FirstTimeUseScreen';
-import ProfileScreen from './Screens/ProfileScreen';
+import {Provider} from 'react-redux';
+import {Store} from './reducers/Store';
+import {NavigationContainer} from '@react-navigation/native';
+import Routers from './Navigations/Routers';
 
 const App = () => {
-  let screen = <ProfileScreen />;
-  return <View style={styles.container}>{screen}</View>;
+  return (
+    <Provider store={Store}>
+      <NavigationContainer>
+        <Routers />
+      </NavigationContainer>
+    </Provider>
+  );
 };
 export default App;
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
