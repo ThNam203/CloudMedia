@@ -84,6 +84,7 @@ function FirstTimeUseScreen({navigation}: any) {
           <View style={{flex: 13}}>
             <ScrollView contentContainerStyle={{flexGrow: 1}}>
               <SignUpHrScreen
+                handleCloseModal={setModalHrVisible}
                 handleToLogin={() => {
                   closeModalHr();
                   setModalLoginVisible(true);
@@ -107,7 +108,10 @@ function FirstTimeUseScreen({navigation}: any) {
           />
           <View style={{flex: 7}}>
             <LoginScreen
-              handleToSignUp={closeModalLogin}
+              handleToSignUp={() => {
+                closeModalLogin();
+                setModalHrVisible(true);
+              }}
               handleNavigate={navigateToMain}
             />
           </View>
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   button: {
-    width: 100,
+    width: 200,
     height: 40,
   },
   lastView: {

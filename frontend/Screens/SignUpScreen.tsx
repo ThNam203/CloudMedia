@@ -13,6 +13,7 @@ import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
 import {user_signup} from '../api/user_api';
+import {Alert} from 'react-native';
 
 function SignUpHrScreen(props: any) {
   const [name, setName] = useState('');
@@ -66,13 +67,17 @@ function SignUpHrScreen(props: any) {
       createdDate: new Date(),
     })
       .then((response: any) => {
-        if (response.status === 200) {
-          return response.json();
+        if (response.status === 204) {
+          return response;
         } else {
           throw new Error('Failed.');
         }
       })
-      .then(data => console.log(data))
+      .then(data => {
+        console.log(data);
+        console.warn('Signup success!');
+        props.handleCloseModal(false);
+      })
       .catch(error => console.log(error));
   };
 
