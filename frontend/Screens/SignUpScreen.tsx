@@ -13,11 +13,11 @@ import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
 import {user_signup} from '../api/user_api';
-import {Alert} from 'react-native';
-import AppLoader from '../components/ui/AppLoader';
+import {useDispatch} from 'react-redux';
+import {setStatus} from '../reducers/Loading_reducer';
 
 function SignUpHrScreen(props: any) {
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +59,7 @@ function SignUpHrScreen(props: any) {
     if (!checkInfo()) {
       return;
     }
-    setIsLoading(true);
+    dispatch(setStatus(true));
     user_signup({
       name,
       email,
@@ -82,7 +82,7 @@ function SignUpHrScreen(props: any) {
       })
       .catch(error => console.log(error))
       .finally(() => {
-        setIsLoading(false);
+        dispatch(setStatus(false));
       });
   };
 
@@ -108,7 +108,6 @@ function SignUpHrScreen(props: any) {
 
   return (
     <View style={styles.container}>
-      {isLoading ? <AppLoader /> : null}
       <View style={styles.titleView}>
         <Text style={styles.titleText}>Get Started</Text>
       </View>

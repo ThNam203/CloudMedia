@@ -6,21 +6,18 @@ import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
 import {user_login} from '../api/user_api';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../reducers/Store';
+import {useDispatch} from 'react-redux';
 import {setToken} from '../reducers/Token_reducer';
-import AppLoader from '../components/ui/AppLoader';
 import {setIdFromJwt} from '../reducers/Uid_reducer';
+import {setStatus} from '../reducers/Loading_reducer';
 
 function LoginScreen(props: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  // const token = useSelector((state: RootState) => state.token);
   const dispatch = useDispatch();
 
   const handleLogin = async () => {
-    setIsLoading(true);
+    dispatch(setStatus(true));
     user_login({
       email: username,
       password: password,
@@ -45,12 +42,11 @@ function LoginScreen(props: any) {
         console.error(error);
       })
       .finally(() => {
-        setIsLoading(false);
+        dispatch(setStatus(false));
       });
   };
   return (
     <View style={styles.container}>
-      {isLoading ? <AppLoader /> : null}
       <View style={styles.titleView}>
         <Text style={styles.titleText}>Welcome Back</Text>
       </View>
