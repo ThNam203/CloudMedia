@@ -8,7 +8,9 @@ import {
   Text,
   View,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
+import ActivitySection from '../components/ui/ActivitySection';
 import UploadPhoto from '../components/ui/UploadPhoto';
 
 const screenWidth = Dimensions.get('window').width;
@@ -18,166 +20,174 @@ function ProfileScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
 
   return (
-    <View style={styles.container}>
-      <UploadPhoto
-        isVisible={isModalVisible}
-        setVisible={setModalVisible}
-        setPhoto={setImgAvatar}
-      />
-      <View style={styles.backgroundAvatarContainer}>
-        <Image
-          source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
-          style={styles.backgroundAvatarImage}
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View style={styles.container}>
+        <UploadPhoto
+          isVisible={isModalVisible}
+          setVisible={setModalVisible}
+          setPhoto={setImgAvatar}
         />
-      </View>
-      <View
-        style={{
-          height: 100,
-          width: screenWidth,
-          flexDirection: 'row-reverse',
-        }}>
-        <View style={styles.avatarContainer}>
+        <View style={styles.backgroundAvatarContainer}>
           <Image
-            source={
-              imgAvatar === ''
-                ? require('../assets/images/Spiderman.jpg')
-                : {uri: imgAvatar}
-            }
-            style={styles.avatarImage}
+            source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
+            style={styles.backgroundAvatarImage}
           />
-          <View style={styles.buttonAddImageOuter}>
-            <TouchableOpacity
-              style={styles.buttonAddImage}
-              onPress={() => setModalVisible(!isModalVisible)}>
-              <Image
-                source={require('../assets/images/Add.png')}
-                style={{width: 25, height: 25, marginTop: 3}}
-              />
-            </TouchableOpacity>
-          </View>
         </View>
-        <TouchableOpacity
-          style={{
-            alignSelf: 'flex-start',
-            margin: 10,
-          }}>
-          <Image
-            style={{height: 28, width: 28}}
-            source={require('../assets/images/la_pen.png')}
-          />
-        </TouchableOpacity>
-      </View>
-      <View>
-        <Text style={styles.textName}>Spider man</Text>
-        <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
-          Attended Multiverse of Madness
-        </Text>
-        <Text
-          style={[
-            styles.textName,
-            {fontSize: 18, fontWeight: 'normal', marginTop: 10},
-          ]}>
-          Academy of Heros (AOF)
-        </Text>
-        {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
-        <Text
-          style={[
-            styles.textName,
-            {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
-          ]}>
-          Da Nang, Viet Nam
-        </Text>
-        <Text
-          style={[
-            styles.textName,
-            {
-              fontSize: 18,
-              fontWeight: 'normal',
-              color: '#000000a2',
-              marginTop: 10,
-            },
-          ]}>
-          0 connections
-        </Text>
         <View
-          style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
-          <View
-            style={{
-              height: 35,
-              width: 150,
-              borderRadius: 30,
-              overflow: 'hidden',
-              backgroundColor: '#0A66C2',
-              alignItems: 'center',
-            }}>
-            <Pressable
-              android_ripple={{color: '#00043d'}}
-              style={{
-                backgroundColor: 'transparent',
-                width: 150,
-                height: 35,
-                justifyContent: 'center',
-              }}>
-              <Text style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
-                Open to
-              </Text>
-            </Pressable>
+          style={{
+            height: 100,
+            width: screenWidth,
+            flexDirection: 'row-reverse',
+          }}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={
+                imgAvatar === ''
+                  ? require('../assets/images/Spiderman.jpg')
+                  : {uri: imgAvatar}
+              }
+              style={styles.avatarImage}
+            />
+            <View style={styles.buttonAddImageOuter}>
+              <TouchableOpacity
+                style={styles.buttonAddImage}
+                onPress={() => setModalVisible(!isModalVisible)}>
+                <Image
+                  source={require('../assets/images/Add.png')}
+                  style={{width: 25, height: 25, marginTop: 3}}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View
+          <TouchableOpacity
             style={{
-              height: 35,
-              width: 150,
-              borderRadius: 30,
-              borderWidth: 1,
-              borderColor: '#0A66C2',
-              overflow: 'hidden',
-              backgroundColor: 'white',
-              marginHorizontal: 10,
+              alignSelf: 'flex-start',
+              margin: 10,
             }}>
-            <Pressable
-              android_ripple={{color: '#0d8fe0ff'}}
+            <Image
+              style={{height: 28, width: 28}}
+              source={require('../assets/images/la_pen.png')}
+            />
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text style={styles.textName}>Spider man</Text>
+          <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
+            Attended Multiverse of Madness
+          </Text>
+          <Text
+            style={[
+              styles.textName,
+              {fontSize: 18, fontWeight: 'normal', marginTop: 10},
+            ]}>
+            Academy of Heros (AOF)
+          </Text>
+          {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
+          <Text
+            style={[
+              styles.textName,
+              {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
+            ]}>
+            Da Nang, Viet Nam
+          </Text>
+          <Text
+            style={[
+              styles.textName,
+              {
+                fontSize: 18,
+                fontWeight: 'normal',
+                color: '#000000a2',
+                marginTop: 10,
+              },
+            ]}>
+            0 connections
+          </Text>
+          <View
+            style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
+            <View
               style={{
-                backgroundColor: 'transparent',
+                height: 35,
                 width: 150,
-                height: 35,
-                justifyContent: 'center',
-              }}>
-              <Text
-                style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
-                Add section
-              </Text>
-            </Pressable>
-          </View>
-          <View
-            style={{
-              height: 35,
-              width: 35,
-              borderRadius: 17.5,
-              borderWidth: 1,
-              borderColor: '#727272',
-              overflow: 'hidden',
-              backgroundColor: 'white',
-              marginHorizontal: 10,
-            }}>
-            <Pressable
-              android_ripple={{color: '#0d8fe0ff'}}
-              style={{
-                backgroundColor: 'transparent',
-                width: 35,
-                height: 35,
-                justifyContent: 'center',
+                borderRadius: 30,
+                overflow: 'hidden',
+                backgroundColor: '#0A66C2',
                 alignItems: 'center',
               }}>
-              <Image
-                source={require('../assets/images/3Dot.png')}
-                style={{width: 25, height: 25}}
-              />
-            </Pressable>
+              <Pressable
+                android_ripple={{color: '#00043d'}}
+                style={{
+                  backgroundColor: 'transparent',
+                  width: 150,
+                  height: 35,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
+                  Open to
+                </Text>
+              </Pressable>
+            </View>
+            <View
+              style={{
+                height: 35,
+                width: 150,
+                borderRadius: 30,
+                borderWidth: 1,
+                borderColor: '#0A66C2',
+                overflow: 'hidden',
+                backgroundColor: 'white',
+                marginHorizontal: 10,
+              }}>
+              <Pressable
+                android_ripple={{color: '#0d8fe0ff'}}
+                style={{
+                  backgroundColor: 'transparent',
+                  width: 150,
+                  height: 35,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
+                  Add section
+                </Text>
+              </Pressable>
+            </View>
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                borderRadius: 17.5,
+                borderWidth: 1,
+                borderColor: '#727272',
+                overflow: 'hidden',
+                backgroundColor: 'white',
+                marginHorizontal: 10,
+              }}>
+              <Pressable
+                android_ripple={{color: '#0d8fe0ff'}}
+                style={{
+                  backgroundColor: 'transparent',
+                  width: 35,
+                  height: 35,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Image
+                  source={require('../assets/images/3Dot.png')}
+                  style={{width: 25, height: 25}}
+                />
+              </Pressable>
+            </View>
+          </View>
+          <View
+            style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
+          />
+          <View>
+            <ActivitySection />
           </View>
         </View>
-        <View style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 export default ProfileScreen;
