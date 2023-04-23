@@ -1,42 +1,56 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
+import {user_login} from '../api/user_api';
+import {nameStorage, storeData} from '../reducers/AsyncStorage';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {setToken} from '../reducers/Token_reducer';
+import AppLoader from '../components/ui/AppLoader';
+import {setIdFromJwt} from '../reducers/Uid_reducer';
 
 function LoginScreen(props: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  // const token = useSelector((state: RootState) => state.token);
+  const dispatch = useDispatch();
 
-  const handleLogin = () => {
-    fetch('https://workwise.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: username, // hthnam@gmail.com
-        password: password, // 12345678
-      }),
+  const handleLogin = async () => {
+    setIsLoading(true);
+    user_login({
+      email: username,
+      password: password,
     })
-      .then(response => {
+      .then((response: any) => {
         if (response.status === 200) {
-          return response.json();
+          return response.data;
         } else {
           throw new Error('Login failed.');
         }
       })
       .then(data => {
-        const jwtToken = data.data.jwtToken;
         // do something with the JWT token
+        const jwtToken = data;
+        storeData(jwtToken, nameStorage.jwtToken);
+        dispatch(setToken(jwtToken));
+        dispatch(setIdFromJwt(jwtToken));
         console.log(jwtToken);
+        props.handleNavigate();
       })
       .catch(error => {
         console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
   return (
     <View style={styles.container}>
+      {isLoading ? <AppLoader /> : null}
       <View style={styles.titleView}>
         <Text style={styles.titleText}>Welcome Back</Text>
       </View>

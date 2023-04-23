@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -9,35 +9,22 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
+import UploadPhoto from '../components/ui/UploadPhoto';
+
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 function ProfileScreen() {
-  const takePhotoFromCamera = () => {
-    ImagePicker.openCamera({
-      width: 300,
-      height: 400,
-      cropping: true,
-    })
-      .then(image => {
-        console.log(image);
-      })
-      .catch(err => console.log(err));
-  };
-  const choosePhotoFromLibrary = () => {
-    ImagePicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
-    })
-      .then(image => {
-        console.log(image);
-      })
-      .catch(err => console.log(err));
-  };
+  const [imgAvatar, setImgAvatar] = useState('');
+  const [isModalVisible, setModalVisible] = useState(false);
+
   return (
     <View style={styles.container}>
+      <UploadPhoto
+        isVisible={isModalVisible}
+        setVisible={setModalVisible}
+        setPhoto={setImgAvatar}
+      />
       <View style={styles.backgroundAvatarContainer}>
         <Image
           source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
@@ -52,13 +39,17 @@ function ProfileScreen() {
         }}>
         <View style={styles.avatarContainer}>
           <Image
-            source={require('../assets/images/Spiderman.jpg')}
+            source={
+              imgAvatar === ''
+                ? require('../assets/images/Spiderman.jpg')
+                : {uri: imgAvatar}
+            }
             style={styles.avatarImage}
           />
           <View style={styles.buttonAddImageOuter}>
             <TouchableOpacity
               style={styles.buttonAddImage}
-              onPress={choosePhotoFromLibrary}>
+              onPress={() => setModalVisible(!isModalVisible)}>
               <Image
                 source={require('../assets/images/Add.png')}
                 style={{width: 25, height: 25, marginTop: 3}}

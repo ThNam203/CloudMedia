@@ -12,8 +12,12 @@ import {
 import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
+import {user_signup} from '../api/user_api';
+import {Alert} from 'react-native';
+import AppLoader from '../components/ui/AppLoader';
 
 function SignUpHrScreen(props: any) {
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,30 +59,31 @@ function SignUpHrScreen(props: any) {
     if (!checkInfo()) {
       return;
     }
-
-    fetch('https://workwise.onrender.com/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        phoneNumber,
-        userRole,
-        createdDate: new Date(),
-      }),
+    setIsLoading(true);
+    user_signup({
+      name,
+      email,
+      password,
+      phoneNumber,
+      userRole,
+      createdDate: new Date(),
     })
-      .then(response => {
-        if (response.status === 200) {
-          return response.json();
+      .then((response: any) => {
+        if (response.status === 204) {
+          return response;
         } else {
           throw new Error('Failed.');
         }
       })
-      .then(data => console.log(data))
-      .catch(error => console.log(error));
+      .then(data => {
+        console.log(data);
+        console.warn('Signup success!');
+        props.handleCloseModal(false);
+      })
+      .catch(error => console.log(error))
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const listboxData = [
@@ -87,7 +92,7 @@ function SignUpHrScreen(props: any) {
     {label: 'Open For Work', value: 'Open For Work'},
   ];
 
-  const renderItem = item => {
+  const renderItem = (item: any) => {
     return (
       <View
         style={{
@@ -103,6 +108,7 @@ function SignUpHrScreen(props: any) {
 
   return (
     <View style={styles.container}>
+      {isLoading ? <AppLoader /> : null}
       <View style={styles.titleView}>
         <Text style={styles.titleText}>Get Started</Text>
       </View>
