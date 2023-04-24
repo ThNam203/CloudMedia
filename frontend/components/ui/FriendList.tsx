@@ -60,7 +60,7 @@ const FriendList = () => {
                   fontWeight: 'bold',
                   textAlign: 'center',
                 }}>
-                Chấp nhận
+                Thêm bạn bè
               </Text>
             </Pressable>
           </View>
