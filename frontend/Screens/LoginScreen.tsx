@@ -4,20 +4,52 @@ import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
-import {user_login} from '../api/user_api';
+import {user_info, user_login} from '../api/user_api';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setToken} from '../reducers/Token_reducer';
 import {setIdFromJwt} from '../reducers/Uid_reducer';
+import AppLoader from '../components/ui/AppLoader';
+import {RootState} from '../reducers/Store';
+import {UserInfo, saveUser} from '../reducers/User_reducer';
 import {setStatus} from '../reducers/Loading_reducer';
+import jwt_decode from 'jwt-decode';
 
 function LoginScreen(props: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const user = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
 
+  const saveInfo = (jwt: any) => {
+    const json = jwt_decode(jwt) as {id: string};
+    const idUser = json.id;
+    console.log(idUser);
+    user_info(idUser)
+      .then((response: any) => {
+        if (response.status === 200) {
+          return response.data;
+        } else {
+          throw new Error('Get info failed.');
+        }
+      })
+      .then(data => {
+        console.log(data);
+        const user: UserInfo = {...data};
+        // miss info
+        dispatch(saveUser(user));
+      })
+      .catch(error => {
+        console.error(error);
+      })
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
+  };
   const handleLogin = async () => {
-    dispatch(setStatus(true));
+    setIsLoading(true);
     user_login({
       email: username,
       password: password,
@@ -35,18 +67,20 @@ function LoginScreen(props: any) {
         storeData(jwtToken, nameStorage.jwtToken);
         dispatch(setToken(jwtToken));
         dispatch(setIdFromJwt(jwtToken));
-        console.log(jwtToken);
+        saveInfo(jwtToken);
+        // console.log(jwtToken);
         props.handleNavigate();
       })
       .catch(error => {
         console.error(error);
       })
       .finally(() => {
-        dispatch(setStatus(false));
+        setIsLoading(false);
       });
   };
   return (
     <View style={styles.container}>
+      {isLoading ? <AppLoader /> : null}
       <View style={styles.titleView}>
         <Text style={styles.titleText}>Welcome Back</Text>
       </View>

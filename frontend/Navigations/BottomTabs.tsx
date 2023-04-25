@@ -12,6 +12,11 @@ import Colors from '../constants/Colors';
 import * as Animatable from 'react-native-animatable';
 
 import ProfileScreen from '../Screens/ProfileScreen';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {user_info} from '../api/user_api';
+import {setStatus} from '../reducers/Loading_reducer';
+import {User, setUser} from '../reducers/User_reducer';
 
 const TabArr = [
   {
@@ -93,7 +98,7 @@ const TabButton = (props: any) => {
   );
 };
 
-export default function AnimTab1() {
+export default function AnimTab() {
   return (
     <Tab.Navigator
       screenOptions={{

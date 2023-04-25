@@ -29,3 +29,14 @@ export const user_signup = async (data: any) => {
     return error;
   }
 };
+
+export const user_info = async (data: any) => {
+  try {
+    const result = await ApiManager(`/${data}`, {
+      method: 'GET',
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
