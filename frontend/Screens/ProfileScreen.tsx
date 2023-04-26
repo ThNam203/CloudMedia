@@ -12,12 +12,14 @@ import {
 } from 'react-native';
 import ActivitySection from '../components/ui/ActivitySection';
 import UploadPhoto from '../components/ui/UploadPhoto';
+import EditProfileScreen from './EditProfileScreen';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 function ProfileScreen() {
   const [imgAvatar, setImgAvatar] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
+  const [editProfile, setEditProfile] = useState(false);
 
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -26,6 +28,10 @@ function ProfileScreen() {
           isVisible={isModalVisible}
           setVisible={setModalVisible}
           setPhoto={setImgAvatar}
+        />
+        <EditProfileScreen
+          isVisible={editProfile}
+          setVisible={setEditProfile}
         />
         <View style={styles.backgroundAvatarContainer}>
           <Image
@@ -63,7 +69,8 @@ function ProfileScreen() {
             style={{
               alignSelf: 'flex-start',
               margin: 10,
-            }}>
+            }}
+            onPress={() => setEditProfile(!editProfile)}>
             <Image
               style={{height: 28, width: 28}}
               source={require('../assets/images/la_pen.png')}
