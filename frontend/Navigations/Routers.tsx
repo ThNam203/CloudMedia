@@ -5,6 +5,7 @@ import FirstTimeUseScreen from '../Screens/FirstTimeUseScreen';
 import {RootState} from '../reducers/Store';
 import {useSelector} from 'react-redux';
 import AppLoader from '../components/ui/AppLoader';
+import ProfileScreen from '../Screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ export default function Routers() {
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="login" component={FirstTimeUseScreen} />
         <Stack.Screen name="main" component={BottomTabs} />
+        <Stack.Screen name="profile" component={ProfileScreen} />
       </Stack.Navigator>
       {isLoading ? <AppLoader /> : null}
     </>
