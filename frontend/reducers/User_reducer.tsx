@@ -1,0 +1,53 @@
+import {PayloadAction, createSlice} from '@reduxjs/toolkit';
+
+export interface UserInfo {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  // location: string;
+  // company: {
+  //   logoUrl: string;
+  //   name: string;
+  //   linkToWebsite: string;
+  // };
+  // connections: [];
+  userRole: string;
+}
+const initialState: UserInfo = {
+  name: '',
+  email: '',
+  phoneNumber: '',
+  // location: '',
+  // company: {
+  //   logoUrl: '',
+  //   name: '',
+  //   linkToWebsite: '',
+  // },
+  // connections: [],
+  userRole: '',
+};
+
+const UserSlice = createSlice({
+  name: 'UserInfo',
+  initialState,
+  reducers: {
+    saveUser: (state: UserInfo, action: PayloadAction<UserInfo>) => {
+      state.name = action.payload.name;
+      state.email = action.payload.email;
+      state.phoneNumber = action.payload.phoneNumber;
+      // state.location = action.payload.location;
+
+      // state.company.logoUrl = action.payload.company.logoUrl;
+      // state.company.name = action.payload.company.name;
+      // state.company.linkToWebsite = action.payload.company.linkToWebsite;
+
+      // state.connections = action.payload.connections; /// null
+      state.userRole = action.payload.userRole;
+
+      /// spread operator ('...') is fail. fuck
+    },
+  },
+});
+
+export const {saveUser} = UserSlice.actions;
+export default UserSlice.reducer;

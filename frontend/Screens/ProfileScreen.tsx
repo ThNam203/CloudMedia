@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -12,14 +12,25 @@ import {
 } from 'react-native';
 import ActivitySection from '../components/ui/ActivitySection';
 import UploadPhoto from '../components/ui/UploadPhoto';
+
 import EditProfileScreen from './EditProfileScreen';
+
+import {useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 function ProfileScreen() {
   const [imgAvatar, setImgAvatar] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
+
   const [editProfile, setEditProfile] = useState(false);
+
+  const user = useSelector((state: RootState) => state.userInfo);
+
+  useEffect(() => {
+    console.log(user);
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -78,7 +89,7 @@ function ProfileScreen() {
           </TouchableOpacity>
         </View>
         <View>
-          <Text style={styles.textName}>Spider man</Text>
+          <Text style={styles.textName}>{user.name}</Text>
           <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
             Attended Multiverse of Madness
           </Text>
