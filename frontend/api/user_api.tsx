@@ -30,6 +30,20 @@ export const user_signup = async (data: any) => {
   }
 };
 
+export const user_logout = async (token: any) => {
+  try {
+    const result = await ApiManager('/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const user_info = async (data: any) => {
   try {
     const result = await ApiManager(`/${data}`, {

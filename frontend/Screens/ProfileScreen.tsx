@@ -17,20 +17,44 @@ import EditProfileScreen from './EditProfileScreen';
 
 import {useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
+import {user_logout} from '../api/user_api';
+import {nameStorage, storeData} from '../reducers/AsyncStorage';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
-function ProfileScreen() {
+function ProfileScreen({navigation}: any) {
   const [imgAvatar, setImgAvatar] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
 
   const [editProfile, setEditProfile] = useState(false);
 
   const user = useSelector((state: RootState) => state.userInfo);
+  const token = useSelector((state: RootState) => state.token.key);
 
   useEffect(() => {
     console.log(user);
   }, []);
+
+  const handleLogout = async () => {
+    user_logout(token)
+      .then((response: any) => {
+        if (response.status === 204) {
+          console.log(response);
+          storeData(false, nameStorage.isLogin)
+            .then(() => {
+              navigation.navigate('login');
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        } else {
+          throw new Error('Logout failed.');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
 
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -182,6 +206,7 @@ function ProfileScreen() {
                 marginHorizontal: 10,
               }}>
               <Pressable
+                onPress={handleLogout}
                 android_ripple={{color: '#0d8fe0ff'}}
                 style={{
                   backgroundColor: 'transparent',

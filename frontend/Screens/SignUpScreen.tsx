@@ -14,8 +14,10 @@ import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
 import {user_signup} from '../api/user_api';
 import AppLoader from '../components/ui/AppLoader';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {setStatus} from '../reducers/Loading_reducer';
 function SignUpHrScreen(props: any) {
-  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,6 +30,10 @@ function SignUpHrScreen(props: any) {
   const [emailWarning, setEmailWarning] = useState(false);
   const [passwordWarning, setPasswordWarning] = useState(false);
   const [phoneWarning, setPhoneWarning] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const isLoading = useSelector((state: RootState) => state.loading.status);
 
   function isValidEmail(mail: any) {
     return /\S+@\S+\.\S+/.test(mail);
@@ -57,7 +63,7 @@ function SignUpHrScreen(props: any) {
     if (!checkInfo()) {
       return;
     }
-    setIsLoading(true);
+    dispatch(setStatus(true));
     user_signup({
       name,
       email,
@@ -80,7 +86,7 @@ function SignUpHrScreen(props: any) {
       })
       .catch(error => console.log(error))
       .finally(() => {
-        setIsLoading(false);
+        dispatch(setStatus(false));
       });
   };
 

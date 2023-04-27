@@ -25,4 +25,5 @@ export const retrieveData = async (nameStorage: string) => {
 
 export const nameStorage = {
   jwtToken: 'jwtToken',
+  isLogin: 'isLogin',
 };
