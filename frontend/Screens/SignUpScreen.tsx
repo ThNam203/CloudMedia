@@ -13,9 +13,7 @@ import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
 import {user_signup} from '../api/user_api';
-import AppLoader from '../components/ui/AppLoader';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../reducers/Store';
+import {useDispatch} from 'react-redux';
 import {setStatus} from '../reducers/Loading_reducer';
 function SignUpHrScreen(props: any) {
   const [name, setName] = useState('');
@@ -76,7 +74,7 @@ function SignUpHrScreen(props: any) {
         if (response.status === 204) {
           return response;
         } else {
-          // console.log(response.response.data.errorMessage);
+          console.log(response.response.status);
           throw new Error(response.response.data.errorMessage);
         }
       })

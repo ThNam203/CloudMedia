@@ -74,8 +74,8 @@ function ProfileScreen({navigation}: any) {
           console.log(response.data);
           return response.data;
         } else {
-          // console.log(response.request._response);
-          throw new Error(response.request._response);
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
         }
       })
       .then((data: any) => {

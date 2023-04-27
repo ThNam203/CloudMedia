@@ -48,7 +48,8 @@ function FirstTimeUseScreen({navigation}: any) {
         if (response.status === 200) {
           return response.data;
         } else {
-          throw new Error('Get info failed.');
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
         }
       })
       .then(data => {
