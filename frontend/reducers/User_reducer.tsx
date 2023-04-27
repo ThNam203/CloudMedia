@@ -12,6 +12,7 @@ export interface UserInfo {
   // };
   // connections: [];
   userRole: string;
+  profileImagePath: string;
 }
 const initialState: UserInfo = {
   name: '',
@@ -25,6 +26,7 @@ const initialState: UserInfo = {
   // },
   // connections: [],
   userRole: '',
+  profileImagePath: '',
 };
 
 const UserSlice = createSlice({
@@ -43,11 +45,14 @@ const UserSlice = createSlice({
 
       // state.connections = action.payload.connections; /// null
       state.userRole = action.payload.userRole;
-
+      state.profileImagePath = action.payload.profileImagePath || '';
       /// spread operator ('...') is fail. fuck
+    },
+    updateAvatar: (state: UserInfo, action: PayloadAction<string>) => {
+      state.profileImagePath = action.payload;
     },
   },
 });
 
-export const {saveUser} = UserSlice.actions;
+export const {saveUser, updateAvatar} = UserSlice.actions;
 export default UserSlice.reducer;

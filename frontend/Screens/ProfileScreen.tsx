@@ -15,21 +15,25 @@ import UploadPhoto from '../components/ui/UploadPhoto';
 
 import EditProfileScreen from './EditProfileScreen';
 
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {user_logout} from '../api/user_api';
+import {user_avatarImg, user_logout} from '../api/user_api';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
+import {setStatus} from '../reducers/Loading_reducer';
+import {updateAvatar} from '../reducers/User_reducer';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 function ProfileScreen({navigation}: any) {
-  const [imgAvatar, setImgAvatar] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
 
   const [editProfile, setEditProfile] = useState(false);
 
   const user = useSelector((state: RootState) => state.userInfo);
   const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((state: RootState) => state.uid.id);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     console.log(user);
@@ -56,13 +60,40 @@ function ProfileScreen({navigation}: any) {
       });
   };
 
+  const postImage = (image: any) => {
+    const dataForm = new FormData();
+    dataForm.append('profile-image', {
+      uri: image.path,
+      type: image.mime,
+      name: image.filename || 'profile-image',
+    });
+    dispatch(setStatus(true));
+    user_avatarImg(dataForm, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          return response.data;
+        } else {
+          // console.log(response.request._response);
+          throw new Error(response.request._response);
+        }
+      })
+      .then((data: any) => {
+        dispatch(updateAvatar(data.imagePath));
+      })
+      .catch(error => console.error(error))
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
+  };
+
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <View style={styles.container}>
         <UploadPhoto
           isVisible={isModalVisible}
           setVisible={setModalVisible}
-          setPhoto={setImgAvatar}
+          postImage={postImage}
         />
         <EditProfileScreen
           isVisible={editProfile}
@@ -83,9 +114,9 @@ function ProfileScreen({navigation}: any) {
           <View style={styles.avatarContainer}>
             <Image
               source={
-                imgAvatar === ''
+                user.profileImagePath === ''
                   ? require('../assets/images/Spiderman.jpg')
-                  : {uri: imgAvatar}
+                  : {uri: user.profileImagePath}
               }
               style={styles.avatarImage}
             />

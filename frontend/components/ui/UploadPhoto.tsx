@@ -19,8 +19,9 @@ function UploadPhoto(props: any) {
       cropperCircleOverlay: true,
     })
       .then(image => {
-        console.log(image);
-        props.setPhoto(image.path);
+        props.postImage(image);
+        // console.log(image);
+        // props.setPhoto(image.path);
       })
       .catch(err => console.log(err));
   };
@@ -33,8 +34,9 @@ function UploadPhoto(props: any) {
       cropperCircleOverlay: true,
     })
       .then(image => {
-        console.log(image);
-        props.setPhoto(image.path);
+        props.postImage(image);
+        // console.log(image);
+        // props.setPhoto(image.path);
       })
       .catch(err => console.log(err));
   };

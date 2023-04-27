@@ -27,7 +27,8 @@ function LoginScreen(props: any) {
         if (response.status === 200) {
           return response.data;
         } else {
-          throw new Error('Login failed.');
+          // console.log(response.response.data.errorMessage);
+          throw new Error(response.response.data.errorMessage);
         }
       })
       .then(data => {
