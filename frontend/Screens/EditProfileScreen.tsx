@@ -1,24 +1,68 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Pressable,
   ScrollView,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import {CheckBox} from '@rneui/themed';
 import Icon, {Icons} from '../components/ui/Icons';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {user_update} from '../api/user_api';
+import {saveUser} from '../reducers/User_reducer';
 function EditProfileScreen(props: any) {
+  const [checked, setChecked] = useState(true);
+  const toggleCheckbox = () => setChecked(!checked);
+  const user = useSelector((state: RootState) => state.userInfo);
+  const uid = useSelector((state: RootState) => state.uid.id);
+  const token = useSelector((state: RootState) => state.token.key);
+
+  const dispatch = useDispatch();
+
+  const [fullName, setFullName] = useState('');
+  const [location, setLocation] = useState('');
+
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
   };
-  const [checked, setChecked] = useState(true);
-  const toggleCheckbox = () => setChecked(!checked);
+
+  const SaveIntro = () => {
+    const data = {
+      ...user,
+      name: fullName,
+      location: location,
+      company: {
+        logoUrl:
+          'https://static.vecteezy.com/system/resources/previews/010/353/285/original/colourful-google-logo-on-white-background-free-vector.jpg',
+        name: 'Google',
+        linkToWebsite: 'google.com',
+      },
+    };
+    user_update(data, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          dispatch(saveUser(response.data));
+          toggleModal();
+        } else {
+          throw new Error(response.response.data.errorMessage);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    setFullName(user.name);
+    setLocation(user.location);
+  }, []);
+
   return (
     <Modal
       onBackdropPress={() => props.setVisible(false)}
@@ -33,7 +77,7 @@ function EditProfileScreen(props: any) {
           </View>
           <View style={{marginHorizontal: 10}}>
             <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              First name*
+              Full name*
             </Text>
             <TextInput
               style={{
@@ -42,7 +86,9 @@ function EditProfileScreen(props: any) {
                 color: 'black',
                 fontSize: 16,
               }}
-              placeholder="Enter your first name"
+              placeholder="Enter your full name"
+              value={fullName}
+              onChangeText={text => setFullName(text)}
             />
           </View>
           <View style={{marginHorizontal: 10}}>
@@ -178,6 +224,8 @@ function EditProfileScreen(props: any) {
                 fontSize: 16,
               }}
               placeholder="Enter your country/region"
+              value={location}
+              onChangeText={text => setLocation(text)}
             />
           </View>
           <TouchableOpacity>
@@ -238,7 +286,7 @@ function EditProfileScreen(props: any) {
         </View>
       </ScrollView>
       <View style={styles.bottomView}>
-        <TouchableOpacity onPress={toggleModal}>
+        <TouchableOpacity onPress={SaveIntro}>
           <View
             style={{
               borderRadius: 30,

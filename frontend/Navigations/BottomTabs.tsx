@@ -13,6 +13,7 @@ import * as Animatable from 'react-native-animatable';
 
 import ProfileScreen from '../Screens/ProfileScreen';
 import Header from '../components/ui/Header';
+import StillHiringScreen from '../Screens/StillHiringScreen';
 
 const TabArr = [
   {
@@ -53,7 +54,7 @@ const TabArr = [
     type: Icons.MaterialCommunityIcons,
     activeIcon: 'briefcase-variant',
     inActiveIcon: 'briefcase-variant-outline',
-    component: JobsScreen,
+    component: StillHiringScreen,
   },
 ];
 

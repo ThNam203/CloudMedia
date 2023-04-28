@@ -74,3 +74,18 @@ export const user_avatarImg = async (
     return error;
   }
 };
+
+export const user_update = async (data: any, userId: any, token: any) => {
+  try {
+    const result = await ApiManager(`/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+      data: data,
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};

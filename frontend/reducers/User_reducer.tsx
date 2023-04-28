@@ -4,13 +4,14 @@ export interface UserInfo {
   name: string;
   email: string;
   phoneNumber: string;
-  // location: string;
-  // company: {
-  //   logoUrl: string;
-  //   name: string;
-  //   linkToWebsite: string;
-  // };
-  // connections: [];
+  location: string;
+  company: {
+    logoUrl: string;
+    name: string;
+    linkToWebsite: string;
+  };
+  connections: [];
+  chatRooms: [];
   userRole: string;
   profileImagePath: string;
 }
@@ -18,13 +19,14 @@ const initialState: UserInfo = {
   name: '',
   email: '',
   phoneNumber: '',
-  // location: '',
-  // company: {
-  //   logoUrl: '',
-  //   name: '',
-  //   linkToWebsite: '',
-  // },
-  // connections: [],
+  location: '',
+  company: {
+    logoUrl: '',
+    name: '',
+    linkToWebsite: '',
+  },
+  connections: [],
+  chatRooms: [],
   userRole: '',
   profileImagePath: '',
 };
@@ -37,13 +39,16 @@ const UserSlice = createSlice({
       state.name = action.payload.name;
       state.email = action.payload.email;
       state.phoneNumber = action.payload.phoneNumber;
-      // state.location = action.payload.location;
+      state.location = action.payload.location || '';
 
-      // state.company.logoUrl = action.payload.company.logoUrl;
-      // state.company.name = action.payload.company.name;
-      // state.company.linkToWebsite = action.payload.company.linkToWebsite;
+      if (action.payload.company) {
+        state.company.name = action.payload.company.name;
+        state.company.logoUrl = action.payload.company.logoUrl;
+        state.company.linkToWebsite = action.payload.company.linkToWebsite;
+      }
 
-      // state.connections = action.payload.connections; /// null
+      state.connections = action.payload.connections || []; /// null
+      state.chatRooms = action.payload.chatRooms || [];
       state.userRole = action.payload.userRole;
       state.profileImagePath = action.payload.profileImagePath || '';
       /// spread operator ('...') is fail. fuck
