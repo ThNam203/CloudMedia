@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/ThNam203/WorkWise#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.312.0",
     "bcrypt": "^5.1.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
@@ -28,6 +29,9 @@
     "google-auth-library": "^8.7.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.3",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
+    "uuid": "^9.0.0",
     "validator": "^13.9.0"
   },
   "devDependencies": {

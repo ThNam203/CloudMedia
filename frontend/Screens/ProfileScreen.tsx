@@ -25,7 +25,9 @@ import Colors from '../constants/Colors';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
+
 function ProfileScreen({navigation}: any) {
+
   const [isModalVisible, setModalVisible] = useState(false);
 
   const [editProfile, setEditProfile] = useState(false);

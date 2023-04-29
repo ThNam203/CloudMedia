@@ -6,7 +6,7 @@ const userJobPostController = require('../controllers/userJobPostController')
 
 router
     .route('')
-    .get(authController.isUser, userJobPostController.getAllJobPosts)
+    .get(authController.isUser, userJobPostController.getAllJobPostsOfAUser)
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
