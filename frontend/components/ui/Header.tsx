@@ -12,14 +12,6 @@ export default function Header({navigation}: any) {
   return (
     <View style={styles.container}>
       <View style={{paddingLeft: 10}}>
-        {/* {isPostScreen ? (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('login');
-            }}>
-            <Icon type={Icons.Entypo} name="plus" color={Colors.black} />
-          </TouchableOpacity> */}
-
         <TouchableOpacity
           onPress={() => {
             navigation.navigate('profile');

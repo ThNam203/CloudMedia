@@ -6,6 +6,7 @@ import {RootState} from '../reducers/Store';
 import {useSelector} from 'react-redux';
 import AppLoader from '../components/ui/AppLoader';
 import ProfileScreen from '../Screens/ProfileScreen';
+import PostScreen from '../Screens/PostScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ export default function Routers() {
         <Stack.Screen name="profile" component={ProfileScreen} />
       </Stack.Navigator>
       {isLoading ? <AppLoader /> : null}
+      <PostScreen />
     </>
   );
 }

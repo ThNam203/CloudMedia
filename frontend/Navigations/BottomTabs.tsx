@@ -11,9 +11,10 @@ import NotificationsScreen from '../Screens/NotificationsScreen';
 import Colors from '../constants/Colors';
 import * as Animatable from 'react-native-animatable';
 
-import ProfileScreen from '../Screens/ProfileScreen';
 import Header from '../components/ui/Header';
-import StillHiringScreen from '../Screens/StillHiringScreen';
+import StillHiringScreen from '../Screens/PostScreen';
+import {useDispatch} from 'react-redux';
+import {setPostShow} from '../reducers/Post_reducer';
 
 const TabArr = [
   {
@@ -54,7 +55,7 @@ const TabArr = [
     type: Icons.MaterialCommunityIcons,
     activeIcon: 'briefcase-variant',
     inActiveIcon: 'briefcase-variant-outline',
-    component: StillHiringScreen,
+    component: JobsScreen,
   },
 ];
 
@@ -64,6 +65,8 @@ const TabButton = (props: any) => {
   const {item, onPress, accessibilityState} = props;
   const focused = accessibilityState.selected;
   const viewRef = useRef(null);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (focused) {
@@ -79,9 +82,13 @@ const TabButton = (props: any) => {
     }
   }, [focused]);
 
+  const showPost = () => {
+    dispatch(setPostShow(true));
+  };
+
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={item.route === 'Post' ? showPost : onPress}
       activeOpacity={1}
       style={styles.container}>
       <Animatable.View ref={viewRef} duration={1000} style={styles.container}>

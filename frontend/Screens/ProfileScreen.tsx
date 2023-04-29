@@ -21,6 +21,7 @@ import {user_avatarImg, user_logout} from '../api/user_api';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
 import {setStatus} from '../reducers/Loading_reducer';
 import {updateAvatar} from '../reducers/User_reducer';
+import Colors from '../constants/Colors';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -237,7 +238,7 @@ function ProfileScreen({navigation}: any) {
                 marginHorizontal: 10,
               }}>
               <Pressable
-                onPress={handleLogout}
+                onPress={() => {}}
                 android_ripple={{color: '#0d8fe0ff'}}
                 style={{
                   backgroundColor: 'transparent',
@@ -259,6 +260,32 @@ function ProfileScreen({navigation}: any) {
           <View>
             <ActivitySection />
           </View>
+        </View>
+        <View
+          style={{
+            overflow: 'hidden',
+            borderRadius: 15,
+            width: 300,
+            alignSelf: 'center',
+            marginBottom: 10,
+          }}>
+          <Pressable
+            onPress={handleLogout}
+            style={styles.btnLogout}
+            android_ripple={{color: '#613FC2', borderless: false}}>
+            <Text
+              style={[
+                styles.fontText,
+                {
+                  fontWeight: '700',
+                  lineHeight: 20,
+                  alignSelf: 'center',
+                  color: '#ffffff',
+                },
+              ]}>
+              Log out
+            </Text>
+          </Pressable>
         </View>
       </View>
     </ScrollView>
@@ -321,5 +348,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     marginLeft: 25,
+  },
+  btnLogout: {
+    backgroundColor: Colors.skyBlue,
+    padding: 18,
+    elevation: 3,
+  },
+  fontText: {
+    fontFamily: 'Roboto',
+    fontStyle: 'normal',
+    fontSize: 20,
+    lineHeight: 19,
   },
 });
