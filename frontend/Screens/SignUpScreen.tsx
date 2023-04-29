@@ -13,11 +13,9 @@ import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
 import {user_signup} from '../api/user_api';
-import {Alert} from 'react-native';
-import AppLoader from '../components/ui/AppLoader';
-
+import {useDispatch} from 'react-redux';
+import {setStatus} from '../reducers/Loading_reducer';
 function SignUpHrScreen(props: any) {
-  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +28,10 @@ function SignUpHrScreen(props: any) {
   const [emailWarning, setEmailWarning] = useState(false);
   const [passwordWarning, setPasswordWarning] = useState(false);
   const [phoneWarning, setPhoneWarning] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const [isSelected, setSelection] = useState(false);
 
   function isValidEmail(mail: any) {
     return /\S+@\S+\.\S+/.test(mail);
@@ -59,7 +61,7 @@ function SignUpHrScreen(props: any) {
     if (!checkInfo()) {
       return;
     }
-    setIsLoading(true);
+    dispatch(setStatus(true));
     user_signup({
       name,
       email,
@@ -72,7 +74,8 @@ function SignUpHrScreen(props: any) {
         if (response.status === 204) {
           return response;
         } else {
-          throw new Error('Failed.');
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
         }
       })
       .then(data => {
@@ -80,9 +83,9 @@ function SignUpHrScreen(props: any) {
         console.warn('Signup success!');
         props.handleCloseModal(false);
       })
-      .catch(error => console.log(error))
+      .catch(error => console.error(error))
       .finally(() => {
-        setIsLoading(false);
+        dispatch(setStatus(false));
       });
   };
 
@@ -108,7 +111,6 @@ function SignUpHrScreen(props: any) {
 
   return (
     <View style={styles.container}>
-      {isLoading ? <AppLoader /> : null}
       <View style={styles.titleView}>
         <Text style={styles.titleText}>Get Started</Text>
       </View>
@@ -226,7 +228,10 @@ function SignUpHrScreen(props: any) {
       <View style={{marginTop: 15, width: 300, height: 25}}>
         <View style={styles.bottomContainer}>
           <View>
-            <CustomCheckBox />
+            <CustomCheckBox
+              isSelected={isSelected}
+              setSelection={setSelection}
+            />
           </View>
           <Text
             style={[styles.fontText, {fontWeight: '400', color: '#808080'}]}>

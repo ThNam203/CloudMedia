@@ -1,11 +1,16 @@
-import {View, Text} from 'react-native';
+import {View, FlatList} from 'react-native';
 import React from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {Posts} from '../components/data/Posts';
+import ShowPosts from '../components/ui/ShowPosts';
 
 export default function HomeScreen({navigation}: any) {
   return (
     <View>
-      <Text>HomeScreen</Text>
+      <FlatList
+        data={Posts}
+        showsVerticalScrollIndicator={false}
+        renderItem={({item}) => <ShowPosts item={item} />}
+      />
     </View>
   );
 }

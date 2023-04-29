@@ -2,16 +2,14 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 
-function CustomCheckBox() {
-  const [isSelected, setSelection] = useState(false);
-
+function CustomCheckBox(props: any) {
   return (
     <TouchableOpacity
       style={{
         flexDirection: 'row',
         alignItems: 'center',
       }}
-      onPress={() => setSelection(!isSelected)}>
+      onPress={() => props.setSelection(!props.isSelected)}>
       <View
         style={{
           width: 20,
@@ -22,7 +20,7 @@ function CustomCheckBox() {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        {isSelected ? (
+        {props.isSelected ? (
           <View
             style={{
               width: 10,

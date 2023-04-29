@@ -19,8 +19,9 @@ function UploadPhoto(props: any) {
       cropperCircleOverlay: true,
     })
       .then(image => {
-        console.log(image);
-        props.setPhoto(image.path);
+        props.postImage(image);
+        // console.log(image);
+        // props.setPhoto(image.path);
       })
       .catch(err => console.log(err));
   };
@@ -33,8 +34,9 @@ function UploadPhoto(props: any) {
       cropperCircleOverlay: true,
     })
       .then(image => {
-        console.log(image);
-        props.setPhoto(image.path);
+        props.postImage(image);
+        // console.log(image);
+        // props.setPhoto(image.path);
       })
       .catch(err => console.log(err));
   };
@@ -58,7 +60,7 @@ function UploadPhoto(props: any) {
         <View style={styles.barIcon} />
         <View style={{alignItems: 'center'}}>
           <Text style={styles.panelTitle}>Upload Photo</Text>
-          <Text style={styles.panelSubtitle}>Choose Yout Profile Picture</Text>
+          <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
         </View>
         <View style={styles.viewButton}>
           <Pressable
