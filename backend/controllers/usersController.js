@@ -17,7 +17,7 @@ const s3Client = new S3Client({
 const deleteOldProfileImage = (path) => {
     const command = new DeleteObjectCommand({
         Bucket: 'workwise',
-        Key: path.substring(path.lastIndexOf('/') + 1, path.length()),
+        Key: path.substring(path.lastIndexOf('/') + 1, path.length),
     })
 
     s3Client.send(command).catch(() => {})
@@ -39,7 +39,7 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
     if (!req.file || !req.file.location)
         return next(new AppError('Unable to upload profile image', 500))
 
-    const userId = req.params.user_id
+    const { userId } = req.params
     const user = await User.findById(userId)
     if (user.profileImagePath) deleteOldProfileImage(user.profileImagePath)
 
@@ -50,7 +50,7 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
 })
 
 exports.getUserById = asyncCatch(async (req, res, next) => {
-    const { user_id: userId } = req.params
+    const { userId } = req.params
     const user = await User.findById(userId)
     if (!user) return next(new AppError('No user found!', 400))
 
@@ -58,7 +58,7 @@ exports.getUserById = asyncCatch(async (req, res, next) => {
 })
 
 exports.updateUserById = asyncCatch(async (req, res, next) => {
-    const { user_id: userId } = req.params
+    const { userId } = req.params
     const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
         new: true,
         runValidators: true,

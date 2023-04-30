@@ -44,9 +44,7 @@ const sendErrorInProductionEnv = function (err, res) {
         err = JWTErrorHandler.notBeforeErrorHandler(err)
 
     res.status(err.statusCode).json({
-        error: {
-            message: err.message,
-        },
+        errorMessage: err.message,
     })
 }
 

@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/b59fbf77-86fc-4c63-ae35-480eb092330e/resourceGroups/workwize_gr/providers/Microsoft.Web/sites/workwize",
+    "appService.deploySubpath": "backend"
+}

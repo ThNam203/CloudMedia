@@ -25,7 +25,7 @@ class Message {
   }
 }
 
-const ChatMessagesScreen = (props: any) => {
+const ChatRoom = (props: any) => {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
   const [user, setUser] = useState('');
@@ -125,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatMessagesScreen;
+export default ChatRoom;

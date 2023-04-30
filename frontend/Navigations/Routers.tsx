@@ -7,20 +7,20 @@ import {useSelector} from 'react-redux';
 import AppLoader from '../components/ui/AppLoader';
 import ProfileScreen from '../Screens/ProfileScreen';
 import PostScreen from '../Screens/PostScreen';
+import ChatScreen from '../Screens/chatScreens/ChatScreen';
+import ChatRoom from '../Screens/chatScreens/ChatRoom';
 
 const Stack = createNativeStackNavigator();
 
 export default function Routers() {
   const isLoading = useSelector((state: RootState) => state.loading.status);
   return (
-    <>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="login" component={FirstTimeUseScreen} />
-        <Stack.Screen name="main" component={BottomTabs} />
-        <Stack.Screen name="profile" component={ProfileScreen} />
-      </Stack.Navigator>
-      {isLoading ? <AppLoader /> : null}
-      <PostScreen />
-    </>
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen name="login" component={FirstTimeUseScreen} />
+      <Stack.Screen name="main" component={BottomTabs} />
+      <Stack.Screen name="chat" component={ChatScreen} />
+      <Stack.Screen name="chatRoom" component={ChatRoom} />
+    </Stack.Navigator>
   );
 }

@@ -68,11 +68,8 @@ const userSchema = new mongoose.Schema({
         default: 'Being Idle',
         trim: true,
     },
-    jobPosts: {
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'JobPost' }],
-    },
-    socialPosts: {
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SocialPost' }],
+    chatRooms: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatRoom' }],
     },
     createdDate: {
         type: Date,
@@ -95,8 +92,7 @@ userSchema.statics.createNewUser = function (req) {
         company: req.body.company,
         connections: req.body.connections,
         userRole: req.body.userRole,
-        jobPosts: req.body.jobPosts,
-        socialPosts: req.body.socialPosts,
+        chatRooms: req.body.chatRooms,
         createdDate: req.body.createdDate,
     })
 }

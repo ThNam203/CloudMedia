@@ -5,8 +5,26 @@ const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 const User = require('../models/User')
 
+exports.getAJobPostById = asyncCatch(async (req, res, next) => {
+    const { jobPostId } = req.params
+    const jobPost = await JobPost.findById(jobPostId)
+
+    if (!jobPost)
+        return next(
+            new AppError(
+                `Unable to find the jobpost or invalid jobpost's id`,
+                500
+            )
+        )
+
+    res.status(200).json({
+        status: 'success',
+        data: jobPost,
+    })
+})
+
 exports.createNewJobPost = asyncCatch(async (req, res, next) => {
-    const userId = req.params.user_id
+    const { userId } = req.params
     req.body.author = userId
 
     const newJobPost = await JobPost.createNewJobPost(req)
@@ -27,7 +45,7 @@ exports.createNewJobPost = asyncCatch(async (req, res, next) => {
 })
 
 exports.getAllJobPostsOfAUser = asyncCatch(async (req, res, next) => {
-    const { user_id: userId } = req.params
+    const { userId } = req.params
     const user = await User.findById(userId)
     if (!user) return next(new AppError('Unable to find this user', 400))
     const jobPosts = await JobPost.find({ author: userId })
@@ -45,7 +63,7 @@ exports.getAJobPostUsingItsId = asyncCatch(async (req, res, next) => {
 
 exports.updateJobPostById = asyncCatch(async (req, res, next) => {
     const { body: jobPostBody } = req
-    const { job_post_id: jobPostId } = req.params
+    const { jobPostId } = req.params
 
     const updatedPost = await JobPost.findByIdAndUpdate(
         jobPostId,
@@ -63,7 +81,7 @@ exports.updateJobPostById = asyncCatch(async (req, res, next) => {
 })
 
 exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
-    const { job_post_id: jobPostId } = req.params
+    const { jobPostId } = req.params
 
     const deletedPost = await JobPost.findByIdAndDelete(jobPostId)
     if (!deletedPost)
