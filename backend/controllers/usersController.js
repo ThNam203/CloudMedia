@@ -17,7 +17,7 @@ const s3Client = new S3Client({
 const deleteOldProfileImage = (path) => {
     const command = new DeleteObjectCommand({
         Bucket: 'workwise',
-        Key: path.substring(path.lastIndexOf('/') + 1, path.length()),
+        Key: path.substring(path.lastIndexOf('/') + 1, path.length),
     })
 
     s3Client.send(command).catch(() => {})

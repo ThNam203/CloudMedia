@@ -37,6 +37,6 @@ app.use('/:userId', usersRouter)
 app.use('*', errorHandlers.invalidUrlHandler)
 app.use(errorHandlers.globalErrorHandler)
 
-server.listen(process.env.SERVER_PORT, () => {
-    console.log(`Server running on port ${process.env.SERVER_PORT}`)
+server.listen(process.env.PORT || 3000, () => {
+    console.log(`Server running on port ${process.env.PORT}`)
 })

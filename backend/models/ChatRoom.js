@@ -1,14 +1,16 @@
 const mongoose = require('mongoose')
 
 const chatRoomSchema = new mongoose.Schema({
-    _id: {
-        type: String,
-        required: true,
-    },
     title: {
         type: String,
         trim: true,
+    },
+    members: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         required: true,
+    },
+    logoPath: {
+        type: String,
     },
 })
 
