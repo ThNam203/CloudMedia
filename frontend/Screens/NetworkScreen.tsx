@@ -11,54 +11,16 @@ import {
 import React, {useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import FriendList from '../components/ui/FriendList';
+import InvitationsScreen from './InvitationsScreen';
 
 function NetworkScreen({navigation}: any) {
   const [icon_1] = useState(new Animated.Value(40));
   const [icon_2] = useState(new Animated.Value(40));
   const [icon_3] = useState(new Animated.Value(40));
 
-  const [friends, setFriends] = useState(friendsData);
-
   const [pop, setPop] = useState(false);
 
-  const friendsData = [
-    {
-      id: '1',
-      name: 'John Doe',
-      connection: 'Friend',
-      avatar: require('../assets/images/DefaultAvatar.png'),
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      connection: 'Family',
-      avatar: require('../assets/images/DefaultAvatar.png'),
-    },
-    {
-      id: '3',
-      name: 'Bob Johnson',
-      connection: 'Colleague',
-      avatar: require('../assets/images/DefaultAvatar.png'),
-    },
-  ];
-
-  const renderItem = ({item}) => (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 10,
-      }}>
-      <Image
-        source={item.avatar}
-        style={{width: 50, height: 50, borderRadius: 25, marginRight: 10}}
-      />
-      <View>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>{item.name}</Text>
-        <Text style={{color: 'gray'}}>{item.connection}</Text>
-      </View>
-    </View>
-  );
+  const [invitationsScreen, setInvitationsScreen] = useState(false);
 
   const popIn = () => {
     setPop(true);
@@ -144,7 +106,12 @@ function NetworkScreen({navigation}: any) {
         </View>
       </TouchableOpacity>
       <View style={{backgroundColor: '#eeeeee', height: 10}} />
-      <TouchableOpacity>
+      <InvitationsScreen
+        isVisible={invitationsScreen}
+        setVisible={setInvitationsScreen}
+      />
+      <TouchableOpacity
+        onPress={() => setInvitationsScreen(!invitationsScreen)}>
         <View style={styles.manageNetworkView}>
           <Text style={styles.title}>Invitation</Text>
           <Icon type={Icons.AntDesign} name={'right'} />

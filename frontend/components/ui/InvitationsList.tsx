@@ -2,29 +2,29 @@
 import React, {useState} from 'react';
 import {View, Text, FlatList, Image, Pressable} from 'react-native';
 
-const friendsData = [
+const invitationsData = [
   {
     id: '1',
     name: 'John Doe',
-    connection: 'Friend',
+    datebetween: '1d',
     avatar: require('../../assets/images/Spiderman.jpg'),
   },
   {
     id: '2',
     name: 'Jane Smith',
-    connection: 'Family',
+    datebetween: '345d',
     avatar: require('../../assets/images/Spiderman.jpg'),
   },
   {
     id: '3',
     name: 'Bob Johnson',
-    connection: 'Colleague',
+    datebetween: '1d',
     avatar: require('../../assets/images/Spiderman.jpg'),
   },
 ];
 
-const FriendList = () => {
-  const [friends, setFriends] = useState(friendsData);
+const InvitationsList = () => {
+  const [invitations, setInvitation] = useState(invitationsData);
 
   const renderItem = ({item}) => (
     <View
@@ -34,10 +34,30 @@ const FriendList = () => {
         style={{width: 80, height: 80, borderRadius: 40, marginRight: 10}}
       />
       <View>
-        <Text style={{fontSize: 18, fontWeight: 'bold', color: 'black'}}>
-          {item.name}
-        </Text>
-        <Text style={{color: 'gray'}}>{item.connection}</Text>
+        <View
+          style={{
+            marginBottom: 10,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: 'bold',
+              color: 'black',
+            }}>
+            {item.name}
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: 'grey',
+              marginHorizontal: 20,
+            }}>
+            {item.datebetween}
+          </Text>
+        </View>
+
         <View style={{flexDirection: 'row'}}>
           <View
             style={{
@@ -59,7 +79,7 @@ const FriendList = () => {
                   fontWeight: 'bold',
                   textAlign: 'center',
                 }}>
-                Thêm bạn bè
+                Chấp nhận
               </Text>
             </Pressable>
           </View>
@@ -95,7 +115,7 @@ const FriendList = () => {
 
   return (
     <FlatList
-      data={friends.slice(0, 2)}
+      data={invitations}
       renderItem={renderItem}
       keyExtractor={item => item.id}
       showsVerticalScrollIndicator={false}
@@ -104,4 +124,4 @@ const FriendList = () => {
   );
 };
 
-export default FriendList;
+export default InvitationsList;
