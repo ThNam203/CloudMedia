@@ -11,7 +11,6 @@ import {
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
 import ChoosePostTemplate from '../components/ui/ChoosePostTemplate';
-import UploadPhoto from '../components/ui/UploadPhoto';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {setPostShow} from '../reducers/Post_reducer';
