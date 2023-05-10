@@ -1,45 +1,46 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
-import {CheckBox} from '@rneui/themed';
 import Modal from 'react-native-modal';
-function ListViewModal(props: any) {
+import Icon, {Icons} from './Icons';
+function MyJobsSetting(props: any) {
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
   };
-  const [selectedIndex, setIndex] = useState(props.selectedItem);
-  const list = props.listData;
+  const list = [
+    {title: 'Send in a message', icon: 'send'},
+    {title: 'Share via..', icon: 'share-alt'},
+    {title: 'Unsave', icon: 'bookmark-o'},
+  ];
   const ListItem = ({item}: any) => (
     <TouchableOpacity
-      onPress={() => {
-        setIndex(item.title);
-        props.setSelectedItem(item.title);
-      }}
+      onPress={() => {}}
       style={{
         display: 'flex',
         marginVertical: 7,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
       }}>
+      <View style={{width: 50}}>
+        <Icon
+          name={item.icon}
+          type={Icons.FontAwesome}
+          size={25}
+          color={'gray'}
+          style={{marginLeft: 20}}
+        />
+      </View>
+
       <Text
         style={{
-          color: '#323232',
+          color: 'gray',
+          fontWeight: 'bold',
           fontSize: 16,
           marginLeft: 20,
         }}>
         {item.title}
       </Text>
-      <CheckBox
-        checked={selectedIndex === item.title}
-        onPress={() => {
-          setIndex(item.title);
-          props.setSelectedItem(item.title);
-        }}
-        checkedIcon="dot-circle-o"
-        uncheckedIcon="circle-o"
-      />
     </TouchableOpacity>
   );
   return (
@@ -55,9 +56,6 @@ function ListViewModal(props: any) {
       style={styles.modal}>
       <View style={styles.modalContent}>
         <View style={styles.barIcon} />
-        <View style={{marginHorizontal: 20, marginTop: 20}}>
-          <Text style={{color: 'black', fontSize: 20}}>{props.title}</Text>
-        </View>
         <View
           style={{
             elevation: 1,
@@ -69,7 +67,7 @@ function ListViewModal(props: any) {
     </Modal>
   );
 }
-export default ListViewModal;
+export default MyJobsSetting;
 const styles = StyleSheet.create({
   modal: {
     justifyContent: 'flex-end',
@@ -81,7 +79,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    minHeight: 300,
+    minHeight: 150,
     paddingBottom: 20,
     elevation: 5,
   },

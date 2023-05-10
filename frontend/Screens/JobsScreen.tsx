@@ -12,6 +12,7 @@ import SaveButton from '../components/ui/SaveButton';
 import Colors from '../constants/Colors';
 import Icon, {Icons} from '../components/ui/Icons';
 import PostJobScreen from './PostJobScreen';
+import MyJobsScreen from './MyJobsScreen';
 
 const defaultJobs = [
   {
@@ -40,12 +41,13 @@ const defaultJobs = [
 const JobScreen = () => {
   const [jobs, setJobs] = useState(defaultJobs);
   const [postJob, setPostJob] = useState(false);
-
+  const [myJobs, setMyJobs] = useState(false);
   return (
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={{flexGrow: 1, backgroundColor: Colors.white}}>
         <PostJobScreen isVisible={postJob} setVisible={setPostJob} />
+        <MyJobsScreen isVisible={myJobs} setVisible={setMyJobs} />
         <View
           style={{
             flexDirection: 'row',
@@ -54,6 +56,7 @@ const JobScreen = () => {
             borderBottomWidth: 5,
           }}>
           <Pressable
+            onPress={() => setMyJobs(!myJobs)}
             style={styles.btnHeader}
             android_ripple={{color: Colors.gray, borderless: false}}>
             <View style={{marginTop: 4, marginRight: 4}}>
