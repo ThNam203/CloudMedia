@@ -1,17 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-  FlatList,
-  Image,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
 import React, {useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import FriendList from '../components/ui/FriendList';
 import InvitationsScreen from './InvitationsScreen';
+import AddFriendEmail from '../components/ui/AddFriendEmail';
 
 function NetworkScreen({navigation}: any) {
   const [icon_1] = useState(new Animated.Value(40));
@@ -21,6 +14,8 @@ function NetworkScreen({navigation}: any) {
   const [pop, setPop] = useState(false);
 
   const [invitationsScreen, setInvitationsScreen] = useState(false);
+
+  const [ishowAddEmail, setIshowAddEmail] = useState(false);
 
   const popIn = () => {
     setPop(true);
@@ -62,6 +57,7 @@ function NetworkScreen({navigation}: any) {
 
   return (
     <View style={styles.container}>
+      <AddFriendEmail isVisible={ishowAddEmail} setVisible={setIshowAddEmail} />
       <Animated.View style={[styles.circle, {bottom: icon_1}]}>
         <TouchableOpacity>
           <Icon
@@ -83,7 +79,11 @@ function NetworkScreen({navigation}: any) {
         </TouchableOpacity>
       </Animated.View>
       <Animated.View style={[styles.circle, {right: icon_3}]}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setIshowAddEmail(true);
+            popOut();
+          }}>
           <Icon
             type={Icons.MaterialIcons}
             name="group-add"
