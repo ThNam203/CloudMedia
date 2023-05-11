@@ -31,7 +31,11 @@ const FriendList = () => {
     <FlatList
       data={friends.slice(0, 2)}
       renderItem={({item}) => (
-        <ItemRequestUser item={item} nameRequest="Add friend" />
+        <ItemRequestUser
+          item={item}
+          nameRequest="Add friend"
+          nameRequest2="Cancel"
+        />
       )}
       keyExtractor={item => item.id}
       showsVerticalScrollIndicator={false}

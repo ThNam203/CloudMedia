@@ -6,6 +6,7 @@ import Colors from '../../constants/Colors';
 export default function ItemRequestUser({
   item,
   nameRequest,
+  nameRequest2,
   pressLeft,
   pressRight,
 }: any) {
@@ -20,7 +21,7 @@ export default function ItemRequestUser({
         <Text style={{fontSize: 18, fontWeight: 'bold', color: 'black'}}>
           {item.name}
         </Text>
-        <Text style={{color: 'gray'}}>{item.connection}</Text>
+        <Text style={{color: 'gray'}}>{`${item.datebetween}h`}</Text>
         <View style={{flexDirection: 'row'}}>
           <View
             style={{
@@ -70,7 +71,7 @@ export default function ItemRequestUser({
                   fontWeight: 'bold',
                   textAlign: 'center',
                 }}>
-                Cancle
+                {nameRequest2}
               </Text>
             </Pressable>
           </View>

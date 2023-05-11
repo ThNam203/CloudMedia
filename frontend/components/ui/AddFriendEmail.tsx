@@ -53,8 +53,8 @@ export default function AddFriendEmail(props: any) {
             ...infoEmail,
             name: data.name,
           });
-          setNameHandle('Add friend');
         }
+        setNameHandle('Add friend');
       })
       .catch(error => {
         console.error(error);
@@ -125,6 +125,7 @@ export default function AddFriendEmail(props: any) {
             <ItemRequestUser
               item={infoEmail}
               nameRequest={nameHandle}
+              nameRequest2="Cancel"
               pressLeft={handleAddFr}
               pressRight={toggleModal}
             />
