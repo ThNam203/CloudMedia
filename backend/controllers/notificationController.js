@@ -26,7 +26,7 @@ exports.getAllNotificationsOfAUser = asyncCatch(async (req, res, next) => {
     res.status(200).json(notifications)
 })
 
-exports.getANotification = asyncCatch(async (req, res, next) => {
+exports.getNotificationById = asyncCatch(async (req, res, next) => {
     const { notificationId } = req.params
     const notification = await Notification.findById(notificationId)
     if (!notification)

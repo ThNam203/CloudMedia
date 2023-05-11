@@ -2,15 +2,15 @@ const AppError = require('../../utils/AppError')
 
 module.exports = class JWTErrorHandler {
     static tokenExpiredErrorHandler() {
-        return AppError('Token is expired, please re-authenticate!', 401)
+        return new AppError('Token is expired, please re-authenticate!', 401)
     }
 
     static jsonWebTokenErrorHandler() {
-        return AppError('Invalid JWT token', 401)
+        return new AppError('Invalid JWT token', 401)
     }
 
     static notBeforeErrorHandler() {
-        return AppError('Token is not ready for authentication', 401)
+        return new AppError('Token is not ready for authentication', 401)
     }
 }
 

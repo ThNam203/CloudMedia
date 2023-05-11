@@ -26,10 +26,11 @@ function LoginScreen(props: any) {
       password: password,
     })
       .then((response: any) => {
+        console.log(response.data)
         if (response.status === 200) {
           return response.data;
         } else {
-          throw new Error('Login failed.');
+          throw new Error(response.errorMessage);
         }
       })
       .then(data => {

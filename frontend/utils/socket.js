@@ -1,3 +1,3 @@
 import {io} from 'socket.io-client';
-const socket = io('http://172.30.159.113:3000');
+const socket = io('http://10.0.140.194:3000');
 module.exports = socket;

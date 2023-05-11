@@ -7,7 +7,7 @@ const asyncCatch = require('../utils/asyncCatch')
 
 const getJWTToken = (userId) =>
     jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-        expiresIn: '7 days',
+        expiresIn: '30 days',
     })
 
 const verifyAndGetJWTToken = async (req, next) => {
@@ -54,12 +54,12 @@ exports.logIn = asyncCatch(async (req, res, next) => {
 
 exports.isUser = asyncCatch(async (req, res, next) => {
     const token = await verifyAndGetJWTToken(req, next)
-    if (!token) return next(new AppError('Invalid token', 401))
+    if (!token) return next(new AppError('Invalid JWT', 401))
 
     const data = jwt.decode(token)
     const userId = data.id
     const user = await User.findById(userId)
-    if (!user) return next(new AppError('No user found', 401))
+    if (!user) return next(new AppError('Invalid JWT', 401))
     next()
 })
 
@@ -86,7 +86,17 @@ exports.logOut = asyncCatch(async (req, res, next) => {
     if (!jwtBlacklist)
         return next(new AppError('Unable to logout, try again', 500))
 
-    res.status(204).end()
+    res.status(204).json()
+})
+
+exports.validateJwt = asyncCatch(async (req, res, next) => {
+    try {
+        await verifyAndGetJWTToken(req, next)
+    } catch (error) {
+        return next(error)
+    }
+
+    res.status(204).json()
 })
 
 // exports.changePassword = asyncCatch(async (req, res, next) => {

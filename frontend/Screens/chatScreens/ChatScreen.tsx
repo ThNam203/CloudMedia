@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   FlatList,
@@ -19,23 +19,13 @@ interface ChatRoom {
 
 const ChatScreen = () => {
   const navigation = useNavigation();
-  const chatRoomList: ChatRoom[] = [];
-  const [modalVisible, setModalVisible] = useState(false);
-  const [email, setEmail] = useState('');
+  const chatRooms: ChatRoom[] = [];
 
-  const addFriend = () => {
-    setModalVisible(true);
-  };
-
-  const saveFriend = () => {
-    setEmail('');
-    setModalVisible(false);
-  };
-
-  const cancelFriend = () => {
-    setEmail('');
-    setModalVisible(false);
-  };
+  useEffect(() => {
+    const getChatRooms = async () => {
+      
+    }
+  })
 
   const renderItem = ({item}: any) => (
     <TouchableOpacity
@@ -51,35 +41,10 @@ const ChatScreen = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={chatRoomList}
+        data={chatRooms}
         renderItem={renderItem}
         keyExtractor={item => item._id}
       />
-      <TouchableOpacity style={styles.button} onPress={addFriend}>
-        <Text style={styles.buttonText}>Add Friend</Text>
-      </TouchableOpacity>
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter email"
-              onChangeText={text => setEmail(text)}
-              value={email}
-            />
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity style={styles.modalButton} onPress={saveFriend}>
-                <Text style={styles.modalButtonText}>Save</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={cancelFriend}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -121,42 +86,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-  },
-  input: {
-    height: 40,
-    borderColor: '#CCCCCC',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  modalButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  modalButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
-    padding: 10,
-    marginLeft: 10,
-  },
-  modalButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
   },

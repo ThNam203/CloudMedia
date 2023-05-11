@@ -7,7 +7,7 @@ const router = new express.Router({
 })
 
 router
-    .route('/:userId/friend-request')
+    .route('')
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
@@ -15,7 +15,7 @@ router
     )
 
 router
-    .route('/:userId/friend-request/sent')
+    .route('/sent')
     .get(
         authController.isUser,
         authController.isOwnerOfThePath,
@@ -23,7 +23,7 @@ router
     )
 
 router
-    .route('/:userId/friend-request/received')
+    .route('/received')
     .get(
         authController.isUser,
         authController.isOwnerOfThePath,
@@ -31,7 +31,7 @@ router
     )
 
 router
-    .route('/:userId/friend-request/received/:requestId')
+    .route('/received/:requestId')
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,

@@ -25,20 +25,44 @@ const sendNotificationOnReply = (receiver, isAccept) => {
         userId: receiver._id,
         notificationType: 'FriendRequest',
         title: message,
-        content: '',
     })
 }
 
 exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
     const { userId: senderId } = req.params
-    const { receiverId } = req.body
+    const { receiverEmail } = req.body
 
-    const receiver = await User.findById(receiverId)
-    if (!receiver) return next(new AppError(`Invalid receiver's id`, 400))
+    const receiver = await User.findOne({ email: receiverEmail })
+    if (!receiver) return next(new AppError(`Email not found`, 400))
+    if (receiver._id === senderId)
+        return next(new AppError('Unable to add friend to yourself', 400))
+
+    // check if friend request is pending
+    const isExisted = await FriendRequest.findOne({
+        senderId,
+        receiverId: receiver._id,
+    })
+
+    if (isExisted)
+        return next(new AppError('The request is already on pending', 400))
+
+    // check if already been friend
+    await User.find(
+        { connections: { $in: [receiver._id] } },
+        (err, documents) => {
+            if (err) {
+                return next(new AppError(err, 500))
+            }
+
+            if (documents.length > 0) {
+                return next(new AppError('Already friend with '))
+            }
+        }
+    )
 
     const newFriendRequest = await FriendRequest.create({
         senderId,
-        receiverId,
+        receiverId: receiver._id,
     })
 
     if (!newFriendRequest)
@@ -83,7 +107,9 @@ exports.replyFriendRequest = asyncCatch(async (req, res, next) => {
         sendNotificationOnReply(requestSender, true)
 
         await Promise.all(respondent.save(), requestSender.save())
-    } else sendNotificationOnReply(requestSender, false)
+    } else if (response === 'Decline')
+        sendNotificationOnReply(requestSender, false)
+    else return next(new AppError('False response format', 400))
 
     res.status(204).end()
 })

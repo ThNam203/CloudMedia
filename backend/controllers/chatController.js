@@ -14,7 +14,7 @@ const createNewChatRoom = async (title, chatRoomMembers) => {
     return newChatRoom
 }
 
-exports.createNewChatRoom = asyncCatch(async (req, res, next) => {
+exports.checkAndCreateNewChatRoom = asyncCatch(async (req, res, next) => {
     const { title, chatRoomMemberIds } = req.body
 
     let chatRoomMembers
@@ -39,30 +39,7 @@ exports.createNewChatRoom = asyncCatch(async (req, res, next) => {
         return next(e)
     }
 
-    res.status(200).json({
-        status: 'success',
-        data: newChatRoom,
-    })
-})
-
-exports.createNewMessage = asyncCatch(async (req, res, next) => {
-    const { chatRoomId, messageData } = req.params
-    const chatRoom = await ChatRoom.findById(chatRoomId)
-    if (!chatRoom) return next(new AppError('Chat room not found', 400))
-
-    const newMessage = await ChatMessage.create({
-        chatRoomId: chatRoom._id,
-        message: messageData.message,
-        sender: messageData.sender,
-    })
-
-    if (!newMessage)
-        return next(new AppError('Unable to create new message', 500))
-
-    res.status(200).json({
-        status: 'success',
-        data: newMessage,
-    })
+    res.status(200).json(newChatRoom)
 })
 
 exports.getMessagesInChatRoomId = asyncCatch(async (req, res, next) => {
