@@ -17,9 +17,13 @@ export default function AppLoader() {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.3)',
-    zIndex: 1,
+    zIndex: 100,
+  },
+  animation: {
+    marginTop: 30,
+    width: 75,
+    height: 75,
   },
 });

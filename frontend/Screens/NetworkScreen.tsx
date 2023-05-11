@@ -8,20 +8,18 @@ import {
   FlatList,
   Image,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import FriendList from '../components/ui/FriendList';
-import friendApi from '../api/friendApi';
-import { useSelector } from 'react-redux';
-import { AxiosError } from 'axios';
 
 function NetworkScreen({navigation}: any) {
   const [icon_1] = useState(new Animated.Value(40));
   const [icon_2] = useState(new Animated.Value(40));
   const [icon_3] = useState(new Animated.Value(40));
 
-  const userId = useSelector((state: any) => state.uid.id)
-  const jwt = useSelector((state: any) => state.token.key)
+  const [friends, setFriends] = useState(friendsData);
+
+  const [pop, setPop] = useState(false);
 
   const friendsData = [
     {
@@ -43,28 +41,6 @@ function NetworkScreen({navigation}: any) {
       avatar: require('../assets/images/DefaultAvatar.png'),
     },
   ];
-
-  const [friends, setFriends] = useState(friendsData);
-  const [friendRequests, setFriendRequests] = useState([]);
-
-  const [pop, setPop] = useState(false);
-
-  useEffect(() => {
-    const fetchFriendRequests = async () => {
-      friendApi.getFriendRequests(userId, jwt).then(response => {
-        console.log('concac')
-        console.log(JSON.stringify(response, null, 2))
-      }).catch((error: any) => {
-        console.log(error)
-      })
-        
-      // setFriendRequests(friendRequests.data)
-      // console.log(friendRequests.data)
-      // console.log('end of friend requests')
-    }
-
-    fetchFriendRequests()
-  })
 
   const renderItem = ({item}) => (
     <View
@@ -123,8 +99,97 @@ function NetworkScreen({navigation}: any) {
   };
 
   return (
-    <View>
-      <Text>NetworkScreen</Text>
+    <View style={styles.container}>
+      <Animated.View style={[styles.circle, {bottom: icon_1}]}>
+        <TouchableOpacity>
+          <Icon
+            type={Icons.FontAwesome}
+            name="address-book-o"
+            size={25}
+            color="#0A66C2"
+          />
+        </TouchableOpacity>
+      </Animated.View>
+      <Animated.View style={[styles.circle, {bottom: icon_2, right: icon_2}]}>
+        <TouchableOpacity>
+          <Icon
+            type={Icons.AntDesign}
+            name="qrcode"
+            size={25}
+            color="#0A66C2"
+          />
+        </TouchableOpacity>
+      </Animated.View>
+      <Animated.View style={[styles.circle, {right: icon_3}]}>
+        <TouchableOpacity>
+          <Icon
+            type={Icons.MaterialIcons}
+            name="group-add"
+            size={25}
+            color="#0A66C2"
+          />
+        </TouchableOpacity>
+      </Animated.View>
+      <TouchableOpacity
+        style={[styles.circle, {backgroundColor: '#0A66C2'}]}
+        onPress={() => {
+          pop === false ? popIn() : popOut();
+        }}>
+        <Icon type={Icons.AntDesign} name="adduser" size={25} color="#FFFF" />
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <View style={styles.manageNetworkView}>
+          <Text style={styles.title}>Manage my network</Text>
+          <Icon type={Icons.AntDesign} name={'right'} />
+        </View>
+      </TouchableOpacity>
+      <View style={{backgroundColor: '#eeeeee', height: 10}} />
+      <TouchableOpacity>
+        <View style={styles.manageNetworkView}>
+          <Text style={styles.title}>Invitation</Text>
+          <Icon type={Icons.AntDesign} name={'right'} />
+        </View>
+      </TouchableOpacity>
+      <View style={{backgroundColor: '#eeeeee', height: 10}} />
+      <View>
+        <View style={styles.manageNetworkView}>
+          <Text style={styles.title}>People you may know</Text>
+        </View>
+        <View style={{marginLeft: 20}}>
+          <FriendList />
+        </View>
+      </View>
     </View>
   );
 }
+
+export default NetworkScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  manageNetworkView: {
+    margin: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  title: {
+    color: '#0A66C2',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  circle: {
+    backgroundColor: 'white',
+    width: 60,
+    height: 60,
+    position: 'absolute',
+    bottom: 40,
+    right: 40,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+});

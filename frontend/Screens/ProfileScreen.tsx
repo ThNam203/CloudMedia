@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -8,177 +8,289 @@ import {
   Text,
   View,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
+import ActivitySection from '../components/ui/ActivitySection';
 import UploadPhoto from '../components/ui/UploadPhoto';
+
+import EditProfileScreen from './EditProfileScreen';
+
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {user_avatarImg, user_logout} from '../api/user_api';
+import {nameStorage, storeData} from '../reducers/AsyncStorage';
+import {setStatus} from '../reducers/Loading_reducer';
+import {updateAvatar} from '../reducers/User_reducer';
+import Colors from '../constants/Colors';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-function ProfileScreen() {
-  const [imgAvatar, setImgAvatar] = useState('');
+function ProfileScreen({navigation}: any) {
+
   const [isModalVisible, setModalVisible] = useState(false);
 
+  const [editProfile, setEditProfile] = useState(false);
+
+  const user = useSelector((state: RootState) => state.userInfo);
+  const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((state: RootState) => state.uid.id);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log(user);
+  }, []);
+
+  const handleLogout = async () => {
+    user_logout(token)
+      .then((response: any) => {
+        if (response.status === 204) {
+          console.log(response);
+          storeData(false, nameStorage.isLogin)
+            .then(() => {
+              navigation.navigate('login');
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        } else {
+          throw new Error('Logout failed.');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  const postImage = (image: any) => {
+    const dataForm = new FormData();
+    dataForm.append('profile-image', {
+      uri: image.path,
+      type: image.mime,
+      name: image.filename || 'profile-image',
+    });
+    dispatch(setStatus(true));
+    user_avatarImg(dataForm, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          return response.data;
+        } else {
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
+        }
+      })
+      .then((data: any) => {
+        dispatch(updateAvatar(data.imagePath));
+      })
+      .catch(error => console.error(error))
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
+  };
+
   return (
-    <View style={styles.container}>
-      <UploadPhoto
-        isVisible={isModalVisible}
-        setVisible={setModalVisible}
-        setPhoto={setImgAvatar}
-      />
-      <View style={styles.backgroundAvatarContainer}>
-        <Image
-          source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
-          style={styles.backgroundAvatarImage}
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View style={styles.container}>
+        <UploadPhoto
+          isVisible={isModalVisible}
+          setVisible={setModalVisible}
+          postImage={postImage}
         />
-      </View>
-      <View
-        style={{
-          height: 100,
-          width: screenWidth,
-          flexDirection: 'row-reverse',
-        }}>
-        <View style={styles.avatarContainer}>
+        <EditProfileScreen
+          isVisible={editProfile}
+          setVisible={setEditProfile}
+        />
+        <View style={styles.backgroundAvatarContainer}>
           <Image
-            source={
-              imgAvatar === ''
-                ? require('../assets/images/Spiderman.jpg')
-                : {uri: imgAvatar}
-            }
-            style={styles.avatarImage}
+            source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
+            style={styles.backgroundAvatarImage}
           />
-          <View style={styles.buttonAddImageOuter}>
-            <TouchableOpacity
-              style={styles.buttonAddImage}
-              onPress={() => setModalVisible(!isModalVisible)}>
-              <Image
-                source={require('../assets/images/Add.png')}
-                style={{width: 25, height: 25, marginTop: 3}}
-              />
-            </TouchableOpacity>
-          </View>
         </View>
-        <TouchableOpacity
-          style={{
-            alignSelf: 'flex-start',
-            margin: 10,
-          }}>
-          <Image
-            style={{height: 28, width: 28}}
-            source={require('../assets/images/la_pen.png')}
-          />
-        </TouchableOpacity>
-      </View>
-      <View>
-        <Text style={styles.textName}>Spider man</Text>
-        <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
-          Attended Multiverse of Madness
-        </Text>
-        <Text
-          style={[
-            styles.textName,
-            {fontSize: 18, fontWeight: 'normal', marginTop: 10},
-          ]}>
-          Academy of Heros (AOF)
-        </Text>
-        {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
-        <Text
-          style={[
-            styles.textName,
-            {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
-          ]}>
-          Da Nang, Viet Nam
-        </Text>
-        <Text
-          style={[
-            styles.textName,
-            {
-              fontSize: 18,
-              fontWeight: 'normal',
-              color: '#000000a2',
-              marginTop: 10,
-            },
-          ]}>
-          0 connections
-        </Text>
         <View
-          style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
-          <View
-            style={{
-              height: 35,
-              width: 150,
-              borderRadius: 30,
-              overflow: 'hidden',
-              backgroundColor: '#0A66C2',
-              alignItems: 'center',
-            }}>
-            <Pressable
-              android_ripple={{color: '#00043d'}}
-              style={{
-                backgroundColor: 'transparent',
-                width: 150,
-                height: 35,
-                justifyContent: 'center',
-              }}>
-              <Text style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
-                Open to
-              </Text>
-            </Pressable>
+          style={{
+            height: 100,
+            width: screenWidth,
+            flexDirection: 'row-reverse',
+          }}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={
+                user.profileImagePath === ''
+                  ? require('../assets/images/Spiderman.jpg')
+                  : {uri: user.profileImagePath}
+              }
+              style={styles.avatarImage}
+            />
+            <View style={styles.buttonAddImageOuter}>
+              <TouchableOpacity
+                style={styles.buttonAddImage}
+                onPress={() => setModalVisible(!isModalVisible)}>
+                <Image
+                  source={require('../assets/images/Add.png')}
+                  style={{width: 25, height: 25, marginTop: 3}}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View
+          <TouchableOpacity
             style={{
-              height: 35,
-              width: 150,
-              borderRadius: 30,
-              borderWidth: 1,
-              borderColor: '#0A66C2',
-              overflow: 'hidden',
-              backgroundColor: 'white',
-              marginHorizontal: 10,
-            }}>
-            <Pressable
-              android_ripple={{color: '#0d8fe0ff'}}
+              alignSelf: 'flex-start',
+              margin: 10,
+            }}
+            onPress={() => setEditProfile(!editProfile)}>
+            <Image
+              style={{height: 28, width: 28}}
+              source={require('../assets/images/la_pen.png')}
+            />
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text style={styles.textName}>{user.name}</Text>
+          <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
+            Attended Multiverse of Madness
+          </Text>
+          <Text
+            style={[
+              styles.textName,
+              {fontSize: 18, fontWeight: 'normal', marginTop: 10},
+            ]}>
+            Academy of Heros (AOF)
+          </Text>
+          {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
+          <Text
+            style={[
+              styles.textName,
+              {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
+            ]}>
+            Da Nang, Viet Nam
+          </Text>
+          <Text
+            style={[
+              styles.textName,
+              {
+                fontSize: 18,
+                fontWeight: 'normal',
+                color: '#000000a2',
+                marginTop: 10,
+              },
+            ]}>
+            0 connections
+          </Text>
+          <View
+            style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
+            <View
               style={{
-                backgroundColor: 'transparent',
+                height: 35,
                 width: 150,
-                height: 35,
-                justifyContent: 'center',
-              }}>
-              <Text
-                style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
-                Add section
-              </Text>
-            </Pressable>
-          </View>
-          <View
-            style={{
-              height: 35,
-              width: 35,
-              borderRadius: 17.5,
-              borderWidth: 1,
-              borderColor: '#727272',
-              overflow: 'hidden',
-              backgroundColor: 'white',
-              marginHorizontal: 10,
-            }}>
-            <Pressable
-              android_ripple={{color: '#0d8fe0ff'}}
-              style={{
-                backgroundColor: 'transparent',
-                width: 35,
-                height: 35,
-                justifyContent: 'center',
+                borderRadius: 30,
+                overflow: 'hidden',
+                backgroundColor: '#0A66C2',
                 alignItems: 'center',
               }}>
-              <Image
-                source={require('../assets/images/3Dot.png')}
-                style={{width: 25, height: 25}}
-              />
-            </Pressable>
+              <Pressable
+                android_ripple={{color: '#00043d'}}
+                style={{
+                  backgroundColor: 'transparent',
+                  width: 150,
+                  height: 35,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
+                  Open to
+                </Text>
+              </Pressable>
+            </View>
+            <View
+              style={{
+                height: 35,
+                width: 150,
+                borderRadius: 30,
+                borderWidth: 1,
+                borderColor: '#0A66C2',
+                overflow: 'hidden',
+                backgroundColor: 'white',
+                marginHorizontal: 10,
+              }}>
+              <Pressable
+                android_ripple={{color: '#0d8fe0ff'}}
+                style={{
+                  backgroundColor: 'transparent',
+                  width: 150,
+                  height: 35,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
+                  Add section
+                </Text>
+              </Pressable>
+            </View>
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                borderRadius: 17.5,
+                borderWidth: 1,
+                borderColor: '#727272',
+                overflow: 'hidden',
+                backgroundColor: 'white',
+                marginHorizontal: 10,
+              }}>
+              <Pressable
+                onPress={() => {}}
+                android_ripple={{color: '#0d8fe0ff'}}
+                style={{
+                  backgroundColor: 'transparent',
+                  width: 35,
+                  height: 35,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Image
+                  source={require('../assets/images/3Dot.png')}
+                  style={{width: 25, height: 25}}
+                />
+              </Pressable>
+            </View>
+          </View>
+          <View
+            style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
+          />
+          <View>
+            <ActivitySection />
           </View>
         </View>
-        <View style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}} />
+        <View
+          style={{
+            overflow: 'hidden',
+            borderRadius: 15,
+            width: 300,
+            alignSelf: 'center',
+            marginBottom: 10,
+          }}>
+          <Pressable
+            onPress={handleLogout}
+            style={styles.btnLogout}
+            android_ripple={{color: '#613FC2', borderless: false}}>
+            <Text
+              style={[
+                styles.fontText,
+                {
+                  fontWeight: '700',
+                  lineHeight: 20,
+                  alignSelf: 'center',
+                  color: '#ffffff',
+                },
+              ]}>
+              Log out
+            </Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 export default ProfileScreen;
@@ -238,5 +350,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     marginLeft: 25,
+  },
+  btnLogout: {
+    backgroundColor: Colors.skyBlue,
+    padding: 18,
+    elevation: 3,
+  },
+  fontText: {
+    fontFamily: 'Roboto',
+    fontStyle: 'normal',
+    fontSize: 20,
+    lineHeight: 19,
   },
 });

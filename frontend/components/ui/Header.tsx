@@ -34,7 +34,7 @@ export default function Header({navigation}: any) {
       <TouchableOpacity
         style={{marginRight: 10}}
         onPress={() => {
-          navigation.navigate('chat')
+          console.log('as');
         }}>
         <Icon type={Icons.Ionicons} name="chatbox-ellipses-outline" />
       </TouchableOpacity>

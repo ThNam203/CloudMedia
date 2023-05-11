@@ -8,14 +8,26 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RectangleButton from '../components/ui/RectangleButton';
 import SignUpHrScreen from './SignUpScreen';
 import LoginScreen from './LoginScreen';
+import {nameStorage, retrieveData} from '../reducers/AsyncStorage';
+import {user_info} from '../api/user_api';
+import jwt_decode from 'jwt-decode';
+import {useDispatch, useSelector} from 'react-redux';
+import {UserInfo, saveUser} from '../reducers/User_reducer';
+import {setStatus} from '../reducers/Loading_reducer';
+import {setToken} from '../reducers/Token_reducer';
+import {setIdFromJwt} from '../reducers/Uid_reducer';
+import {RootState} from '../reducers/Store';
+import AppLoader from '../components/ui/AppLoader';
 
 function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
   const [modalLoginVisible, setModalLoginVisible] = useState(false);
+  const isLoading = useSelector((state: RootState) => state.loading.status);
+  const dispatch = useDispatch();
   function closeModalLogin() {
     setModalLoginVisible(false);
   }
@@ -26,6 +38,55 @@ function FirstTimeUseScreen({navigation}: any) {
   const navigateToMain = () => {
     navigation.replace('main');
   };
+
+  const saveInfo = (jwt: any) => {
+    const json = jwt_decode(jwt) as {id: string};
+    const idUser = json.id;
+    console.log(idUser);
+    user_info(idUser)
+      .then((response: any) => {
+        if (response.status === 200) {
+          return response.data;
+        } else {
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
+        }
+      })
+      .then(data => {
+        console.log(data);
+        const user: UserInfo = {...data};
+        // miss info
+        dispatch(saveUser(user));
+      })
+      .catch(error => {
+        console.error(error);
+      })
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
+  };
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const islogin = await retrieveData(nameStorage.isLogin);
+      if (islogin) {
+        try {
+          dispatch(setStatus(true));
+          const jwt = await retrieveData(nameStorage.jwtToken);
+          dispatch(setToken(jwt));
+          dispatch(setIdFromJwt(jwt));
+          saveInfo(jwt);
+          navigateToMain();
+        } catch (error) {
+          console.log(error);
+        } finally {
+          dispatch(setStatus(false));
+        }
+      }
+    };
+
+    checkLogin();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -76,6 +137,7 @@ function FirstTimeUseScreen({navigation}: any) {
           onRequestClose={() => {
             setModalHrVisible(!modalHrVisible);
           }}>
+          {isLoading ? <AppLoader /> : null}
           <TouchableOpacity
             style={{flex: 1}}
             activeOpacity={1}
@@ -101,6 +163,7 @@ function FirstTimeUseScreen({navigation}: any) {
           onRequestClose={() => {
             setModalLoginVisible(!modalLoginVisible);
           }}>
+          {isLoading ? <AppLoader /> : null}
           <TouchableOpacity
             style={{flex: 4}}
             activeOpacity={1}
@@ -113,6 +176,7 @@ function FirstTimeUseScreen({navigation}: any) {
                 setModalHrVisible(true);
               }}
               handleNavigate={navigateToMain}
+              saveInfo={saveInfo}
             />
           </View>
         </Modal>

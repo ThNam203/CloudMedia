@@ -5,7 +5,7 @@ interface Uid {
   id: string;
 }
 const initialState: Uid = {
-  id: '',
+  id: 'null',
 };
 
 const UidSlice = createSlice({
