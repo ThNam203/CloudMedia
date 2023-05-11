@@ -14,7 +14,7 @@ const createNewChatRoom = async (title, chatRoomMembers) => {
     return newChatRoom
 }
 
-exports.createNewChatRoom = asyncCatch(async (req, res, next) => {
+exports.checkAndCreateNewChatRoom = asyncCatch(async (req, res, next) => {
     const { title, chatRoomMemberIds } = req.body
 
     let chatRoomMembers
@@ -39,30 +39,19 @@ exports.createNewChatRoom = asyncCatch(async (req, res, next) => {
         return next(e)
     }
 
-    res.status(200).json({
-        status: 'success',
-        data: newChatRoom,
-    })
+    res.status(200).json(newChatRoom)
 })
 
-exports.createNewMessage = asyncCatch(async (req, res, next) => {
-    const { chatRoomId, messageData } = req.params
-    const chatRoom = await ChatRoom.findById(chatRoomId)
-    if (!chatRoom) return next(new AppError('Chat room not found', 400))
+exports.getAllChatRooms = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    let chatrooms
+    try {
+        chatrooms = await ChatRoom.find({ members: { $in: [userId] } })
+    } catch (err) {
+        return next(err)
+    }
 
-    const newMessage = await ChatMessage.create({
-        chatRoomId: chatRoom._id,
-        message: messageData.message,
-        sender: messageData.sender,
-    })
-
-    if (!newMessage)
-        return next(new AppError('Unable to create new message', 500))
-
-    res.status(200).json({
-        status: 'success',
-        data: newMessage,
-    })
+    res.status(200).json(chatrooms)
 })
 
 exports.getMessagesInChatRoomId = asyncCatch(async (req, res, next) => {
@@ -72,13 +61,12 @@ exports.getMessagesInChatRoomId = asyncCatch(async (req, res, next) => {
     if (limit < 0) limit = 1
     else if (limit > 100) limit = 100
 
-    const messages = await ChatMessage.find({ chatRoomId: chatRoomId })
+    const messages = await ChatMessage.find({ chatRoomId })
         .sort({ createdAt: -1 })
         .skip(page * limit)
         .limit(limit)
 
-    res.status(200).json({
-        status: 'success',
-        data: messages,
-    })
+    const reverseMessages = messages.reverse()
+
+    res.status(200).json(reverseMessages)
 })

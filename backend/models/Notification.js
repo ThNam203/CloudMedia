@@ -1,33 +1,33 @@
 const mongoose = require('mongoose')
 
-const notificationSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+const notificationSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        notificationType: {
+            type: String,
+            required: true,
+            enum: ['FriendRequest', 'NewMessage', 'Comment', 'Like', 'Share'],
+        },
+        content: {
+            type: String,
+            required: true,
+        },
+        isRead: {
+            type: Boolean,
+            default: false,
+        },
+        link: {
+            type: String,
+        },
     },
-    notificationType: {
-        type: String,
-        required: true,
-        enum: ['FriendRequest', 'NewMessage', 'Comment', 'Like', 'Share'],
-    },
-    title: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    content: {
-        type: String,
-        required: true,
-    },
-    isRead: {
-        type: Boolean,
-        default: false,
-    },
-    link: {
-        type: String,
-    },
-})
+    {
+        timestamps: true,
+    }
+)
 
 notificationSchema.methods.createNewNotification = (req) =>
     this.create({

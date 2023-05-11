@@ -20,6 +20,7 @@ export default function Routers() {
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="login" component={FirstTimeUseScreen} />
       <Stack.Screen name="main" component={BottomTabs} />
+      <Stack.Screen name="profile" component={ProfileScreen} />
       <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="search" component={SearchScreen} />
       <Stack.Screen name="chatRoom" component={ChatRoom} />

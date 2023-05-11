@@ -1,30 +1,29 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
 
-export default function ChatMessage({item, user}: any) {
-  const status = item.user !== user;
+export default function ChatMessage({chat, userId}: any) {
+  const status = chat.senderId !== userId;
+  const rawTime = new Date(chat.createdAt)
+  const time = rawTime.toLocaleString()
+
 
   return (
-    <View>
       <View
         style={
           status
             ? styles.mmessageWrapper
             : [styles.mmessageWrapper, {alignItems: 'flex-end'}]
         }>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <View
-            style={
-              status
-                ? styles.mmessage
-                : [styles.mmessage, {backgroundColor: 'rgb(194, 243, 194)'}]
-            }>
-            <Text>{item.message}</Text>
-          </View>
-          <Text style={{marginLeft: 8}}>{item.time}</Text>
+        <View
+          style={
+            status
+              ? styles.mmessage
+              : [styles.mmessage, {backgroundColor: 'rgb(194, 243, 194)'}]
+          }>
+          <Text>{chat.message}</Text>
         </View>
+        <Text style={{marginLeft: 8}}>{time}</Text>
       </View>
-    </View>
   );
 }
 

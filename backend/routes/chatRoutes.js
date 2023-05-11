@@ -2,13 +2,13 @@ const express = require('express')
 const authController = require('../controllers/authController')
 const chatController = require('../controllers/chatController')
 
-const router = new express.Router()
+const router = express.Router({
+    mergeParams: true,
+})
+
+router.route('/').post(chatController.checkAndCreateNewChatRoom)
 router
-    .route('/')
-    .post(
-        authController.isUser,
-        authController.isOwnerOfThePath,
-        chatController.createNewChatRoom
-    )
+    .route('/:chatRoomId')
+    .get(authController.isUser, chatController.getMessagesInChatRoomId)
 
 module.exports = router

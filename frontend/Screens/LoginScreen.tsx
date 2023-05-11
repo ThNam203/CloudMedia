@@ -24,14 +24,17 @@ function LoginScreen(props: any) {
       password: password,
     })
       .then((response: any) => {
+        console.log(response.data)
         if (response.status === 200) {
           return response.data;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          throw new Error(response.errorMessage);
         }
       })
       .then(data => {
+        // connect to socket
+        require('../utils/socket')
+        
         // do something with the JWT token
         const jwtToken = data;
         storeData(jwtToken, nameStorage.jwtToken);

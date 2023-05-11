@@ -16,33 +16,63 @@ const createChatRoomOnAccept = async (firstUser, secondUser) => {
     }
 }
 
-const sendNotificationOnReply = (receiver, isAccept) => {
+const sendNotificationOnReply = (sender, receiver, isAccept) => {
     let message
     if (isAccept) message = `${receiver.name} accepted your friend request`
     else message = `${receiver.name} denied your friend request`
 
     Notification.create({
-        userId: receiver._id,
+        userId: sender._id,
         notificationType: 'FriendRequest',
-        title: message,
-        content: '',
+        content: message,
+    })
+}
+
+const sendNotificationOnRequest = async (senderId, receiverId) => {
+    const sender = await User.findById(senderId)
+    const content = `${sender.name} has sent you a friend request`
+
+    Notification.create({
+        userId: receiverId,
+        notificationType: 'FriendRequest',
+        content,
     })
 }
 
 exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
     const { userId: senderId } = req.params
-    const { receiverId } = req.body
+    const { receiverEmail } = req.body
 
-    const receiver = await User.findById(receiverId)
-    if (!receiver) return next(new AppError(`Invalid receiver's id`, 400))
+    const receiver = await User.findOne({ email: receiverEmail })
+    if (!receiver) return next(new AppError(`Email not found`, 400))
+    if (receiver._id === senderId)
+        return next(new AppError('Unable to add friend to yourself', 400))
 
+    // check if friend request is pending
+    const isExisted = await FriendRequest.findOne({
+        senderId,
+        receiverId: receiver._id,
+    })
+
+    if (isExisted)
+        return next(new AppError('The request is already on pending', 400))
+
+    // check if already been friend
+    const isFriended = await User.findOne({
+        connections: { $in: [receiver._id] },
+    })
+    if (isFriended) return next(new AppError('Already friend', 400))
+
+    // create the request in db
     const newFriendRequest = await FriendRequest.create({
         senderId,
-        receiverId,
+        receiverId: receiver._id,
     })
 
     if (!newFriendRequest)
         return next(new AppError('Unable to create new friend request', 500))
+
+    sendNotificationOnRequest(senderId, receiver._id)
 
     res.status(200).json(newFriendRequest)
 })
@@ -67,11 +97,16 @@ exports.replyFriendRequest = asyncCatch(async (req, res, next) => {
     const { requestId: friendRequestId, userId: respondentId } = req.params
     const { response } = req.body
 
-    const respondent = await User.find(respondentId)
+    const respondent = await User.findById(respondentId)
 
+    // check if the respone is correct
+    if (response !== 'Accept' && response !== 'Decline')
+        return next(new AppError('False response format', 400))
+
+    // delete the friend request
     const friendRequest = await FriendRequest.findByIdAndDelete(friendRequestId)
     if (!friendRequest)
-        return next(new AppError(`Invalid friend request's id`, 400))
+        return next(new AppError('Invalid friend request id', 400))
 
     const requestSender = await User.findById(friendRequest.senderId)
 
@@ -80,10 +115,11 @@ exports.replyFriendRequest = asyncCatch(async (req, res, next) => {
         requestSender.connections.push(respondent._id)
 
         createChatRoomOnAccept(respondent, requestSender)
-        sendNotificationOnReply(requestSender, true)
+        sendNotificationOnReply(requestSender, respondent, true)
 
-        await Promise.all(respondent.save(), requestSender.save())
-    } else sendNotificationOnReply(requestSender, false)
+        await Promise.all([respondent.save(), requestSender.save()])
+    } else if (response === 'Decline')
+        sendNotificationOnReply(requestSender, false)
 
     res.status(204).end()
 })
