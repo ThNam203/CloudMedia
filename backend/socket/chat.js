@@ -7,6 +7,7 @@ const io = socketIO.getIO()
 const joinChatRooms = async (userId, socket) => {
     const chatrooms = await ChatRoom.find({ members: { $in: [userId] } })
     chatrooms.forEach((chatroom) => {
+        console.log('the user entered ' + chatroom._id.toString())
         socket.join(chatroom._id.toString())
     })
 }
@@ -31,7 +32,6 @@ io.on('connection', (socket) => {
         if (!newChatMessage)
             return socket.emit('messageError', 'Unable to send new message')
 
-        console.log('sent message')
         io.in(chatRoomId).emit('newMessage', newChatMessage)
     })
 })

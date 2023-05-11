@@ -6,7 +6,7 @@ import jwt_decode from 'jwt-decode'
   const userJWT = await retrieveData(nameStorage.jwtToken);
   const data = jwt_decode(userJWT)
   const userId = data.id
-  const socket = io('http://10.0.140.194:3000', {
+  const socket = io('https://workwize.azurewebsites.net', {
     auth: {
       userId,
     }

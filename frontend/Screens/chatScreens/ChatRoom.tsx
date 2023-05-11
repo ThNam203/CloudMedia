@@ -38,6 +38,11 @@ const ChatRoom = ({ route }: any) => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
+    if (flatListRef.current !== null)
+      flatListRef.current.scrollToEnd();
+  }, [chatMessages])
+
+  useEffect(() => {
     const getAllMessages = async () => {
       const rawMessages = await chatApi.getMessagesFromAChatRoom(jwt, chatRoomId)
       const messages: Message[] = rawMessages.data.map((rawMessage: any) => {
@@ -45,7 +50,6 @@ const ChatRoom = ({ route }: any) => {
         return { _id, message, senderId, createdAt }
       });
       setChatMessages(messages)
-      if (flatListRef.current ) flatListRef.current.scrollToEnd();
     }
     
     socket.on('newMessage', (newRawMessage: any) => {
