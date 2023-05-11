@@ -42,6 +42,18 @@ exports.checkAndCreateNewChatRoom = asyncCatch(async (req, res, next) => {
     res.status(200).json(newChatRoom)
 })
 
+exports.getAllChatRooms = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    let chatrooms
+    try {
+        chatrooms = await ChatRoom.find({ members: { $in: [userId] } })
+    } catch (err) {
+        return next(err)
+    }
+
+    res.status(200).json(chatrooms)
+})
+
 exports.getMessagesInChatRoomId = asyncCatch(async (req, res, next) => {
     const { chatRoomId } = req.params
     let { page = 0, limit = 20 } = req.query
@@ -49,13 +61,12 @@ exports.getMessagesInChatRoomId = asyncCatch(async (req, res, next) => {
     if (limit < 0) limit = 1
     else if (limit > 100) limit = 100
 
-    const messages = await ChatMessage.find({ chatRoomId: chatRoomId })
+    const messages = await ChatMessage.find({ chatRoomId })
         .sort({ createdAt: -1 })
         .skip(page * limit)
         .limit(limit)
 
-    res.status(200).json({
-        status: 'success',
-        data: messages,
-    })
+    const reverseMessages = messages.reverse()
+
+    res.status(200).json(reverseMessages)
 })

@@ -4,9 +4,18 @@ const socketIO = require('./socket')
 
 const io = socketIO.getIO()
 
+const joinChatRooms = async (userId, socket) => {
+    const chatrooms = await ChatRoom.find({ members: { $in: [userId] } })
+    chatrooms.forEach((chatroom) => {
+        socket.join(chatroom._id.toString())
+    })
+}
+
 io.on('connection', (socket) => {
+    joinChatRooms(socket.handshake.auth.userId, socket)
+
     socket.on('newMessage', async (data) => {
-        const { chatRoomId, message, sender } = data
+        const { chatRoomId, message, senderId } = data
         const chatRoom = await ChatRoom.findById(chatRoomId)
         if (!chatRoom)
             return socket
@@ -16,12 +25,13 @@ io.on('connection', (socket) => {
         const newChatMessage = await ChatMessage.create({
             chatRoomId,
             message,
-            sender,
+            senderId,
         })
 
         if (!newChatMessage)
             return socket.emit('messageError', 'Unable to send new message')
 
-        socket.in(chatRoomId).emit('newMessage', newChatMessage)
+        console.log('sent message')
+        io.in(chatRoomId).emit('newMessage', newChatMessage)
     })
 })

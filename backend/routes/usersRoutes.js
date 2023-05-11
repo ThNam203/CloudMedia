@@ -1,21 +1,13 @@
 const express = require('express')
 const usersController = require('../controllers/usersController')
 const authController = require('../controllers/authController')
+const chatController = require('../controllers/chatController')
 
 const router = express.Router({ mergeParams: true })
 
 router
     .route('/u/:userEmail')
     .get(authController.isUser, usersController.getUserByEmail)
-
-router
-    .route('/:userId')
-    .get(usersController.getUserById)
-    .patch(
-        authController.isUser,
-        authController.isOwnerOfThePath,
-        usersController.updateUserById
-    )
 
 router
     .route('/:userId/profile-image')
@@ -32,6 +24,24 @@ router
         authController.isUser,
         authController.isOwnerOfThePath,
         usersController.getAllFriends
+    )
+
+
+router
+    .route('/:userId/chatroom')
+    .get(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        chatController.getAllChatRooms
+    )
+
+router
+    .route('/:userId')
+    .get(usersController.getUserById)
+    .put(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        usersController.updateUserById
     )
 
 module.exports = router

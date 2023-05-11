@@ -11,6 +11,7 @@ const usersRouter = require('./routes/usersRoutes')
 const jobPostRouter = require('./routes/jobPostRoutes')
 const friendRouter = require('./routes/friendRoutes')
 const notificationRouter = require('./routes/notificationRoutes')
+const chatRouter = require('./routes/chatRoutes')
 
 const app = express()
 const server = http.createServer(app)
@@ -27,6 +28,7 @@ app.use(
 )
 
 app.use('', authRouter)
+app.use('/chatroom', chatRouter)
 app.get('/jobpost/:jobPostId', userJobPostController.getAJobPostUsingItsId)
 app.use('/:userId/jobpost', jobPostRouter)
 app.use('/:userId/friend-request', friendRouter)

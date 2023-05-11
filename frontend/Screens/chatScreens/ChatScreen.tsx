@@ -10,33 +10,47 @@ import {
   TextInput,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../reducers/Store';
+import chatApi from '../../api/chatApi'
 
 interface ChatRoom {
   _id: string;
-  name: string;
-  logoPath: 'https://reactnative.dev/img/tiny_logo.png';
+  members: string[];
 }
 
 const ChatScreen = () => {
   const navigation = useNavigation();
-  const chatRooms: ChatRoom[] = [];
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
+  const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((state: RootState) => state.uid.id);
 
   useEffect(() => {
     const getChatRooms = async () => {
-      
+      const chatRoomsData = await chatApi.getAllChatRooms(uid, token)
+      const chatRooms: ChatRoom[] = chatRoomsData.data.map((chatroomData: any) => {
+        const { _id, members } = chatroomData;
+        return { _id, members };
+      });
+      setChatRooms(chatRooms)
     }
-  })
 
-  const renderItem = ({item}: any) => (
-    <TouchableOpacity
-      style={styles.userContainer}
-      onPress={() => {
-        navigation.navigate('chatRoom', {user: item});
-      }}>
-      <Image style={styles.userImage} source={{uri: item.logoPath}} />
-      <Text style={styles.userName}>{item.name}</Text>
-    </TouchableOpacity>
-  );
+    getChatRooms()
+  }, [])
+
+  const renderItem = ({ item }: any) => {
+    const imageSource = item.logoPath ? { uri: item.logoPath } : { uri: 'https://images.unsplash.com/photo-1683339708262-b1208394ffec?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80'};
+    return (
+      <TouchableOpacity
+        style={styles.userContainer}
+        onPress={() => {
+          navigation.navigate('chatRoom', { chatRoomId: item._id });
+        }}>
+        <Image style={styles.roomImage} source={imageSource} />
+        <Text style={styles.roomName}>THIS IS A ROOM</Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -59,14 +73,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  userImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  roomImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     marginRight: 8,
   },
-  userName: {
-    fontSize: 16,
+  roomName: {
+    fontSize: 18,
+    color: 'black',
+    marginStart: 16,
   },
   button: {
     position: 'absolute',

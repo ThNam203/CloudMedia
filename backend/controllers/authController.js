@@ -43,10 +43,15 @@ exports.logIn = asyncCatch(async (req, res, next) => {
         return next(new AppError('Missing email or password', 400))
 
     const freshUser = await User.findOne({ email }).select('+password')
-    if (!freshUser) return next(new AppError('Email not found', 400))
+    if (!freshUser)
+        return next(
+            new AppError('Invalid username or password. Please try again', 404)
+        )
 
     if (!(await freshUser.checkPassword(password, freshUser.password)))
-        return next(new AppError('Wrong password', 400))
+        return next(
+            new AppError('Invalid username or password. Please try again', 404)
+        )
 
     const jwtToken = getJWTToken(freshUser.id)
     res.status(200).json(jwtToken)

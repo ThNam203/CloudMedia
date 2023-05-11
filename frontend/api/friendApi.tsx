@@ -8,5 +8,8 @@ export default {
                 'Authorization': 'Bearer ' + token,
             }
         })
-    }
+    },
+    // getAllFriends: function(userId: string, token: string) {
+    //     return ApiManager(`${userId}/friend`)
+    // },
 };

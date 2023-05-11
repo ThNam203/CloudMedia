@@ -71,6 +71,9 @@ function FirstTimeUseScreen({navigation}: any) {
       const islogin = await retrieveData(nameStorage.isLogin);
       if (islogin) {
         try {
+          //connect to socket.io
+          require('../utils/socket')
+
           dispatch(setStatus(true));
           const jwt = await retrieveData(nameStorage.jwtToken);
           dispatch(setToken(jwt));

@@ -32,6 +32,9 @@ function LoginScreen(props: any) {
         }
       })
       .then(data => {
+        // connect to socket
+        require('../utils/socket')
+        
         // do something with the JWT token
         const jwtToken = data;
         storeData(jwtToken, nameStorage.jwtToken);
