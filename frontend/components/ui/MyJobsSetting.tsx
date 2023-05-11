@@ -4,19 +4,14 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import Modal from 'react-native-modal';
 import Icon, {Icons} from './Icons';
-function ChoosePostTemplate(props: any) {
+function MyJobsSetting(props: any) {
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
   };
   const list = [
-    {title: 'Add a photo', icon: 'photo'},
-    {title: 'Take a video', icon: 'video-camera'},
-    {title: 'Celebrate an occasion', icon: 'sun-o'},
-    {title: 'Add a document', icon: 'newspaper-o'},
-    {title: "Share that you're hiring", icon: 'briefcase'},
-    {title: 'Find an expert', icon: 'angellist'},
-    {title: 'Create a poll', icon: 'bar-chart'},
-    {title: 'Create an event', icon: 'calendar'},
+    {title: 'Send in a message', icon: 'send'},
+    {title: 'Share via..', icon: 'share-alt'},
+    {title: 'Unsave', icon: 'bookmark-o'},
   ];
   const ListItem = ({item}: any) => (
     <TouchableOpacity
@@ -55,13 +50,9 @@ function ChoosePostTemplate(props: any) {
       isVisible={props.isVisible}
       swipeDirection="down"
       onSwipeComplete={toggleModal}
-      animationIn="bounceInUp"
-      animationOut="bounceOutDown"
-      backdropOpacity={0}
-      animationInTiming={900}
-      animationOutTiming={500}
-      backdropTransitionInTiming={1000}
-      backdropTransitionOutTiming={500}
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      backdropOpacity={0.4}
       style={styles.modal}>
       <View style={styles.modalContent}>
         <View style={styles.barIcon} />
@@ -76,7 +67,7 @@ function ChoosePostTemplate(props: any) {
     </Modal>
   );
 }
-export default ChoosePostTemplate;
+export default MyJobsSetting;
 const styles = StyleSheet.create({
   modal: {
     justifyContent: 'flex-end',
@@ -88,9 +79,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    minHeight: 300,
+    minHeight: 150,
     paddingBottom: 20,
     elevation: 5,
   },

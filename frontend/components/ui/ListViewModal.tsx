@@ -1,51 +1,45 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {CheckBox} from '@rneui/themed';
 import Modal from 'react-native-modal';
-import Icon, {Icons} from './Icons';
-function ChoosePostTemplate(props: any) {
+function ListViewModal(props: any) {
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
   };
-  const list = [
-    {title: 'Add a photo', icon: 'photo'},
-    {title: 'Take a video', icon: 'video-camera'},
-    {title: 'Celebrate an occasion', icon: 'sun-o'},
-    {title: 'Add a document', icon: 'newspaper-o'},
-    {title: "Share that you're hiring", icon: 'briefcase'},
-    {title: 'Find an expert', icon: 'angellist'},
-    {title: 'Create a poll', icon: 'bar-chart'},
-    {title: 'Create an event', icon: 'calendar'},
-  ];
+  const [selectedIndex, setIndex] = useState(props.selectedItem);
+  const list = props.listData;
   const ListItem = ({item}: any) => (
     <TouchableOpacity
-      onPress={() => {}}
+      onPress={() => {
+        setIndex(item.title);
+        props.setSelectedItem(item.title);
+      }}
       style={{
         display: 'flex',
         marginVertical: 7,
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
       }}>
-      <View style={{width: 50}}>
-        <Icon
-          name={item.icon}
-          type={Icons.FontAwesome}
-          size={25}
-          color={'gray'}
-          style={{marginLeft: 20}}
-        />
-      </View>
-
       <Text
         style={{
-          color: 'gray',
-          fontWeight: 'bold',
+          color: '#323232',
           fontSize: 16,
           marginLeft: 20,
         }}>
         {item.title}
       </Text>
+      <CheckBox
+        checked={selectedIndex === item.title}
+        onPress={() => {
+          setIndex(item.title);
+          props.setSelectedItem(item.title);
+        }}
+        checkedIcon="dot-circle-o"
+        uncheckedIcon="circle-o"
+      />
     </TouchableOpacity>
   );
   return (
@@ -55,16 +49,15 @@ function ChoosePostTemplate(props: any) {
       isVisible={props.isVisible}
       swipeDirection="down"
       onSwipeComplete={toggleModal}
-      animationIn="bounceInUp"
-      animationOut="bounceOutDown"
-      backdropOpacity={0}
-      animationInTiming={900}
-      animationOutTiming={500}
-      backdropTransitionInTiming={1000}
-      backdropTransitionOutTiming={500}
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      backdropOpacity={0.4}
       style={styles.modal}>
       <View style={styles.modalContent}>
         <View style={styles.barIcon} />
+        <View style={{marginHorizontal: 20, marginTop: 20}}>
+          <Text style={{color: 'black', fontSize: 20}}>{props.title}</Text>
+        </View>
         <View
           style={{
             elevation: 1,
@@ -76,7 +69,7 @@ function ChoosePostTemplate(props: any) {
     </Modal>
   );
 }
-export default ChoosePostTemplate;
+export default ListViewModal;
 const styles = StyleSheet.create({
   modal: {
     justifyContent: 'flex-end',
@@ -88,8 +81,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    borderColor: '#ccc',
-    borderWidth: 1,
     minHeight: 300,
     paddingBottom: 20,
     elevation: 5,
