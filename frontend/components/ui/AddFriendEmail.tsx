@@ -53,6 +53,7 @@ export default function AddFriendEmail(props: any) {
             ...infoEmail,
             name: data.name,
           });
+          setNameHandle('Add friend');
         }
       })
       .catch(error => {

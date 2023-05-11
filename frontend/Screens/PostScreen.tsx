@@ -16,6 +16,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {setPostShow} from '../reducers/Post_reducer';
 function PostScreen() {
+  const user = useSelector((state: RootState) => state.userInfo);
+
   const postVisible = useSelector((state: RootState) => state.post.show);
 
   const dispatch = useDispatch();
@@ -63,7 +65,11 @@ function PostScreen() {
             <Icon type={Icons.AntDesign} name="close" />
           </TouchableOpacity>
           <Image
-            source={require('../assets/images/Spiderman.jpg')}
+            source={
+              user.profileImagePath === ''
+                ? require('../assets/images/Spiderman.jpg')
+                : {uri: user.profileImagePath}
+            }
             style={{
               height: 40,
               width: 40,

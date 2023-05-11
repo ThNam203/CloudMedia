@@ -1,9 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
-import {View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
 import React from 'react';
 import Colors from '../../constants/Colors';
 import Icon, {Icons} from './Icons';
-import {Image} from 'react-native-animatable';
+import {Image, Text} from 'react-native-animatable';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
 
@@ -26,15 +32,18 @@ export default function Header({navigation}: any) {
           />
         </TouchableOpacity>
       </View>
-      <TextInput
-        placeholder="Search"
-        placeholderTextColor={Colors.black}
+      <Pressable
         style={styles.textInput}
-      />
+        onPress={() => {
+          navigation.navigate('search');
+        }}>
+        <Icon type={Icons.Feather} name="search" />
+        <Text style={{marginHorizontal: 10, fontSize: 18}}>Search</Text>
+      </Pressable>
       <TouchableOpacity
         style={{marginRight: 10}}
         onPress={() => {
-          console.log('as');
+          console.log('mess show');
         }}>
         <Icon type={Icons.Ionicons} name="chatbox-ellipses-outline" />
       </TouchableOpacity>
@@ -58,5 +67,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     color: Colors.black,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 });
