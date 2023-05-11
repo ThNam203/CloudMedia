@@ -57,7 +57,7 @@ function ChoosePostTemplate(props: any) {
       onSwipeComplete={toggleModal}
       animationIn="bounceInUp"
       animationOut="bounceOutDown"
-      backdropOpacity={0.4}
+      backdropOpacity={0}
       animationInTiming={900}
       animationOutTiming={500}
       backdropTransitionInTiming={1000}
@@ -88,6 +88,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
+    borderColor: '#ccc',
+    borderWidth: 1,
     minHeight: 300,
     paddingBottom: 20,
     elevation: 5,

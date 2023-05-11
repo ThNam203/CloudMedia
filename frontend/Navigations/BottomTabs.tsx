@@ -107,6 +107,7 @@ export default function AnimTab({navigation}: any) {
     <Tab.Navigator
       screenOptions={{
         // headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           height: 60,
           borderTopLeftRadius: 16,

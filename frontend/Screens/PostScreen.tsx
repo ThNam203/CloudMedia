@@ -42,10 +42,6 @@ function PostScreen() {
                 height: 250,
                 flex: 1,
               }}>
-              <Image
-                source={require('../assets/images/Spiderman.jpg')}
-                style={{height: 70, width: 70, borderRadius: 35}}
-              />
               <TextInput
                 style={{color: 'black', fontSize: 19, paddingTop: 16}}
                 placeholder="What do you want to talk about?"
@@ -66,6 +62,15 @@ function PostScreen() {
           <TouchableOpacity onPress={toggleModal} style={{marginTop: 3}}>
             <Icon type={Icons.AntDesign} name="close" />
           </TouchableOpacity>
+          <Image
+            source={require('../assets/images/Spiderman.jpg')}
+            style={{
+              height: 40,
+              width: 40,
+              borderRadius: 35,
+              marginHorizontal: 20,
+            }}
+          />
           <View
             style={{
               marginTop: 3,

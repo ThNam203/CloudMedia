@@ -93,8 +93,8 @@ export default function AddFriendEmail(props: any) {
       isVisible={props.isVisible}
       swipeDirection="down"
       onSwipeComplete={toggleModal}
-      animationIn="bounceInUp"
-      animationOut="bounceOutDown"
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
       backdropOpacity={0.4}
       animationInTiming={900}
       animationOutTiming={500}
