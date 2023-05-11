@@ -89,3 +89,17 @@ export const user_update = async (data: any, userId: any, token: any) => {
     return error;
   }
 };
+
+export const user_info_email = async (email: any, token: any) => {
+  try {
+    const result = await ApiManager(`/u/${email}`, {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};

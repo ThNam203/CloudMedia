@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
+  ScrollView,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
 import ChoosePostTemplate from '../components/ui/ChoosePostTemplate';
-import UploadPhoto from '../components/ui/UploadPhoto';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {setPostShow} from '../reducers/Post_reducer';
@@ -31,62 +31,31 @@ function PostScreen() {
       onBackButtonPress={() => dispatch(setPostShow(false))}
       isVisible={postVisible}
       style={{margin: 0}}>
-      <View style={styles.modalContent}>
-        <View style={{height: 70}} />
-        <View style={{backgroundColor: 'white', flex: 1}}>
-          <View
-            style={{
-              paddingHorizontal: 20,
-              marginTop: 20,
-              height: 250,
-              flex: 1,
-            }}>
-            <Image
-              source={require('../assets/images/Spiderman.jpg')}
-              style={{height: 70, width: 70, borderRadius: 35}}
-            />
-            <TextInput
-              style={{color: 'black', fontSize: 19, paddingTop: 16}}
-              placeholder="What do you want to talk about?"
-            />
-          </View>
-          <View style={{flexDirection: 'row', padding: 20}}>
-            <TouchableOpacity>
-              <Icon type={Icons.Entypo} name="camera" size={25} />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Icon
-                type={Icons.Ionicons}
-                name="ios-videocam"
-                size={25}
-                style={{marginLeft: 20}}
+      <ScrollView style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+        <View style={styles.modalContent}>
+          <View style={{height: 70}} />
+          <View style={{backgroundColor: 'white', flex: 1}}>
+            <View
+              style={{
+                paddingHorizontal: 20,
+                marginTop: 20,
+                height: 250,
+                flex: 1,
+              }}>
+              <Image
+                source={require('../assets/images/Spiderman.jpg')}
+                style={{height: 70, width: 70, borderRadius: 35}}
               />
-            </TouchableOpacity>
-            <TouchableOpacity style={{marginLeft: 20}}>
-              <Icon type={Icons.FontAwesome} name="photo" size={25} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{marginLeft: 20}}
-              onPress={() => setChoosePostTemplate(!choosePostTemplate)}>
-              <Icon
-                type={Icons.Entypo}
-                name="dots-three-horizontal"
-                size={25}
+              <TextInput
+                style={{color: 'black', fontSize: 19, paddingTop: 16}}
+                placeholder="What do you want to talk about?"
+                multiline={true}
               />
-            </TouchableOpacity>
-            <View style={{marginLeft: 'auto'}}>
-              <TouchableOpacity style={{flexDirection: 'row'}}>
-                <Icon type={Icons.Ionicons} name="chatbox-ellipses" size={25} />
-                <Text style={{marginLeft: 10}}>Anyone</Text>
-              </TouchableOpacity>
             </View>
           </View>
-          <ChoosePostTemplate
-            isVisible={choosePostTemplate}
-            setVisible={setChoosePostTemplate}
-          />
+          <View style={{height: 130}} />
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.topView}>
         <View
@@ -123,6 +92,40 @@ function PostScreen() {
           </View>
         </View>
       </View>
+
+      <View style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
+        <View style={{flexDirection: 'row', padding: 20}}>
+          <TouchableOpacity>
+            <Icon type={Icons.Entypo} name="camera" size={25} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon
+              type={Icons.Ionicons}
+              name="ios-videocam"
+              size={25}
+              style={{marginLeft: 20}}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={{marginLeft: 20}}>
+            <Icon type={Icons.FontAwesome} name="photo" size={25} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{marginLeft: 20}}
+            onPress={() => setChoosePostTemplate(!choosePostTemplate)}>
+            <Icon type={Icons.Entypo} name="dots-three-horizontal" size={25} />
+          </TouchableOpacity>
+          <View style={{marginLeft: 'auto'}}>
+            <TouchableOpacity style={{flexDirection: 'row'}}>
+              <Icon type={Icons.Ionicons} name="chatbox-ellipses" size={25} />
+              <Text style={{marginLeft: 10}}>Anyone</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <ChoosePostTemplate
+          isVisible={choosePostTemplate}
+          setVisible={setChoosePostTemplate}
+        />
+      </View>
     </Modal>
   );
 }
@@ -137,18 +140,6 @@ const styles = StyleSheet.create({
     color: 'black',
     marginLeft: 30,
     fontWeight: 'bold',
-  },
-  bottomView: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 70,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopColor: '#ccc',
-    borderTopWidth: 1,
-    backgroundColor: 'white',
   },
   bottomText: {
     color: 'white',

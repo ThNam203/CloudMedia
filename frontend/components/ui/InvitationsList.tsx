@@ -3,35 +3,35 @@ import React, {useState} from 'react';
 import {View, Text, FlatList, Image, Pressable} from 'react-native';
 import ItemRequestUser from './ItemRequestUser';
 
-const friendsData = [
+const invitationsData = [
   {
     id: '1',
     name: 'John Doe',
-    connection: 'Friend',
+    datebetween: '1d',
     avatar: require('../../assets/images/Spiderman.jpg'),
   },
   {
     id: '2',
     name: 'Jane Smith',
-    connection: 'Family',
+    datebetween: '345d',
     avatar: require('../../assets/images/Spiderman.jpg'),
   },
   {
     id: '3',
     name: 'Bob Johnson',
-    connection: 'Colleague',
+    datebetween: '1d',
     avatar: require('../../assets/images/Spiderman.jpg'),
   },
 ];
 
-const FriendList = () => {
-  const [friends, setFriends] = useState(friendsData);
+const InvitationsList = () => {
+  const [invitations, setInvitation] = useState(invitationsData);
 
   return (
     <FlatList
-      data={friends.slice(0, 2)}
+      data={invitations}
       renderItem={({item}) => (
-        <ItemRequestUser item={item} nameRequest="Add friend" />
+        <ItemRequestUser item={item} nameRequest="Accept" />
       )}
       keyExtractor={item => item.id}
       showsVerticalScrollIndicator={false}
@@ -40,4 +40,4 @@ const FriendList = () => {
   );
 };
 
-export default FriendList;
+export default InvitationsList;

@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import SaveButton from '../components/ui/SaveButton';
 import Colors from '../constants/Colors';
-import {Icon} from '@rneui/base';
+import Icon, {Icons} from '../components/ui/Icons';
+import PostJobScreen from './PostJobScreen';
+import MyJobsScreen from './MyJobsScreen';
 
 const defaultJobs = [
   {
@@ -38,10 +40,14 @@ const defaultJobs = [
 
 const JobScreen = () => {
   const [jobs, setJobs] = useState(defaultJobs);
+  const [postJob, setPostJob] = useState(false);
+  const [myJobs, setMyJobs] = useState(false);
   return (
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={{flexGrow: 1, backgroundColor: Colors.white}}>
+        <PostJobScreen isVisible={postJob} setVisible={setPostJob} />
+        <MyJobsScreen isVisible={myJobs} setVisible={setMyJobs} />
         <View
           style={{
             flexDirection: 'row',
@@ -50,15 +56,21 @@ const JobScreen = () => {
             borderBottomWidth: 5,
           }}>
           <Pressable
+            onPress={() => setMyJobs(!myJobs)}
             style={styles.btnHeader}
             android_ripple={{color: Colors.gray, borderless: false}}>
-            <Icon name="bookmark-outline" />
+            <View style={{marginTop: 4, marginRight: 4}}>
+              <Icon type={Icons.Feather} name="bookmark" size={30} />
+            </View>
             <Text style={styles.textHeader}>My jobs</Text>
           </Pressable>
           <Pressable
+            onPress={() => setPostJob(!postJob)}
             style={styles.btnHeader}
             android_ripple={{color: Colors.gray, borderless: false}}>
-            <Icon name="file-copy" />
+            <View style={{marginTop: 4, marginRight: 4}}>
+              <Icon type={Icons.FontAwesome} name="edit" size={30} />
+            </View>
             <Text style={styles.textHeader}>Post a job</Text>
           </Pressable>
         </View>
