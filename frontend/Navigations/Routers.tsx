@@ -16,14 +16,17 @@ const Stack = createNativeStackNavigator();
 export default function Routers() {
   const isLoading = useSelector((state: RootState) => state.loading.status);
   return (
-    <Stack.Navigator
-      screenOptions={{headerShown: false}}>
-      <Stack.Screen name="login" component={FirstTimeUseScreen} />
-      <Stack.Screen name="main" component={BottomTabs} />
-      <Stack.Screen name="profile" component={ProfileScreen} />
-      <Stack.Screen name="chat" component={ChatScreen} />
+    <>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="login" component={FirstTimeUseScreen} />
+        <Stack.Screen name="main" component={BottomTabs} />
+        <Stack.Screen name="profile" component={ProfileScreen} />
         <Stack.Screen name="search" component={SearchScreen} />
-      <Stack.Screen name="chatRoom" component={ChatRoom} />
-    </Stack.Navigator>
+        <Stack.Screen name="chat" component={ChatScreen} />
+        <Stack.Screen name="chatRoom" component={ChatRoom} />
+      </Stack.Navigator>
+      {isLoading ? <AppLoader /> : null}
+      <PostScreen />
+    </>
   );
 }
