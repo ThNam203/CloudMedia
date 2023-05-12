@@ -7,12 +7,14 @@ import {
   StyleSheet,
   Image,
   Pressable,
+  TouchableOpacity,
 } from 'react-native';
 import SaveButton from '../components/ui/SaveButton';
 import Colors from '../constants/Colors';
 import Icon, {Icons} from '../components/ui/Icons';
 import PostJobScreen from './PostJobScreen';
 import MyJobsScreen from './MyJobsScreen';
+import JobDetailModal from '../components/ui/JobDetailModal';
 
 const defaultJobs = [
   {
@@ -21,6 +23,28 @@ const defaultJobs = [
     company: 'Google',
     location: 'Mountain View, CA',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/706px-Google_%22G%22_Logo.svg.png',
+    dateAgo: '1 month a go',
+    workplaceType: 'On-site',
+    jobType: 'Full-time',
+    jobDescription: `We are looking for a highly skilled and motivated Software Engineer to join our team at Google. As a Software Engineer, you will work closely with other engineers and developers to design, develop, and maintain software systems and applications.
+
+Responsibilities:
+
+Design, develop, and maintain software systems and applications
+Collaborate with other engineers and developers to design and implement new features and functionality
+Write clean, efficient, and well-documented code
+Troubleshoot and debug software issues
+Perform code reviews and provide feedback to other team members
+Stay up-to-date with emerging trends and technologies in software engineering
+Requirements:
+
+Bachelor's degree in Computer Science or related field
+Strong knowledge of programming languages such as Java, Python, or C++
+Experience with software development tools such as Git, JIRA, or Jenkins
+Experience with web development frameworks such as React, Angular, or Vue.js
+Excellent problem-solving and analytical skills
+Strong communication and teamwork skills
+At Google, we value diversity and are committed to creating an inclusive environment for all employees. We offer competitive compensation packages, comprehensive benefits, and opportunities for professional growth and development. If you are a talented and motivated Software Engineer looking for an exciting new challenge, we want to hear from you!`,
   },
   {
     id: 2,
@@ -28,6 +52,10 @@ const defaultJobs = [
     company: 'Facebook',
     location: 'Menlo Park, CA',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/1200px-Facebook_Logo_%282019%29.png',
+    dateAgo: '1 month a go',
+    workplaceType: 'Hybrid',
+    jobType: 'Part-time',
+    jobDescription: 'hello',
   },
   {
     id: 3,
@@ -35,6 +63,10 @@ const defaultJobs = [
     company: 'Apple',
     location: 'Cupertino, CA',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Apple-logo.png/640px-Apple-logo.png',
+    dateAgo: '1 month a go',
+    workplaceType: 'Remote',
+    jobType: 'Full-time',
+    jobDescription: 'hello',
   },
 ];
 
@@ -42,12 +74,19 @@ const JobScreen = () => {
   const [jobs, setJobs] = useState(defaultJobs);
   const [postJob, setPostJob] = useState(false);
   const [myJobs, setMyJobs] = useState(false);
+  const [jobDetail, setJobDetail] = useState(false);
+  const [jobSelected, setJobSelected] = useState(jobs[0]);
   return (
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={{flexGrow: 1, backgroundColor: Colors.white}}>
         <PostJobScreen isVisible={postJob} setVisible={setPostJob} />
         <MyJobsScreen isVisible={myJobs} setVisible={setMyJobs} />
+        <JobDetailModal
+          isVisible={jobDetail}
+          setVisible={setJobDetail}
+          jobData={jobSelected}
+        />
         <View
           style={{
             flexDirection: 'row',
@@ -85,22 +124,32 @@ const JobScreen = () => {
         </Text>
         {jobs.map(job => (
           <View key={job.id} style={styles.jobContainer}>
-            <View style={{height: 70, justifyContent: 'center'}}>
-              <Image style={{width: 60, height: 60}} source={{uri: job.logo}} />
-            </View>
-            <View style={styles.jobDescription}>
-              <Text style={styles.jobTitle}>{job.title}</Text>
-              <Text
-                style={[
-                  styles.jobTitle,
-                  {color: 'black', fontSize: 18, fontWeight: 'normal'},
-                ]}>
-                {job.company}
-              </Text>
-              <Text style={{fontFamily: 'Roboto', color: '#585C60'}}>
-                {job.location}
-              </Text>
-            </View>
+            <TouchableOpacity
+              style={{flexDirection: 'row'}}
+              onPress={() => {
+                setJobDetail(!jobDetail);
+                setJobSelected(job);
+              }}>
+              <View style={{height: 70, justifyContent: 'center'}}>
+                <Image
+                  style={{width: 60, height: 60}}
+                  source={{uri: job.logo}}
+                />
+              </View>
+              <View style={styles.jobDescription}>
+                <Text style={styles.jobTitle}>{job.title}</Text>
+                <Text
+                  style={[
+                    styles.jobTitle,
+                    {color: 'black', fontSize: 18, fontWeight: 'normal'},
+                  ]}>
+                  {job.company}
+                </Text>
+                <Text style={{fontFamily: 'Roboto', color: '#585C60'}}>
+                  {job.location}
+                </Text>
+              </View>
+            </TouchableOpacity>
             <View>
               <SaveButton />
             </View>

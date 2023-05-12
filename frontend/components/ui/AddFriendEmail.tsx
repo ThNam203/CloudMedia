@@ -97,8 +97,6 @@ export default function AddFriendEmail(props: any) {
       animationIn="slideInUp"
       animationOut="slideOutDown"
       backdropOpacity={0.4}
-      animationInTiming={900}
-      animationOutTiming={500}
       backdropTransitionInTiming={1000}
       backdropTransitionOutTiming={500}
       style={styles.modal}>
