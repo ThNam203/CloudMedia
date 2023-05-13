@@ -22,6 +22,8 @@ import {setToken} from '../reducers/Token_reducer';
 import {setIdFromJwt} from '../reducers/Uid_reducer';
 import {RootState} from '../reducers/Store';
 import AppLoader from '../components/ui/AppLoader';
+import {getAllNotifications} from '../api/notification_api';
+import {setNotifications} from '../reducers/Notification_reducer';
 
 function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
@@ -36,13 +38,12 @@ function FirstTimeUseScreen({navigation}: any) {
   }
 
   const navigateToMain = () => {
-    navigation.replace('main');
+    navigation.navigate('main');
   };
 
   const saveInfo = (jwt: any) => {
     const json = jwt_decode(jwt) as {id: string};
     const idUser = json.id;
-    console.log(idUser);
     user_info(idUser)
       .then((response: any) => {
         if (response.status === 200) {
@@ -60,9 +61,26 @@ function FirstTimeUseScreen({navigation}: any) {
       })
       .catch(error => {
         console.error(error);
+      });
+  };
+
+  const saveNotification = (jwt: any) => {
+    const json = jwt_decode(jwt) as {id: string};
+    const idUser = json.id;
+    getAllNotifications(idUser, jwt)
+      .then((response: any) => {
+        if (response.status === 200) {
+          return response.data;
+        } else {
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
+        }
       })
-      .finally(() => {
-        dispatch(setStatus(false));
+      .then(data => {
+        dispatch(setNotifications(data));
+      })
+      .catch(error => {
+        console.error(error);
       });
   };
 
@@ -75,7 +93,9 @@ function FirstTimeUseScreen({navigation}: any) {
           const jwt = await retrieveData(nameStorage.jwtToken);
           dispatch(setToken(jwt));
           dispatch(setIdFromJwt(jwt));
+          // get some data
           saveInfo(jwt);
+          saveNotification(jwt);
           navigateToMain();
         } catch (error) {
           console.log(error);
@@ -177,6 +197,7 @@ function FirstTimeUseScreen({navigation}: any) {
               }}
               handleNavigate={navigateToMain}
               saveInfo={saveInfo}
+              saveNotification={saveNotification}
             />
           </View>
         </Modal>

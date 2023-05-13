@@ -4,6 +4,7 @@ import UidReducer from './Uid_reducer';
 import LoadingReducer from './Loading_reducer';
 import UserReducer from './User_reducer';
 import PostReducer from './Post_reducer';
+import NotificationReducer from './Notification_reducer';
 
 export const Store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const Store = configureStore({
     loading: LoadingReducer,
     userInfo: UserReducer,
     post: PostReducer,
+    notifications: NotificationReducer,
   },
 });
 

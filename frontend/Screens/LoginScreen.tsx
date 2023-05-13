@@ -37,7 +37,10 @@ function LoginScreen(props: any) {
         storeData(jwtToken, nameStorage.jwtToken);
         dispatch(setToken(jwtToken));
         dispatch(setIdFromJwt(jwtToken));
+
+        // get some data
         props.saveInfo(jwtToken);
+        props.saveNotification(jwtToken);
         // console.log(jwtToken);
         storeData(isSelected, nameStorage.isLogin);
         props.handleNavigate();

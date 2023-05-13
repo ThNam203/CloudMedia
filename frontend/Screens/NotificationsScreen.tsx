@@ -3,10 +3,22 @@
 
 import {View, Text, FlatList, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
-import NotificationsData from '../components/data/NotificationsData';
 import Icon, {Icons} from '../components/ui/Icons';
+import {useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
 
 export default function NotificationsScreen({navigation}: any) {
+  const NotificationsData = useSelector(
+    (state: RootState) => state.notifications.arr,
+  );
+
+  const getTimeToNow = (time: any) => {
+    const dateNow = new Date();
+    const date = new Date(time);
+    const diffInMilliseconds = dateNow.getTime() - date.getTime();
+    return Math.round(diffInMilliseconds / 3600000);
+  };
+
   const CTA = ({title}: any) => (
     <TouchableOpacity
       onPress={() => {}}
@@ -32,7 +44,7 @@ export default function NotificationsScreen({navigation}: any) {
         alignItems: 'center',
       }}>
       <Image
-        source={item.logo}
+        source={require('../assets/images/Spiderman.jpg')}
         style={{height: 70, width: 70, marginRight: 20, borderRadius: 35}}
       />
       <View>
@@ -43,25 +55,19 @@ export default function NotificationsScreen({navigation}: any) {
             color: 'black',
             paddingRight: 5,
           }}>
-          {item.description}
+          {item.content}
         </Text>
-        {item.isNewJob ? (
-          <CTA title="View Job" />
-        ) : item.isAView ? (
-          <CTA title="See all views" />
-        ) : item.isJobAlert ? (
-          <CTA title="See 30+ Jobs" />
-        ) : item.isBirthday ? (
-          <CTA title="Say Happy Birthday" />
-        ) : item.isConnectionAccepted ? (
-          <CTA title="Message" />
-        ) : item.isTrending ? (
-          <Text>{item.trendingCount} Reactions</Text>
+        {item.notificationType === 'FriendRequest' ? (
+          <CTA title="View request" />
+        ) : item.notificationType === 'Comment' ? (
+          <CTA title="See all comment" />
+        ) : item.notificationType === 'Like' ? (
+          <CTA title="See like" />
         ) : null}
       </View>
       <View>
         <Text style={{fontSize: 13, marginBottom: 5}}>
-          {item.notificationTime}d
+          {getTimeToNow(item.updatedAt)}h
         </Text>
         <TouchableOpacity onPress={() => {}}>
           <Icon

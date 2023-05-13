@@ -12,9 +12,9 @@ import Colors from '../constants/Colors';
 import * as Animatable from 'react-native-animatable';
 
 import Header from '../components/ui/Header';
-import StillHiringScreen from '../Screens/PostScreen';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setPostShow} from '../reducers/Post_reducer';
+import {RootState} from '../reducers/Store';
 
 const TabArr = [
   {
@@ -44,9 +44,10 @@ const TabArr = [
   {
     route: 'Notifications',
     label: 'Notifications',
-    type: Icons.Octicons,
-    activeIcon: 'bell-fill',
-    inActiveIcon: 'bell',
+    type: Icons.MaterialCommunityIcons,
+    activeIcon: 'bell',
+    inActiveIcon: 'bell-outline',
+    bellBadge: 'bell-badge-outline',
     component: NotificationsScreen,
   },
   {
@@ -66,6 +67,9 @@ const TabButton = (props: any) => {
   const focused = accessibilityState.selected;
   const viewRef = useRef(null);
 
+  const numberNotification = useSelector(
+    (state: RootState) => state.notifications.numberNoti,
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -94,7 +98,13 @@ const TabButton = (props: any) => {
       <Animatable.View ref={viewRef} duration={1000} style={styles.container}>
         <Icon
           type={item.type}
-          name={focused ? item.activeIcon : item.inActiveIcon}
+          name={
+            focused
+              ? item.activeIcon
+              : numberNotification && item.route === 'Notifications'
+              ? item.bellBadge
+              : item.inActiveIcon
+          }
           color={focused ? Colors.primary : Colors.primaryLite}
         />
       </Animatable.View>

@@ -11,7 +11,7 @@ import React, {useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import ItemRequestUser from '../components/ui/ItemRequestUser';
 
-export default function SearchScreen({navigation}: {navigation: any}) {
+export default function SearchScreen({navigation}: any) {
   const [text, setText] = useState('');
   const friendsData = [
     {
@@ -85,7 +85,9 @@ export default function SearchScreen({navigation}: {navigation: any}) {
         <View style={{margin: 20, flexDirection: 'row'}}>
           <TouchableOpacity
             style={{marginTop: 3}}
-            onPress={() => console.log('hello')}>
+            onPress={() => {
+              navigation.goBack();
+            }}>
             <Icon type={Icons.AntDesign} name="arrowleft" />
           </TouchableOpacity>
           <TextInput

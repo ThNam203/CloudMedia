@@ -36,10 +36,6 @@ function ProfileScreen({navigation}: any) {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    console.log(user);
-  }, []);
-
   const handleLogout = async () => {
     user_logout(token)
       .then((response: any) => {
