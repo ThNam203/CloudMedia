@@ -225,7 +225,7 @@ function SignUpHrScreen(props: any) {
           keyboardType="number-pad"
         />
       </View>
-      <View style={{marginTop: 15, width: 300, height: 25}}>
+      <View style={{marginTop: 15, height: 40}}>
         <View style={styles.bottomContainer}>
           <View>
             <CustomCheckBox
@@ -234,7 +234,10 @@ function SignUpHrScreen(props: any) {
             />
           </View>
           <Text
-            style={[styles.fontText, {fontWeight: '400', color: '#808080'}]}>
+            style={[
+              styles.fontText,
+              {fontWeight: '400', color: '#808080', marginTop: 8},
+            ]}>
             I agree to{' '}
             <Text
               onPress={() => {}}
@@ -251,7 +254,11 @@ function SignUpHrScreen(props: any) {
           </Text>
         </View>
       </View>
-      <View style={[styles.textInput, {overflow: 'hidden', borderRadius: 15}]}>
+      <View
+        style={[
+          styles.textInput,
+          {overflow: 'hidden', borderRadius: 15, marginTop: 0},
+        ]}>
         <Pressable
           style={styles.button}
           onPress={handleSignUp}

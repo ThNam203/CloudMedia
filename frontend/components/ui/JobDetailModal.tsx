@@ -114,7 +114,7 @@ function JobDetailModal(props: any) {
                 style={{paddingHorizontal: 65, paddingVertical: 10}}>
                 <Text
                   style={{fontSize: 16, fontWeight: 'bold', color: '#0f3774'}}>
-                  Apply
+                  Save
                 </Text>
               </Pressable>
             </View>

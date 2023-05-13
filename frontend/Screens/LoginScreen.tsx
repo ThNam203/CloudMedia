@@ -71,17 +71,14 @@ function LoginScreen(props: any) {
           value={password}
         />
       </View>
-      <View style={{marginTop: 15, width: 300, height: 25}}>
+      <View style={{width: 300, height: 70}}>
         <View style={styles.bottomContainer}>
           <View style={{flexDirection: 'row'}}>
             <CustomCheckBox
               isSelected={isSelected}
               setSelection={setSelection}
+              title={'Remember me'}
             />
-            <Text
-              style={[styles.fontText, {fontWeight: '400', color: '#808080'}]}>
-              Remember me
-            </Text>
           </View>
           <Text
             onPress={() => {}}
@@ -97,7 +94,11 @@ function LoginScreen(props: any) {
           </Text>
         </View>
       </View>
-      <View style={[styles.textInput, {overflow: 'hidden', borderRadius: 15}]}>
+      <View
+        style={[
+          styles.textInput,
+          {overflow: 'hidden', borderRadius: 15, marginTop: 0},
+        ]}>
         <Pressable
           onPress={handleLogin}
           style={styles.button}
