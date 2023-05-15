@@ -1,5 +1,4 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {user_info} from '../api/user_api';
 
 interface Notification {
   _id: any;
@@ -21,7 +20,7 @@ const initialState: Notifications = {
   numberNoti: 0,
 };
 
-const Notification = createSlice({
+const NotificationSlice = createSlice({
   name: 'Notification',
   initialState,
   reducers: {
@@ -37,5 +36,5 @@ const Notification = createSlice({
   },
 });
 
-export const {setNotifications} = Notification.actions;
-export default Notification.reducer;
+export const {setNotifications} = NotificationSlice.actions;
+export default NotificationSlice.reducer;

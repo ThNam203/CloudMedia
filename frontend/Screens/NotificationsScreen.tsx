@@ -44,7 +44,11 @@ export default function NotificationsScreen({navigation}: any) {
         alignItems: 'center',
       }}>
       <Image
-        source={require('../assets/images/Spiderman.jpg')}
+        source={
+          item.logo
+            ? {uri: item.logo}
+            : require('../assets/images/Spiderman.jpg')
+        }
         style={{height: 70, width: 70, marginRight: 20, borderRadius: 35}}
       />
       <View>

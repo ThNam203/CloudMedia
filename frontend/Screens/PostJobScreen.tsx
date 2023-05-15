@@ -14,7 +14,18 @@ import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
 import ListViewModal from '../components/ui/ListViewModal';
 import DatePicker from 'react-native-date-picker';
+import {RootState} from '../reducers/Store';
+import {useSelector} from 'react-redux';
+import {post1Job} from '../api/job_api';
 function PostJobScreen(props: any) {
+  const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((state: RootState) => state.uid.id);
+
+  const [title, setTitle] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [jobLocation, setJobLocation] = useState('');
+  const [jobDescription, setJobDescription] = useState('');
+
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
 
@@ -35,6 +46,37 @@ function PostJobScreen(props: any) {
     {title: 'Volunteer'},
     {title: 'Internship'},
   ];
+
+  const handlePost = () => {
+    const data = {
+      title: title,
+      description: jobDescription,
+      workplaceType: workplaceType,
+      employeeLocation: jobLocation,
+      jobType: jobType,
+      deadline: date,
+      company: {
+        logoUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/f/f1/Pornhub-logo.svg',
+        name: companyName,
+        linkToWebsite: 'pornhub.hihi',
+      },
+    };
+    post1Job(data, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          console.log(response.data);
+        } else {
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    props.setVisible(false);
+  };
+
   return (
     <Modal
       onBackdropPress={() => props.setVisible(false)}
@@ -87,6 +129,8 @@ function PostJobScreen(props: any) {
                 color: 'black',
                 fontSize: 16,
               }}
+              value={title}
+              onChangeText={setTitle}
               placeholder="Add job title"
             />
           </View>
@@ -101,6 +145,8 @@ function PostJobScreen(props: any) {
                 color: 'black',
                 fontSize: 16,
               }}
+              value={companyName}
+              onChangeText={setCompanyName}
               placeholder="Add company"
             />
           </View>
@@ -146,6 +192,8 @@ function PostJobScreen(props: any) {
                 color: 'black',
                 fontSize: 16,
               }}
+              value={jobLocation}
+              onChangeText={setJobLocation}
               placeholder="Add job location"
             />
           </View>
@@ -189,6 +237,8 @@ function PostJobScreen(props: any) {
                 color: 'black',
                 fontSize: 16,
               }}
+              value={jobDescription}
+              onChangeText={setJobDescription}
               placeholder="Add job description"
             />
           </View>
@@ -225,7 +275,7 @@ function PostJobScreen(props: any) {
         </View>
       </ScrollView>
       <View style={styles.bottomView}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handlePost}>
           <View
             style={{
               borderRadius: 30,
