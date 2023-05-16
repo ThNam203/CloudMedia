@@ -41,6 +41,7 @@ function LoginScreen(props: any) {
         // get some data
         props.saveInfo(jwtToken);
         props.saveNotification(jwtToken);
+        props.saveJobs(jwtToken);
         // console.log(jwtToken);
         storeData(isSelected, nameStorage.isLogin);
         props.handleNavigate();

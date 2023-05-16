@@ -24,6 +24,8 @@ import {RootState} from '../reducers/Store';
 import AppLoader from '../components/ui/AppLoader';
 import {getAllNotifications} from '../api/notification_api';
 import {setNotifications} from '../reducers/Notification_reducer';
+import {getAllJobOfUser} from '../api/job_api';
+import {setJobs} from '../reducers/Job_reducer';
 
 function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
@@ -54,7 +56,6 @@ function FirstTimeUseScreen({navigation}: any) {
         }
       })
       .then(data => {
-        console.log(data);
         const user: UserInfo = {...data};
         // miss info
         dispatch(saveUser(user));
@@ -84,6 +85,26 @@ function FirstTimeUseScreen({navigation}: any) {
       });
   };
 
+  const saveJobs = (jwt: any) => {
+    const json = jwt_decode(jwt) as {id: string};
+    const idUser = json.id;
+    getAllJobOfUser(idUser, jwt)
+      .then((response: any) => {
+        if (response.status === 200) {
+          return response.data;
+        } else {
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
+        }
+      })
+      .then(data => {
+        dispatch(setJobs(data));
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
   useEffect(() => {
     const checkLogin = async () => {
       const islogin = await retrieveData(nameStorage.isLogin);
@@ -96,6 +117,8 @@ function FirstTimeUseScreen({navigation}: any) {
           // get some data
           saveInfo(jwt);
           saveNotification(jwt);
+          saveJobs(jwt);
+          // navigate
           navigateToMain();
         } catch (error) {
           console.log(error);
@@ -198,6 +221,7 @@ function FirstTimeUseScreen({navigation}: any) {
               handleNavigate={navigateToMain}
               saveInfo={saveInfo}
               saveNotification={saveNotification}
+              saveJobs={saveJobs}
             />
           </View>
         </Modal>

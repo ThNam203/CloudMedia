@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,8 @@ function PostJobScreen(props: any) {
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
 
+  const {isVisible, setVisible} = props;
+
   const [title, setTitle] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [jobLocation, setJobLocation] = useState('');
@@ -34,7 +36,7 @@ function PostJobScreen(props: any) {
   const [jobType, setJobType] = useState('Full-time');
   const [jopen, setJOpen] = useState(false);
   const toggleModal = () => {
-    props.setVisible(!props.isVisible);
+    setVisible(!isVisible);
   };
   const list1 = [{title: 'On-site'}, {title: 'Hybrid'}, {title: 'Remote'}];
   const list2 = [
@@ -46,6 +48,16 @@ function PostJobScreen(props: any) {
     {title: 'Volunteer'},
     {title: 'Internship'},
   ];
+
+  useEffect(() => {
+    setTitle('');
+    setCompanyName('');
+    setJobLocation('');
+    setJobDescription('');
+    setDate(new Date());
+    setWorkplaceType('On-site');
+    setJobType('Full-time');
+  }, [isVisible]);
 
   const handlePost = () => {
     const data = {
@@ -79,9 +91,9 @@ function PostJobScreen(props: any) {
 
   return (
     <Modal
-      onBackdropPress={() => props.setVisible(false)}
-      onBackButtonPress={() => props.setVisible(false)}
-      isVisible={props.isVisible}
+      onBackdropPress={() => setVisible(false)}
+      onBackButtonPress={() => setVisible(false)}
+      isVisible={isVisible}
       style={{margin: 0}}>
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <ListViewModal

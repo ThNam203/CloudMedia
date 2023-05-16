@@ -14,7 +14,7 @@ export const get1Job = async (userId: any, token: any, jobId: any) => {
   }
 };
 
-export const getAllJob = async (userId: any, token: any) => {
+export const getAllJobOfUser = async (userId: any, token: any) => {
   try {
     const result = await ApiManager(`/${userId}/jobpost/`, {
       method: 'GET',

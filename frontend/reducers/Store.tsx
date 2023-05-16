@@ -5,6 +5,7 @@ import LoadingReducer from './Loading_reducer';
 import UserReducer from './User_reducer';
 import PostReducer from './Post_reducer';
 import NotificationReducer from './Notification_reducer';
+import JobReducer from './Job_reducer';
 
 export const Store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const Store = configureStore({
     userInfo: UserReducer,
     post: PostReducer,
     notifications: NotificationReducer,
+    jobs: JobReducer,
   },
 });
 

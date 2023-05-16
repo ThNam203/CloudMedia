@@ -11,8 +11,13 @@ import {
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
 import MyJobsSetting from '../components/ui/MyJobsSetting';
-import SaveButton from '../components/ui/SaveButton';
+import {useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
 function MyJobsScreen(props: any) {
+  const {isVisible, setVisible} = props;
+
+  const jobs = useSelector((state: RootState) => state.jobs.arr);
+
   const defaultJobs = [
     {
       id: 1,
@@ -37,10 +42,9 @@ function MyJobsScreen(props: any) {
     },
   ];
 
-  const [jobs, setJobs] = useState(defaultJobs);
   const [myJobsSetting, setMyJobsSetting] = useState(false);
   const toggleModal = () => {
-    props.setVisible(!props.isVisible);
+    setVisible(!isVisible);
   };
 
   return (
@@ -48,9 +52,9 @@ function MyJobsScreen(props: any) {
       animationIn={'slideInRight'}
       animationOut={'slideOutRight'}
       backdropOpacity={0.4}
-      onBackdropPress={() => props.setVisible(false)}
-      onBackButtonPress={() => props.setVisible(false)}
-      isVisible={props.isVisible}
+      onBackdropPress={() => setVisible(false)}
+      onBackButtonPress={() => setVisible(false)}
+      isVisible={isVisible}
       style={{margin: 0}}>
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <MyJobsSetting
@@ -60,11 +64,16 @@ function MyJobsScreen(props: any) {
         <View style={styles.modalContent}>
           <View style={{height: 70}} />
           {jobs.map(job => (
-            <View key={job.id} style={styles.jobContainer}>
+            <View key={job._id} style={styles.jobContainer}>
               <View style={{height: 70, justifyContent: 'center'}}>
                 <Image
                   style={{width: 60, height: 60}}
-                  source={{uri: job.logo}}
+                  source={
+                    job.company?.logoUrl
+                      ? {uri: job.company?.logoUrl}
+                      : require('../assets/images/Spiderman.jpg')
+                  }
+                  resizeMode="stretch"
                 />
               </View>
               <View style={styles.jobDescription}>
@@ -74,10 +83,10 @@ function MyJobsScreen(props: any) {
                     styles.jobTitle,
                     {color: 'black', fontSize: 18, fontWeight: 'normal'},
                   ]}>
-                  {job.company}
+                  {job.company?.name}
                 </Text>
                 <Text style={{fontFamily: 'Roboto', color: '#585C60'}}>
-                  {job.location}
+                  {job.employeeLocation}
                 </Text>
               </View>
               <View style={{marginTop: 20}}>

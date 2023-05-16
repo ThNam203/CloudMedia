@@ -24,9 +24,9 @@ export default function Header({navigation}: any) {
           }}>
           <Image
             source={
-              user.profileImagePath === ''
-                ? require('../../assets/images/Spiderman.jpg')
-                : {uri: user.profileImagePath}
+              user.profileImagePath
+                ? {uri: user.profileImagePath}
+                : require('../../assets/images/Spiderman.jpg')
             }
             style={{height: 35, width: 35, borderRadius: 100}}
           />
