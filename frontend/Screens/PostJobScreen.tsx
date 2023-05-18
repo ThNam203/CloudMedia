@@ -249,6 +249,7 @@ function PostJobScreen(props: any) {
                 color: 'black',
                 fontSize: 16,
               }}
+              multiline={true}
               value={jobDescription}
               onChangeText={setJobDescription}
               placeholder="Add job description"
