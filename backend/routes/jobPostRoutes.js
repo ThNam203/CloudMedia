@@ -14,7 +14,8 @@ router
     )
 
 router
-    .route('/:job_post_id')
+    .route('/:jobPostId')
+    .get(authController.isUser, userJobPostController.getAJobPostById)
     .patch(
         authController.isUser,
         authController.isOwnerOfThePath,

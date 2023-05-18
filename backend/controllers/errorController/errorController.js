@@ -20,8 +20,7 @@ const handleDuplicateFieldsDB = (err) => {
 
 const sendErrorInDevelopmentEnv = function (err, res) {
     res.status(err.statusCode).json({
-        status: 'error',
-        data: {
+        devErrorData: {
             error: err,
             errorName: err.name,
             message: err.message,
@@ -44,17 +43,13 @@ const sendErrorInProductionEnv = function (err, res) {
         err = JWTErrorHandler.notBeforeErrorHandler(err)
 
     res.status(err.statusCode).json({
-        error: {
-            message: err.message,
-        },
+        errorMessage: err.message,
     })
 }
 
 exports.globalErrorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500
     err.message = err.message || 'Internal server error'
-
-    console.log(err)
 
     if (process.env.NODE_ENV === 'development')
         sendErrorInDevelopmentEnv(err, res)

@@ -17,7 +17,7 @@ const s3Client = new S3Client({
 const deleteOldProfileImage = (path) => {
     const command = new DeleteObjectCommand({
         Bucket: 'workwise',
-        Key: path.substring(path.lastIndexOf('/') + 1, path.length()),
+        Key: path.substring(path.lastIndexOf('/') + 1, path.length),
     })
 
     s3Client.send(command).catch(() => {})
@@ -39,7 +39,7 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
     if (!req.file || !req.file.location)
         return next(new AppError('Unable to upload profile image', 500))
 
-    const userId = req.params.user_id
+    const { userId } = req.params
     const user = await User.findById(userId)
     if (user.profileImagePath) deleteOldProfileImage(user.profileImagePath)
 
@@ -50,15 +50,23 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
 })
 
 exports.getUserById = asyncCatch(async (req, res, next) => {
-    const { user_id: userId } = req.params
+    const { userId } = req.params
     const user = await User.findById(userId)
     if (!user) return next(new AppError('No user found!', 400))
 
     res.status(200).json(user)
 })
 
+exports.getUserByEmail = asyncCatch(async (req, res, next) => {
+    const { userEmail } = req.params
+    const user = await User.findOne({ email: userEmail })
+    if (!user) return next(new AppError('No email found!', 400))
+
+    res.status(200).json(user)
+})
+
 exports.updateUserById = asyncCatch(async (req, res, next) => {
-    const { user_id: userId } = req.params
+    const { userId } = req.params
     const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
         new: true,
         runValidators: true,
@@ -66,4 +74,17 @@ exports.updateUserById = asyncCatch(async (req, res, next) => {
     if (!updatedUser) return next(new AppError('No user found!', 400))
 
     res.status(200).json(updatedUser)
+})
+
+exports.getAllFriends = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const userWithFriends = await User.findById(userId)
+        .populate({
+            path: 'connections',
+            select: '_id profileImagePath name',
+        })
+        .exec((err, user) => {
+            if (err) return next(err)
+        })
+    res.status(200).json(userWithFriends.connections)
 })

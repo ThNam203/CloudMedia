@@ -8,55 +8,66 @@ import {
   StyleSheet,
 } from 'react-native';
 import MessageComponent from '../../components/ui/ChatMessage';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../reducers/Store';
+import chatApi from '../../api/chatApi';
 
 const socket = require('../../utils/socket');
 
 class Message {
   public id: string;
   public message: string;
-  public time: string;
-  public user: string;
+  public senderId: string;
+  public createdAt: string;
 
-  constructor(id: string, message: string, time: string, user: string) {
+  constructor(id: string, message: string, senderId: string, createdAt: string) {
     this.id = id;
     this.message = message;
-    this.time = time;
-    this.user = user;
+    this.senderId = senderId;
+    this.createdAt = createdAt;
   }
 }
 
-const ChatMessagesScreen = (props: any) => {
+const ChatRoom = ({ route }: any) => {
+  const { chatRoomId } = route.params
+  const uid = useSelector((state: RootState) => state.uid.id);
+  const jwt = useSelector((state: RootState) => state.token.key);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
-  const [user, setUser] = useState('');
-
+  
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    setUser(socket.id);
-
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({animated: true});
-    }
-  }, [chatMessages]);
+    if (flatListRef.current !== null)
+      flatListRef.current.scrollToEnd();
+  }, [chatMessages])
 
   useEffect(() => {
-    socket.on('serverSendMessage', (newMessage: Message) => {
+    const getAllMessages = async () => {
+      const rawMessages = await chatApi.getMessagesFromAChatRoom(jwt, chatRoomId)
+      const messages: Message[] = rawMessages.data.map((rawMessage: any) => {
+        const { _id, message, senderId, createdAt } = rawMessage
+        return { _id, message, senderId, createdAt }
+      });
+      setChatMessages(messages)
+    }
+    
+    socket.on('newMessage', (newRawMessage: any) => {
+      const newMessage = new Message(newRawMessage._id, newRawMessage.message, newRawMessage.senderId, newRawMessage.createdAt)
       setChatMessages(prevChatMessages => [...prevChatMessages, newMessage]);
     });
-  }, [socket]);
+
+    getAllMessages()
+  }, [])
 
   const handleNewMessage = () => {
-    const date = new Date();
-
-    const newMessage = new Message(
-      Date.now().toString(),
+    const newMessage = {
+      chatRoomId: chatRoomId,
       message,
-      `${date.getHours()}:${date.getMinutes()}`,
-      user,
-    );
+      senderId: uid,
+    }
 
-    socket.emit('clientSendMessage', newMessage);
+    socket.emit('newMessage', newMessage);
     setMessage('');
   };
 
@@ -67,7 +78,7 @@ const ChatMessagesScreen = (props: any) => {
           <FlatList
             data={chatMessages}
             renderItem={({item}) => (
-              <MessageComponent item={item} user={user} />
+              <MessageComponent chat={item} userId={uid} />
             )}
             ref={flatListRef}
             keyExtractor={item => item.id}
@@ -82,8 +93,7 @@ const ChatMessagesScreen = (props: any) => {
         <TextInput
           style={styles.messageInput}
           value={message}
-          onChangeText={value => setMessage(value)}
-        />
+          onChangeText={value => setMessage(value)} />
         <Pressable style={styles.btnSendMessage} onPress={handleNewMessage}>
           <View>
             <Text style={{color: '#f2f0f1', fontSize: 20}}>SEND</Text>
@@ -125,4 +135,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatMessagesScreen;
+export default ChatRoom;

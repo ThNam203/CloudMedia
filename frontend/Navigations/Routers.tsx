@@ -8,6 +8,8 @@ import AppLoader from '../components/ui/AppLoader';
 import ProfileScreen from '../Screens/ProfileScreen';
 import PostScreen from '../Screens/PostScreen';
 import SearchScreen from '../Screens/SearchScreen';
+import ChatScreen from '../Screens/chatScreens/ChatScreen';
+import ChatRoom from '../Screens/chatScreens/ChatRoom';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +22,8 @@ export default function Routers() {
         <Stack.Screen name="main" component={BottomTabs} />
         <Stack.Screen name="profile" component={ProfileScreen} />
         <Stack.Screen name="search" component={SearchScreen} />
+        <Stack.Screen name="chat" component={ChatScreen} />
+        <Stack.Screen name="chatRoom" component={ChatRoom} />
       </Stack.Navigator>
       {isLoading ? <AppLoader /> : null}
       <PostScreen />

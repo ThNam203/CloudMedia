@@ -7,7 +7,7 @@ const asyncCatch = require('../utils/asyncCatch')
 
 const getJWTToken = (userId) =>
     jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-        expiresIn: '7 days',
+        expiresIn: '30 days',
     })
 
 const verifyAndGetJWTToken = async (req, next) => {
@@ -33,7 +33,7 @@ const verifyAndGetJWTToken = async (req, next) => {
 exports.signUp = asyncCatch(async (req, res, next) => {
     const newUser = await User.createNewUser(req)
     if (!newUser) return next(new AppError('Unable to create new user', 500))
-    res.status(200).end()
+    res.status(204).end()
 })
 
 exports.logIn = asyncCatch(async (req, res, next) => {
@@ -43,18 +43,28 @@ exports.logIn = asyncCatch(async (req, res, next) => {
         return next(new AppError('Missing email or password', 400))
 
     const freshUser = await User.findOne({ email }).select('+password')
-    if (!freshUser) return next(new AppError('Email not found', 400))
+    if (!freshUser)
+        return next(
+            new AppError('Invalid username or password. Please try again', 404)
+        )
 
     if (!(await freshUser.checkPassword(password, freshUser.password)))
-        return next(new AppError('Wrong password', 400))
+        return next(
+            new AppError('Invalid username or password. Please try again', 404)
+        )
 
     const jwtToken = getJWTToken(freshUser.id)
     res.status(200).json(jwtToken)
 })
 
 exports.isUser = asyncCatch(async (req, res, next) => {
-    const token = verifyAndGetJWTToken(req, next)
-    if (!token) return next(new AppError('Invalid token', 401))
+    const token = await verifyAndGetJWTToken(req, next)
+    if (!token) return next(new AppError('Invalid JWT', 401))
+
+    const data = jwt.decode(token)
+    const userId = data.id
+    const user = await User.findById(userId)
+    if (!user) return next(new AppError('Invalid JWT', 401))
     next()
 })
 
@@ -62,7 +72,7 @@ exports.isUser = asyncCatch(async (req, res, next) => {
 exports.isOwnerOfThePath = asyncCatch(async (req, res, next) => {
     const jwtToken = req.headers.authorization.split(' ')[1]
     const { id: userId } = jwt.decode(jwtToken)
-    const { user_id: idParam } = req.params
+    const { userId: idParam } = req.params
     if (userId !== idParam)
         return next(
             new AppError(
@@ -75,13 +85,23 @@ exports.isOwnerOfThePath = asyncCatch(async (req, res, next) => {
 })
 
 exports.logOut = asyncCatch(async (req, res, next) => {
-    const token = verifyAndGetJWTToken(req, next)
+    const token = await verifyAndGetJWTToken(req, next)
 
     const jwtBlacklist = await JWTBlacklist.create({ jwtData: token })
-    if (jwtBlacklist)
+    if (!jwtBlacklist)
         return next(new AppError('Unable to logout, try again', 500))
 
-    res.status(204).end()
+    res.status(204).json()
+})
+
+exports.validateJwt = asyncCatch(async (req, res, next) => {
+    try {
+        await verifyAndGetJWTToken(req, next)
+    } catch (error) {
+        return next(error)
+    }
+
+    res.status(204).json()
 })
 
 // exports.changePassword = asyncCatch(async (req, res, next) => {

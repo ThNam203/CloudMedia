@@ -1,14 +1,24 @@
 require('./utils/startServerScript')
 
 const express = require('express')
+const http = require('http')
+const io = require('./socket/socket')
 
 const errorHandlers = require('./controllers/errorController/errorController')
+const userJobPostController = require('./controllers/userJobPostController')
 const authRouter = require('./routes/authRoutes')
 const usersRouter = require('./routes/usersRoutes')
 const jobPostRouter = require('./routes/jobPostRoutes')
-const userJobPostController = require('./controllers/userJobPostController')
+const friendRouter = require('./routes/friendRoutes')
+const notificationRouter = require('./routes/notificationRoutes')
+const chatRouter = require('./routes/chatRoutes')
 
 const app = express()
+const server = http.createServer(app)
+
+// set up socketio
+io.initialize(server)
+require('./socket/chat')
 
 app.use(express.json())
 app.use(
@@ -17,14 +27,17 @@ app.use(
     })
 )
 
-app.use('/', authRouter)
+app.use('', authRouter)
+app.use('/chatroom', chatRouter)
 app.get('/jobpost/:jobPostId', userJobPostController.getAJobPostUsingItsId)
-app.use('/:user_id/jobpost', jobPostRouter)
-app.use('/:user_id', usersRouter)
+app.use('/:userId/jobpost', jobPostRouter)
+app.use('/:userId/friend-request', friendRouter)
+app.use('/:userId/notification', notificationRouter)
+app.use('', usersRouter)
 
 app.use('*', errorHandlers.invalidUrlHandler)
 app.use(errorHandlers.globalErrorHandler)
 
-app.listen(process.env.SERVER_PORT, () => {
-    console.log(`Server running on port ${process.env.SERVER_PORT}`)
+server.listen(process.env.PORT || 3000, () => {
+    console.log(`Server running on port ${process.env.PORT || 3000}`)
 })
