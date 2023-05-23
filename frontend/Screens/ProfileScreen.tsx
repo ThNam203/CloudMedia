@@ -14,7 +14,6 @@ import ActivitySection from '../components/ui/ActivitySection';
 import UploadPhoto from '../components/ui/UploadPhoto';
 
 import EditProfileScreen from './EditProfileScreen';
-
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {user_avatarImg, user_logout} from '../api/user_api';
@@ -43,7 +42,10 @@ function ProfileScreen({navigation}: any) {
           console.log(response);
           storeData(false, nameStorage.isLogin)
             .then(() => {
-              navigation.navigate('login');
+              navigation.reset({
+                index: 0,
+                routes: [{name: 'login'}],
+              });
             })
             .catch(error => {
               console.error(error);

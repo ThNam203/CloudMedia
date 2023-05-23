@@ -24,7 +24,7 @@ function LoginScreen(props: any) {
       password: password,
     })
       .then((response: any) => {
-        console.log(response.data)
+        console.log(response.data);
         if (response.status === 200) {
           return response.data;
         } else {
@@ -34,21 +34,14 @@ function LoginScreen(props: any) {
       })
       .then(data => {
         // connect to socket
-        require('../utils/socket')
-        
+        require('../utils/socket');
+
         // do something with the JWT token
         const jwtToken = data;
         storeData(jwtToken, nameStorage.jwtToken);
-        dispatch(setToken(jwtToken));
-        dispatch(setIdFromJwt(jwtToken));
 
-        // get some data
-        props.saveInfo(jwtToken);
-        props.saveNotification(jwtToken);
-        props.saveJobs(jwtToken);
-        // console.log(jwtToken);
         storeData(isSelected, nameStorage.isLogin);
-        props.handleNavigate();
+        props.handleNavigate(jwtToken);
       })
       .catch(error => {
         console.error(error);

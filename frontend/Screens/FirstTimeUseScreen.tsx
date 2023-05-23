@@ -13,19 +13,11 @@ import RectangleButton from '../components/ui/RectangleButton';
 import SignUpHrScreen from './SignUpScreen';
 import LoginScreen from './LoginScreen';
 import {nameStorage, retrieveData} from '../reducers/AsyncStorage';
-import {user_info} from '../api/user_api';
-import jwt_decode from 'jwt-decode';
+
 import {useDispatch, useSelector} from 'react-redux';
-import {UserInfo, saveUser} from '../reducers/User_reducer';
 import {setStatus} from '../reducers/Loading_reducer';
-import {setToken} from '../reducers/Token_reducer';
-import {setIdFromJwt} from '../reducers/Uid_reducer';
 import {RootState} from '../reducers/Store';
 import AppLoader from '../components/ui/AppLoader';
-import {getAllNotifications} from '../api/notification_api';
-import {setNotifications} from '../reducers/Notification_reducer';
-import {getAllJobOfUser} from '../api/job_api';
-import {setJobs} from '../reducers/Job_reducer';
 
 function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
@@ -39,96 +31,29 @@ function FirstTimeUseScreen({navigation}: any) {
     setModalHrVisible(false);
   }
 
-  const navigateToMain = () => {
-    navigation.navigate('main');
-  };
-
-  const saveInfo = (jwt: any) => {
-    const json = jwt_decode(jwt) as {id: string};
-    const idUser = json.id;
-    user_info(idUser)
-      .then((response: any) => {
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
-        }
-      })
-      .then(data => {
-        const user: UserInfo = {...data};
-        // miss info
-        dispatch(saveUser(user));
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  };
-
-  const saveNotification = (jwt: any) => {
-    const json = jwt_decode(jwt) as {id: string};
-    const idUser = json.id;
-    getAllNotifications(idUser, jwt)
-      .then((response: any) => {
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
-        }
-      })
-      .then(data => {
-        dispatch(setNotifications(data));
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  };
-
-  const saveJobs = (jwt: any) => {
-    const json = jwt_decode(jwt) as {id: string};
-    const idUser = json.id;
-    getAllJobOfUser(idUser, jwt)
-      .then((response: any) => {
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
-        }
-      })
-      .then(data => {
-        dispatch(setJobs(data));
-      })
-      .catch(error => {
-        console.error(error);
-      });
+  const navigateToMain = (jwt: any) => {
+    navigation.navigate('loading', {jwt});
   };
 
   useEffect(() => {
     const checkLogin = async () => {
-      const islogin = await retrieveData(nameStorage.isLogin);
-      if (islogin) {
-        try {
-          //connect to socket.io
-          require('../utils/socket')
-
-          dispatch(setStatus(true));
-          const jwt = await retrieveData(nameStorage.jwtToken);
-          dispatch(setToken(jwt));
-          dispatch(setIdFromJwt(jwt));
-          // get some data
-          saveInfo(jwt);
-          saveNotification(jwt);
-          saveJobs(jwt);
-          // navigate
-          navigateToMain();
-        } catch (error) {
-          console.log(error);
-        } finally {
+      dispatch(setStatus(true));
+      retrieveData(nameStorage.isLogin)
+        .then((isLogin: any) => {
+          if (isLogin) {
+            // Connect to socket.io
+            require('../utils/socket');
+            return retrieveData(nameStorage.jwtToken).then((jwt: any) => {
+              navigateToMain(jwt);
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        })
+        .finally(() => {
           dispatch(setStatus(false));
-        }
-      }
+        });
     };
 
     checkLogin();
@@ -222,9 +147,6 @@ function FirstTimeUseScreen({navigation}: any) {
                 setModalHrVisible(true);
               }}
               handleNavigate={navigateToMain}
-              saveInfo={saveInfo}
-              saveNotification={saveNotification}
-              saveJobs={saveJobs}
             />
           </View>
         </Modal>

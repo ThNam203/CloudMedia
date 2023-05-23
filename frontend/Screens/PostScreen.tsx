@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,17 +8,32 @@ import {
   TextInput,
   Image,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
-import ChoosePostTemplate from '../components/ui/ChoosePostTemplate';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {setPostShow} from '../reducers/Post_reducer';
-function PostScreen() {
-  const user = useSelector((state: RootState) => state.userInfo);
+import Colors from '../constants/Colors';
+import ImagePicker from 'react-native-image-crop-picker';
+import {createNewPost} from '../api/statusPost_api';
 
+interface ImageItem {
+  uri: string;
+  type: string;
+  name: string;
+}
+
+function PostScreen() {
+  const [mediaFiles, setMediaFiles] = useState<ImageItem[]>([]);
+
+  const [description, setDescription] = useState('');
+
+  const user = useSelector((state: RootState) => state.userInfo);
   const postVisible = useSelector((state: RootState) => state.post.show);
+  const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((state: RootState) => state.uid.id);
 
   const dispatch = useDispatch();
 
@@ -26,7 +41,89 @@ function PostScreen() {
     dispatch(setPostShow(!postVisible));
   };
 
-  const [choosePostTemplate, setChoosePostTemplate] = useState(false);
+  const postStatus = () => {
+    createNewPost({mediaFiles, description}, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          return response.data;
+        } else {
+          console.log(response.response.status);
+          throw new Error(response.response.data.errorMessage);
+        }
+      })
+      .then((data: any) => {})
+      .catch(error => console.error(error));
+  };
+
+  const takePhotoFromCamera = () => {
+    ImagePicker.openCamera({
+      // height: 140,
+      // width: 140,
+      // cropperCircleOverlay: true,
+    })
+      .then((image: any) => {
+        console.log(image);
+        setMediaFiles([
+          ...mediaFiles,
+          {
+            uri: image.path,
+            type: image.mime,
+            name: image.path.split('/').pop(),
+          },
+        ]);
+      })
+      .catch(err => console.log(err));
+  };
+
+  const choosePhotoFromLibrary = () => {
+    ImagePicker.openPicker({
+      height: 300,
+      width: 400,
+      multiple: true,
+    })
+      .then(images => {
+        console.log(images);
+        const selectedImages = images.map(image => ({
+          uri: image.path,
+          type: image.mime,
+          name: image.path.split('/').pop() || image.path,
+        }));
+        setMediaFiles([...mediaFiles, ...selectedImages]);
+      })
+      .catch(err => console.log(err));
+  };
+
+  useEffect(() => {
+    setDescription('');
+    setMediaFiles([]);
+  }, [postVisible]);
+
+  // item image
+  const ItemImageView = ({item}: any) => {
+    return (
+      <View style={{flex: 1}}>
+        <Image
+          style={{
+            height: 120,
+            width: 160,
+            borderRadius: 3,
+            margin: 5,
+          }}
+          source={{uri: item.uri}}
+        />
+        <View style={{position: 'absolute', top: 5, right: 5}}>
+          <TouchableOpacity
+            onPress={() =>
+              setMediaFiles(mediaFiles.filter(i => i.uri != item.uri))
+            }>
+            <Icon type={Icons.FontAwesome} name="close" color={Colors.black} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <Modal
       onBackdropPress={() => dispatch(setPostShow(false))}
@@ -41,19 +138,37 @@ function PostScreen() {
               style={{
                 paddingHorizontal: 20,
                 marginTop: 20,
-                height: 250,
                 flex: 1,
               }}>
               <TextInput
-                style={{color: 'black', fontSize: 19, paddingTop: 16}}
+                value={description}
+                onChangeText={setDescription}
+                style={{
+                  color: 'black',
+                  fontSize: 19,
+                  paddingTop: 16,
+                  flex: 1,
+                  textAlignVertical: 'top',
+                }}
                 placeholder="What do you want to talk about?"
                 multiline={true}
               />
             </View>
           </View>
-          <View style={{height: 130}} />
         </View>
       </ScrollView>
+      {mediaFiles.length > 0 && (
+        <View style={{backgroundColor: Colors.white}}>
+          <FlatList
+            data={mediaFiles}
+            renderItem={({item}) => <ItemImageView item={item} />}
+            keyExtractor={(_, index) => index.toString()}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+      )}
+      <View style={{height: 65}} />
 
       <View style={styles.topView}>
         <View
@@ -83,10 +198,14 @@ function PostScreen() {
               marginLeft: 'auto',
               flexDirection: 'row',
             }}>
-            <TouchableOpacity style={{marginTop: 5}}>
+            <TouchableOpacity
+              style={{marginTop: 5}}
+              onPress={() => {
+                console.log(mediaFiles);
+              }}>
               <Icon type={Icons.Feather} name="clock" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={toggleModal} style={{marginLeft: 20}}>
+            <TouchableOpacity onPress={postStatus} style={{marginLeft: 20}}>
               <View
                 style={{
                   backgroundColor: '#0085f1',
@@ -104,9 +223,16 @@ function PostScreen() {
         </View>
       </View>
 
-      <View style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: Colors.white,
+        }}>
         <View style={{flexDirection: 'row', padding: 20}}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={takePhotoFromCamera}>
             <Icon type={Icons.Entypo} name="camera" size={25} />
           </TouchableOpacity>
           <TouchableOpacity>
@@ -117,13 +243,10 @@ function PostScreen() {
               style={{marginLeft: 20}}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={{marginLeft: 20}}>
-            <Icon type={Icons.FontAwesome} name="photo" size={25} />
-          </TouchableOpacity>
           <TouchableOpacity
-            style={{marginLeft: 20}}
-            onPress={() => setChoosePostTemplate(!choosePostTemplate)}>
-            <Icon type={Icons.Entypo} name="dots-three-horizontal" size={25} />
+            onPress={choosePhotoFromLibrary}
+            style={{marginLeft: 20}}>
+            <Icon type={Icons.FontAwesome} name="photo" size={25} />
           </TouchableOpacity>
           <View style={{marginLeft: 'auto'}}>
             <TouchableOpacity style={{flexDirection: 'row'}}>
@@ -132,10 +255,6 @@ function PostScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        <ChoosePostTemplate
-          isVisible={choosePostTemplate}
-          setVisible={setChoosePostTemplate}
-        />
       </View>
     </Modal>
   );

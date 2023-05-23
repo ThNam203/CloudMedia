@@ -3,9 +3,11 @@ import {TouchableOpacity} from '@gorhom/bottom-sheet';
 import React, {useState} from 'react';
 import {Dimensions} from 'react-native';
 import {FlatList, StyleSheet, Text, Image, View, Pressable} from 'react-native';
+import {useDispatch} from 'react-redux';
+import {setPostShow} from '../../reducers/Post_reducer';
 const screenWidth = Dimensions.get('screen').width;
 
-const Post = ({type, content, image, time, user}) => {
+const Post = ({type, content, image, time, user}: any) => {
   const renderImage = () => {
     if (image) {
       return <Image style={styles.image} source={{uri: image}} />;
@@ -27,6 +29,8 @@ const Post = ({type, content, image, time, user}) => {
 };
 
 const ActivitySection = () => {
+  const dispatch = useDispatch();
+
   const [posts, setPosts] = useState([
     {
       type: 'text',
@@ -67,6 +71,7 @@ const ActivitySection = () => {
             borderColor: '#0565a0ff',
           }}>
           <Pressable
+            onPress={() => dispatch(setPostShow(true))}
             android_ripple={{color: '#7fc1ebff'}}
             style={{
               backgroundColor: 'transparent',

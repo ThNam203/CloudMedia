@@ -7,12 +7,18 @@ import {
   TextInput,
   FlatList,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import ItemRequestUser from '../components/ui/ItemRequestUser';
+import {useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {user_info_email} from '../api/user_api';
 
 export default function SearchScreen({navigation}: any) {
   const [text, setText] = useState('');
+
+  const token = useSelector((state: RootState) => state.token.key);
+
   const friendsData = [
     {
       id: '1',
@@ -76,9 +82,57 @@ export default function SearchScreen({navigation}: any) {
     },
   ];
 
+  const [listData, setListData] = useState(friendsData);
+
   const clearText = () => {
     setText('');
   };
+
+  useEffect(() => {
+    const filtertext = async () => {
+      if (/\S+@\S+\.\S+/.test(text)) {
+        user_info_email(text, token)
+          .then((response: any) => {
+            if (response.status === 200) {
+              return response.data;
+            } else {
+              console.log(response.response.status);
+              throw new Error(response.response.data.errorMessage);
+            }
+          })
+          .then(data => {
+            console.log(data);
+            if (data.profileImagePath !== undefined) {
+              setListData([
+                {
+                  id: 'a' + listData.length,
+                  name: data.name,
+                  connection: 'Superrr',
+                  avatar: {uri: data.profileImagePath},
+                },
+                ...listData,
+              ]);
+            } else {
+              setListData([
+                {
+                  id: 'a' + listData.length,
+                  name: data.name,
+                  connection: 'Superrr',
+                  avatar: null,
+                },
+                ...listData,
+              ]);
+            }
+            // setNameHandle('Add friend');
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
+    };
+    filtertext();
+  }, [text]);
+
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.topView}>
@@ -104,7 +158,7 @@ export default function SearchScreen({navigation}: any) {
         </View>
       </View>
       <FlatList
-        data={friendsData}
+        data={listData}
         renderItem={({item}) => (
           <ItemRequestUser
             item={item}

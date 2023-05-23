@@ -139,7 +139,6 @@ const InvitationsList = () => {
       )}
       keyExtractor={item => item.id}
       showsVerticalScrollIndicator={false}
-      scrollEnabled={false}
     />
   ) : null;
 };
