@@ -2,29 +2,30 @@ const express = require('express')
 
 const router = express.Router({ mergeParams: true })
 const authController = require('../controllers/authController')
-const userJobPostController = require('../controllers/userJobPostController')
+const statusPostController = require('../controllers/statusPostController')
 
 router
     .route('')
-    .get(authController.isUser, userJobPostController.getAllJobPostsOfAUser)
+    .get(authController.isUser, statusPostController.getAllStatusPostsOfAUser)
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
-        userJobPostController.createNewJobPost
+        statusPostController.uploadMediaFiles.array('media-files'),
+        statusPostController.createNewStatusPost
     )
 
 router
-    .route('/:jobPostId')
-    .get(authController.isUser, userJobPostController.getAJobPostById)
+    .route('/:statusPostId')
+    .get(authController.isUser, statusPostController.getStatusPostById)
     .patch(
         authController.isUser,
         authController.isOwnerOfThePath,
-        userJobPostController.updateJobPostById
+        statusPostController.updateJobPostById
     )
     .delete(
         authController.isUser,
         authController.isOwnerOfThePath,
-        userJobPostController.deleteJobPostById
+        statusPostController.deleteJobPostById
     )
 
 module.exports = router

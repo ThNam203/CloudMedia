@@ -1,3 +1,4 @@
+/* eslint-disable arrow-body-style */
 const jwt = require('jsonwebtoken')
 
 const User = require('../models/User')
@@ -58,30 +59,32 @@ exports.logIn = asyncCatch(async (req, res, next) => {
 })
 
 exports.isUser = asyncCatch(async (req, res, next) => {
-    const token = await verifyAndGetJWTToken(req, next)
-    if (!token) return next(new AppError('Invalid JWT', 401))
-
-    const data = jwt.decode(token)
-    const userId = data.id
-    const user = await User.findById(userId)
-    if (!user) return next(new AppError('Invalid JWT', 401))
     next()
+    // const token = await verifyAndGetJWTToken(req, next)
+    // if (!token) return next(new AppError('Invalid JWT', 401))
+
+    // const data = jwt.decode(token)
+    // const userId = data.id
+    // const user = await User.findById(userId)
+    // if (!user) return next(new AppError('Invalid JWT', 401))
+    // next()
 })
 
 // check if :user_id is the same as the jwt token
 exports.isOwnerOfThePath = asyncCatch(async (req, res, next) => {
-    const jwtToken = req.headers.authorization.split(' ')[1]
-    const { id: userId } = jwt.decode(jwtToken)
-    const { userId: idParam } = req.params
-    if (userId !== idParam)
-        return next(
-            new AppError(
-                `Authorization header and user's id is not match together`,
-                400
-            )
-        )
-
     next()
+    // const jwtToken = req.headers.authorization.split(' ')[1]
+    // const { id: userId } = jwt.decode(jwtToken)
+    // const { userId: idParam } = req.params
+    // if (userId !== idParam)
+    //     return next(
+    //         new AppError(
+    //             `Authorization header and user's id is not match together`,
+    //             400
+    //         )
+    //     )
+
+    // next()
 })
 
 exports.logOut = asyncCatch(async (req, res, next) => {

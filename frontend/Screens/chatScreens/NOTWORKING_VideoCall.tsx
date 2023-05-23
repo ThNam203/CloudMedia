@@ -7,51 +7,43 @@ import {
   RTCSessionDescription,
   RTCView,
   mediaDevices,
-  permissions,
 } from 'react-native-webrtc';
 
 const socket = require('../../utils/socket');
 console.debug = () => {};
 
-let peerConstraints = {
-  iceServers: [
-    {
-      urls: 'stun:stun.l.google.com:19302',
-    },
-    {
-      urls: 'stun:stun1.l.google.com:19302',
-    },
-    {
-      urls: 'stun:stun2.l.google.com:19302',
-    },
-  ],
-};
+
 
 const VideoCallScreen = ({route}: any) => {
-  // const { chatRoomId } = route.params
-  const {isCaller = false} = route.params;
+  let peerConstraints = {
+    iceServers: [
+      {
+        urls: 'stun:stun.l.google.com:19302',
+      },
+      {
+        urls: 'stun:stun1.l.google.com:19302',
+      },
+      {
+        urls: 'stun:stun2.l.google.com:19302',
+      },
+    ],
+  };
   const chatRoomId = 1;
-  const [remoteMediaStream, setRemoteMediaStream] = useState(
-    new MediaStream(undefined),
-  );
+  const {isCaller} = route.params;
+  const [remoteMediaStream, setRemoteMediaStream] = useState<any>(null);
   const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(
     null,
   );
+  const [remoteCandidates, setRemoteCandidates] = useState<RTCIceCandidate[]>(
+    [],
+  );
+  const [negotiationNeeded, setNegotiationNeeded] = useState(false);
   const peerConnection = useRef(new RTCPeerConnection(peerConstraints));
   const [isVoiceOnly, setIsVoiceOnly] = useState(false);
 
-  const stopCall = async () => {
-    if (localMediaStream) {
-      localMediaStream.getTracks().forEach(track => track.stop());
-      localMediaStream.release();
-
-      setLocalMediaStream(null);
-    }
-
-    peerConnection.current.close();
-  };
-
   const sendOfferVideoCall = async () => {
+    if (!negotiationNeeded) return;
+
     let sessionConstraints = {
       mandatory: {
         OfferToReceiveAudio: true,
@@ -59,7 +51,6 @@ const VideoCallScreen = ({route}: any) => {
         VoiceActivityDetection: true,
       },
     };
-    console.log('send offer');
     try {
       const offerDescription = await peerConnection.current.createOffer(
         sessionConstraints,
@@ -71,18 +62,41 @@ const VideoCallScreen = ({route}: any) => {
     }
   };
 
-  const answerOfferVideoCall = async (
-    receivedOfferDescription: any,
-    callerSocketId: string,
-  ) => {
+  function handleRemoteCandidate(receivedIceCandidate: any) {
+    const iceCandidate = new RTCIceCandidate(receivedIceCandidate);
+    if (peerConnection.current.remoteDescription == null) {
+      return setRemoteCandidates(prevCandidates => [
+        ...prevCandidates,
+        iceCandidate,
+      ]);
+    }
+
+    return peerConnection.current.addIceCandidate(iceCandidate);
+  }
+
+  function processCandidates() {
+    if (remoteCandidates.length < 1) {
+      return;
+    }
+
+    remoteCandidates.map(candidate =>
+      peerConnection.current.addIceCandidate(candidate),
+    );
+    setRemoteCandidates([]);
+  }
+
+  const answerOfferVideoCall = async (receivedOfferDescription: any) => {
     try {
-      const offerDescription = new RTCSessionDescription(receivedOfferDescription);
+      const offerDescription = new RTCSessionDescription(
+        receivedOfferDescription,
+      );
       await peerConnection.current.setRemoteDescription(offerDescription);
 
       const answerDescription = await peerConnection.current.createAnswer();
       await peerConnection.current.setLocalDescription(answerDescription);
 
-      socket.emit('answerOfferVideoCall', {answerDescription, callerSocketId});
+      processCandidates();
+      socket.emit('answerOfferVideoCall', {answerDescription, chatRoomId});
     } catch (err) {}
   };
 
@@ -95,14 +109,18 @@ const VideoCallScreen = ({route}: any) => {
     } catch (err) {}
   };
 
-  useEffect(() => {
-    setInterval(function () {
-      if (peerConnection.current)
-        console.log(
-          `IS ICE GATHERING ${peerConnection.current.iceGatheringState}`,
-        );
-    }, 5000);
+  const stopCall = async () => {
+    if (localMediaStream) {
+      localMediaStream.getTracks().forEach(track => track.stop());
+      localMediaStream.release();
 
+      setLocalMediaStream(null);
+    }
+
+    peerConnection.current.close();
+  };
+
+  useEffect(() => {
     const startCamera = async () => {
       let mediaConstraints = {
         audio: true,
@@ -128,8 +146,8 @@ const VideoCallScreen = ({route}: any) => {
     };
 
     socket.on('offerVideoCall', (data: any) => {
-      const {offerDescription, callerSocketId} = data;
-      answerOfferVideoCall(offerDescription, callerSocketId);
+      const {offerDescription} = data;
+      answerOfferVideoCall(offerDescription);
     });
 
     socket.on('answerOfferVideoCall', (data: any) => {
@@ -137,20 +155,13 @@ const VideoCallScreen = ({route}: any) => {
     });
 
     socket.on('iceCandidate', (data: any) => {
-      if (peerConnection.current) {
-        peerConnection?.current
-          .addIceCandidate(new RTCIceCandidate(data))
-          .then(data => {
-            console.log('Added ICE candidate');
-          })
-          .catch(err => {
-            console.log('Unable to add ICE candidate');
-          });
-      }
+      handleRemoteCandidate(data);
     });
 
     peerConnection.current.addEventListener('connectionstatechange', event => {
-      console.log('connection state chaneged');
+      console.error(
+        `connectionstatechange ${peerConnection.current.connectionState}`,
+      );
       switch (peerConnection.current.connectionState) {
         case 'closed':
           // You can handle the call being disconnected here.
@@ -160,18 +171,24 @@ const VideoCallScreen = ({route}: any) => {
     });
 
     peerConnection.current.addEventListener('icecandidate', (event: any) => {
-      console.log('icecandidate event triggered');
       if (!event.candidate) {
         return;
       }
       socket.emit('iceCandidate', {iceCandidate: event.candidate, chatRoomId});
     });
 
+    peerConnection.current.addEventListener('negotiationneeded', event => {
+      if (!negotiationNeeded) setNegotiationNeeded(true);
+    });
+
     peerConnection.current.addEventListener(
       'iceconnectionstatechange',
       event => {
-        console.log('iceconnectionstatechange event triggered');
         switch (peerConnection.current.iceConnectionState) {
+          case 'failed': {
+            peerConnection.current.restartIce();
+            break;
+          }
           case 'connected':
           case 'completed':
             break;
@@ -179,28 +196,17 @@ const VideoCallScreen = ({route}: any) => {
       },
     );
 
-    peerConnection.current.addEventListener('signalingstatechange', event => {
-      console.log(
-        'signalingstatechange event triggered' +
-          peerConnection.current.signalingState,
-      );
-      switch (peerConnection.current.signalingState) {
-        case 'closed':
-          // You can handle the call being disconnected here.
-
-          break;
-      }
-    });
-
     peerConnection.current.addEventListener('track', event => {
-      console.log('track event triggered');
-      const newRemoteMediaStream = new MediaStream(undefined);
-      newRemoteMediaStream.addTrack(event.track);
-      setRemoteMediaStream(newRemoteMediaStream);
+      try {
+        const remoteStream = new MediaStream(undefined);
+        event.streams[0].getTracks().forEach((track, index) => {
+          remoteStream.addTrack(track);
+        });
+        setRemoteMediaStream(remoteStream);
+      } catch (e) {}
     });
 
     startCamera();
-    sendOfferVideoCall();
   }, []);
 
   return (
@@ -224,6 +230,9 @@ const VideoCallScreen = ({route}: any) => {
       <TouchableOpacity
         style={styles.endCallButton}
         onPress={stopCall}></TouchableOpacity>
+      <TouchableOpacity
+        style={styles.sendOfferButton}
+        onPress={sendOfferVideoCall}></TouchableOpacity>
     </View>
   );
 };
@@ -260,6 +269,17 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendOfferButton: {
+    position: 'absolute',
+    top: 64,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'green',
     justifyContent: 'center',
     alignItems: 'center',
   },

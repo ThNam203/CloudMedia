@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken')
-
 const JobPost = require('../models/JobPost')
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
@@ -17,10 +15,7 @@ exports.getAJobPostById = asyncCatch(async (req, res, next) => {
             )
         )
 
-    res.status(200).json({
-        status: 'success',
-        data: jobPost,
-    })
+    res.status(200).json(jobPost)
 })
 
 exports.createNewJobPost = asyncCatch(async (req, res, next) => {
@@ -32,15 +27,6 @@ exports.createNewJobPost = asyncCatch(async (req, res, next) => {
     if (!newJobPost)
         return next(new AppError('Unable to create a new job post', 500))
 
-    const user = await User.findById(userId)
-    if (!user)
-        return next(
-            new AppError('Invalid user or missing user posting this job', 400)
-        )
-
-    user.jobPosts.push(newJobPost.id)
-    await user.save()
-
     res.status(200).json(newJobPost)
 })
 
@@ -51,14 +37,6 @@ exports.getAllJobPostsOfAUser = asyncCatch(async (req, res, next) => {
     const jobPosts = await JobPost.find({ author: userId })
 
     res.status(200).json(jobPosts)
-})
-
-exports.getAJobPostUsingItsId = asyncCatch(async (req, res, next) => {
-    const { jobPostId } = req.params
-    const jobPost = await JobPost.findById(jobPostId)
-    if (!jobPost) return next(new AppError('Unable to find the job post', 400))
-
-    res.status(200).json(jobPost)
 })
 
 exports.updateJobPostById = asyncCatch(async (req, res, next) => {

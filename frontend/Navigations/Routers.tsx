@@ -10,6 +10,8 @@ import PostScreen from '../Screens/PostScreen';
 import SearchScreen from '../Screens/SearchScreen';
 import ChatScreen from '../Screens/chatScreens/ChatScreen';
 import ChatRoom from '../Screens/chatScreens/ChatRoom';
+import VideoCallScreen from '../Screens/chatScreens/NOTWORKING_VideoCall';
+import TestCallScreen from '../Screens/chatScreens/TestCallScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +26,7 @@ export default function Routers() {
         <Stack.Screen name="search" component={SearchScreen} />
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="chatRoom" component={ChatRoom} />
+        <Stack.Screen name="videoCall" component={VideoCallScreen}/>
       </Stack.Navigator>
       {isLoading ? <AppLoader /> : null}
       <PostScreen />
