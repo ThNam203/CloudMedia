@@ -125,11 +125,4 @@ jobPostSchema.statics.createNewJobPost = async function (req) {
     })
 }
 
-jobPostSchema.post('findOneAndDelete', async (doc) => {
-    const author = await User.findById(doc.author)
-    const deleteIndex = author.jobPosts.indexOf(doc._id)
-    author.jobPosts.splice(deleteIndex, 1)
-    await author.save()
-})
-
 module.exports = mongoose.model('JobPost', jobPostSchema)
