@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 const ChatRoom = require('../models/ChatRoom')
 const FriendRequest = require('../models/FriendRequest')
 const Notification = require('../models/Notification')
@@ -54,8 +55,7 @@ exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
         receiverId: receiver._id,
     })
 
-    if (isExisted)
-        return next(new AppError('The request is already on pending', 400))
+    if (isExisted) return next(new AppError('The request is already sent', 400))
 
     // check if already been friend
     const isFriended = await User.findOne({

@@ -5,10 +5,12 @@ const http = require('http')
 const io = require('./socket/socket')
 
 const errorHandlers = require('./controllers/errorController/errorController')
-const userJobPostController = require('./controllers/userJobPostController')
+// const userJobPostController = require('./controllers/userJobPostController')
+const stringSearchController = require('./controllers/stringSearchController')
+
 const authRouter = require('./routes/authRoutes')
 const usersRouter = require('./routes/usersRoutes')
-const jobPostRouter = require('./routes/jobPostRoutes')
+// const jobPostRouter = require('./routes/jobPostRoutes')
 const friendRouter = require('./routes/friendRoutes')
 const notificationRouter = require('./routes/notificationRoutes')
 const chatRouter = require('./routes/chatRoutes')
@@ -29,14 +31,15 @@ app.use(
 )
 
 app.use('', authRouter)
+app.post('/email-search', stringSearchController.searchByEmail)
+app.post('/name-search', stringSearchController.searchByName)
 app.use('/chatroom', chatRouter)
-app.get('/jobpost/:jobPostId', userJobPostController.getAJobPostById)
+// app.get('/jobpost/:jobPostId', userJobPostController.getAJobPostUsingItsId)
+// app.use('/:userId/jobpost', jobPostRouter)
 app.use('/:userId/post', statusPostRouter)
-app.use('/:userId/jobpost', jobPostRouter)
 app.use('/:userId/friend-request', friendRouter)
 app.use('/:userId/notification', notificationRouter)
 app.use('', usersRouter)
-
 app.use('*', errorHandlers.invalidUrlHandler)
 app.use(errorHandlers.globalErrorHandler)
 

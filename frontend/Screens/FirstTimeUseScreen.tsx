@@ -68,27 +68,27 @@ function FirstTimeUseScreen({navigation}: any) {
 
   useEffect(() => {
     const checkLogin = async () => {
-      const islogin = await retrieveData(nameStorage.isLogin);
-      if (islogin) {
-        try {
-          //connect to socket.io
-          require('../utils/socket')
-
-          dispatch(setStatus(true));
-          const jwt = await retrieveData(nameStorage.jwtToken);
-          dispatch(setToken(jwt));
-          dispatch(setIdFromJwt(jwt));
-          saveInfo(jwt);
-          navigateToMain();
-        } catch (error) {
-          console.log(error);
-        } finally {
+      dispatch(setStatus(true));
+      retrieveData(nameStorage.isLogin)
+        .then((isLogin: any) => {
+          if (isLogin) {
+            return retrieveData(nameStorage.jwtToken).then((jwt: any) => {
+              navigateToMain(jwt);
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        })
+        .finally(() => {
           dispatch(setStatus(false));
         }
       }
     };
 
-    checkLogin();
+    // Connect to socket.io
+    require('../utils/socket');
+    //checkLogin();
   }, []);
 
   return (
