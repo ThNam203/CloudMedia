@@ -6,14 +6,18 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
+  Pressable,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import Icon, {Icons} from '../../components/ui/Icons';
 import CustomIcon from '../data/CustomIcon';
 import Colors from '../../constants/Colors';
 
-export default function ShowPosts({item}: any) {
+export default function ShowPosts({item, navigation}: any) {
   const deviceWidth = Dimensions.get('window').width;
+
+  const [showMore, setShowMore] = useState(false);
+
   return (
     <View
       style={{
@@ -23,7 +27,7 @@ export default function ShowPosts({item}: any) {
       }}>
       <View style={Styles.flexCenter}>
         <Image
-          source={{uri: item.profile_picture}}
+          source={{uri: item.profileImagePath}}
           style={{
             height: 60,
             width: 60,
@@ -37,24 +41,23 @@ export default function ShowPosts({item}: any) {
               style={{fontSize: 16, color: Colors.black, fontWeight: 'bold'}}>
               {item.name}
             </Text>
-            {item.connection ? (
-              <Text style={{fontWeight: 'bold'}}>
-                <Icon
-                  type={Icons.Entypo}
-                  size={16}
-                  name="dot-single"
-                  color={Colors.gray}
-                />
-                {item.connection}
-              </Text>
-            ) : null}
+            <Text style={{fontWeight: 'bold'}}>
+              <Icon
+                type={Icons.Entypo}
+                size={16}
+                name="dot-single"
+                color={Colors.gray}
+              />
+            </Text>
           </View>
           <Text style={{width: 180}} numberOfLines={1} ellipsizeMode="tail">
-            {item.title}
+            {/* {item.title} */}
+            UIT Student
           </Text>
-          <Text style={{fontSize: 11}}>{item.timeAgo} hr</Text>
+          {/* time ago */}
+          <Text style={{fontSize: 11}}>3 hr</Text>
         </View>
-        {item.connection ? (
+        {
           <View style={{flex: 1, alignItems: 'flex-end'}}>
             <TouchableOpacity
               onPress={() => {}}
@@ -69,89 +72,102 @@ export default function ShowPosts({item}: any) {
               />
             </TouchableOpacity>
           </View>
-        ) : (
-          <TouchableOpacity onPress={() => {}} style={Styles.flexCenter}>
-            <Icon
-              type={Icons.Entypo}
-              name="plus"
-              color={Colors.irisBlue}
-              size={22}
-            />
-            <Text
-              style={{
-                fontSize: 19,
-                fontWeight: 'bold',
-                color: Colors.skyBlue,
-                marginLeft: 5,
-              }}>
-              Follow
-            </Text>
-          </TouchableOpacity>
-        )}
+          // ) : (
+          //   <TouchableOpacity onPress={() => {}} style={Styles.flexCenter}>
+          //     <Icon
+          //       type={Icons.Entypo}
+          //       name="plus"
+          //       color={Colors.irisBlue}
+          //       size={22}
+          //     />
+          //     <Text
+          //       style={{
+          //         fontSize: 19,
+          //         fontWeight: 'bold',
+          //         color: Colors.skyBlue,
+          //         marginLeft: 5,
+          //       }}>
+          //       Follow
+          //     </Text>
+          //   </TouchableOpacity>
+          // )
+        }
       </View>
 
-      {item.content ? (
-        <Text
-          style={{
-            paddingHorizontal: 16,
-            color: Colors.black,
-            marginVertical: 10,
-            textAlign: 'justify',
-          }}
-          numberOfLines={3}
-          ellipsizeMode="tail">
-          {item.content}
-        </Text>
+      {item.description ? (
+        <TouchableOpacity onPress={() => setShowMore(!showMore)}>
+          <Text
+            style={{
+              paddingHorizontal: 16,
+              color: Colors.black,
+              marginVertical: 10,
+              textAlign: 'justify',
+            }}
+            numberOfLines={showMore ? undefined : 3}
+            ellipsizeMode="tail">
+            {item.description}
+          </Text>
+        </TouchableOpacity>
       ) : (
         <View style={{marginTop: 10}} />
       )}
 
-      {item.hasImage ? (
-        <Image
-          source={{uri: item.postImage}}
-          style={{height: 300, width: deviceWidth}}
-        />
-      ) : null}
-
-      <View
-        style={[
-          Styles.flexCenter,
-          {
-            justifyContent: 'space-between',
-            paddingHorizontal: 10,
-            paddingTop: 5,
-          },
-        ]}>
-        <View style={Styles.flexCenter}>
-          <Icon
-            type={Icons.AntDesign}
-            name="like1"
-            color={Colors.irisBlue}
-            style={{height: 25, width: 25, borderRadius: 100}}
+      {item.mediaFiles.length ? (
+        <Pressable
+          onPress={() =>
+            navigation.navigate('imagesPost', {images: item.mediaFiles})
+          }>
+          <Image
+            source={{uri: item.mediaFiles[0]}}
+            style={{height: 300, width: deviceWidth}}
           />
-          <Text>{item.likes} likes</Text>
-        </View>
-        <View style={Styles.flexCenter}>
-          {item.comments > 0 ? <Text>{item.comments} comments</Text> : null}
-          {item.comments > 0 && item.shares > 0 ? (
-            <Icon
-              type={Icons.Entypo}
-              name="dot-single"
-              size={16}
-              color={Colors.gray}
-            />
-          ) : null}
-          {item.shares > 0 ? <Text>{item.shares} shares</Text> : null}
-        </View>
-      </View>
-
-      <View
-        style={{
-          borderTopColor: Colors.darkGray,
-          borderTopWidth: 1,
-          margin: 10,
+        </Pressable>
+      ) : null}
+      <Pressable
+        onPress={() => {
+          navigation.navigate('detailStatus', {item});
         }}
-      />
+        android_ripple={{color: Colors.gray, borderless: false}}>
+        <View
+          style={[
+            Styles.flexCenter,
+            {
+              justifyContent: 'space-between',
+              paddingHorizontal: 10,
+              paddingTop: 5,
+            },
+          ]}>
+          <View style={Styles.flexCenter}>
+            <Icon
+              type={Icons.AntDesign}
+              name="like1"
+              color={Colors.irisBlue}
+              style={{height: 25, width: 25, borderRadius: 100}}
+            />
+            <Text>{item.likeCount} likes</Text>
+          </View>
+          <View style={Styles.flexCenter}>
+            {item.comments > 0 ? <Text>{item.comments} comments</Text> : null}
+            {item.comments > 0 && item.shares > 0 ? (
+              <Icon
+                type={Icons.Entypo}
+                name="dot-single"
+                size={16}
+                color={Colors.gray}
+              />
+            ) : null}
+            {item.shares > 0 ? <Text>{item.shares} shares</Text> : null}
+          </View>
+        </View>
+
+        <View
+          style={{
+            borderTopColor: Colors.darkGray,
+            borderTopWidth: 1,
+            marginVertical: 5,
+          }}
+        />
+      </Pressable>
 
       <View
         style={[
@@ -166,14 +182,16 @@ export default function ShowPosts({item}: any) {
             type={Icons.Entypo}
             name="thumbs-up"
             size={19}
-            color={item.isLiked ? Colors.skyBlue : Colors.gray}
+            color={item.likeCount ? Colors.skyBlue : Colors.gray}
           />
-          <Text style={{color: item.isLiked ? Colors.skyBlue : Colors.gray}}>
+          <Text style={{color: item.likeCount ? Colors.skyBlue : Colors.gray}}>
             Like
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{alignItems: 'center'}} onPress={() => {}}>
+        <TouchableOpacity
+          style={{alignItems: 'center'}}
+          onPress={() => navigation.navigate('detailStatus', {item})}>
           <CustomIcon
             name="chatbubble-ellipses-outline"
             size={19}

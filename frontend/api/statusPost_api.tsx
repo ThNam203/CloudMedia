@@ -36,7 +36,10 @@ export const createNewPost = async (data: any, userId: any, token: any) => {
   try {
     const {mediaFiles, description} = data;
     const dataForm = new FormData();
-    dataForm.append('media-files', mediaFiles[0]);
+
+    for (let i = 0; i < mediaFiles.length; i++)
+      dataForm.append('media-files', mediaFiles[i]);
+
     dataForm.append('description', description);
     const result = await ApiManager(`/${userId}/post`, {
       method: 'POST',
@@ -44,7 +47,7 @@ export const createNewPost = async (data: any, userId: any, token: any) => {
         Authorization: 'Bearer ' + token,
         'Content-Type': 'multipart/form-data',
       },
-      data: data,
+      data: dataForm,
     });
     return result;
   } catch (error) {

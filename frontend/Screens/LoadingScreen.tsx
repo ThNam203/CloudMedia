@@ -12,70 +12,101 @@ import {setJobs} from '../reducers/Job_reducer';
 import {setToken} from '../reducers/Token_reducer';
 import {setIdFromJwt} from '../reducers/Uid_reducer';
 import {useDispatch} from 'react-redux';
+import {getAllStatusPostOfUser} from '../api/statusPost_api';
+import {pushStatusPosts} from '../reducers/StatusPost_reducer';
 
 export default function LoadingScreen({navigation, route}: any) {
   const {jwt} = route.params;
 
   const dispatch = useDispatch();
 
-  const saveInfo = async (jwt: any) => {
-    const json = jwt_decode(jwt) as {id: string};
-    const idUser = json.id;
-    user_info(idUser)
-      .then((response: any) => {
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+  const saveAllStatusPost = async (jwt: any) => {
+    try {
+      const json = jwt_decode(jwt) as {id: string};
+      const idUser = json.id;
+
+      const response: any = await getAllStatusPostOfUser(idUser, jwt);
+      if (response.status === 200) {
+        const data = response.data;
+
+        for (const post of data) {
+          const userInfoResponse: any = await user_info(post.author);
+          if (userInfoResponse.status === 200) {
+            const infoUser = userInfoResponse.data;
+
+            dispatch(
+              pushStatusPosts({
+                ...post,
+                name: infoUser.name,
+                profileImagePath: infoUser.profileImagePath,
+              }),
+            );
+          } else {
+            console.log(userInfoResponse.response.status);
+            throw new Error(userInfoResponse.response.data.errorMessage);
+          }
         }
-      })
-      .then(data => {
-        const user: UserInfo = {...data};
-        // miss info
+      } else {
+        console.log(response.response.status);
+        throw new Error(response.response.data.errorMessage);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const saveInfo = async (jwt: any) => {
+    try {
+      const json = jwt_decode(jwt) as {id: string};
+      const idUser = json.id;
+
+      const response: any = await user_info(idUser);
+      if (response.status === 200) {
+        const user: UserInfo = response.data;
         dispatch(saveUser(user));
-      })
-      .catch(error => {
-        console.error(error);
-      });
+      } else {
+        console.log(response.response.status);
+        throw new Error(response.response.data.errorMessage);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const saveNotification = async (jwt: any) => {
-    const json = jwt_decode(jwt) as {id: string};
-    const idUser = json.id;
-    getAllNotifications(idUser, jwt)
-      .then((response: any) => {
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
-        }
-      })
-      .then(data => {
+    try {
+      const json = jwt_decode(jwt) as {id: string};
+      const idUser = json.id;
+
+      const response: any = await getAllNotifications(idUser, jwt);
+      if (response.status === 200) {
+        const data = response.data;
         dispatch(setNotifications(data));
-      })
-      .catch(error => {
-        console.error(error);
-      });
+      } else {
+        console.log(response.response.status);
+        throw new Error(response.response.data.errorMessage);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const saveJobs = async (jwt: any) => {
-    const json = jwt_decode(jwt) as {id: string};
-    const idUser = json.id;
-    getAllJobOfUser(idUser, jwt)
-      .then((response: any) => {
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
-        }
-      })
-      .then(data => dispatch(setJobs(data)))
-      .catch(error => {
-        console.error(error);
-      });
+    try {
+      const json = jwt_decode(jwt) as {id: string};
+      const idUser = json.id;
+
+      const response: any = await getAllJobOfUser(idUser, jwt);
+      if (response.status === 200) {
+        const data = response.data;
+        dispatch(setJobs(data));
+      } else {
+        console.log(response.response.status);
+        throw new Error(response.response.data.errorMessage);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -83,16 +114,23 @@ export default function LoadingScreen({navigation, route}: any) {
     dispatch(setIdFromJwt(jwt));
     // get some data
     const loadData = async () => {
-      await saveInfo(jwt);
-      await saveNotification(jwt);
-      await saveJobs(jwt);
-      setTimeout(() => {
-        //   make the back button disappear
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'main'}],
-        });
-      }, 1500);
+      try {
+        await Promise.all([
+          saveInfo(jwt),
+          saveNotification(jwt),
+          saveJobs(jwt),
+          saveAllStatusPost(jwt),
+        ]);
+
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'main'}],
+          });
+        }, 1500);
+      } catch (error) {
+        console.error(error);
+      }
     };
     loadData();
   }, []);

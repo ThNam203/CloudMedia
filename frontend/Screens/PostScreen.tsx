@@ -54,6 +54,7 @@ function PostScreen() {
       })
       .then((data: any) => {})
       .catch(error => console.error(error));
+    toggleModal();
   };
 
   const takePhotoFromCamera = () => {
@@ -78,9 +79,10 @@ function PostScreen() {
 
   const choosePhotoFromLibrary = () => {
     ImagePicker.openPicker({
-      height: 300,
-      width: 400,
       multiple: true,
+      waitAnimationEnd: false,
+      compressImageQuality: 0.8,
+      maxFiles: 10,
     })
       .then(images => {
         console.log(images);
