@@ -29,14 +29,4 @@ const notificationSchema = new mongoose.Schema(
     }
 )
 
-notificationSchema.methods.createNewNotification = (req) =>
-    this.create({
-        userId: req.body.userId,
-        notificationType: req.body.notificationType,
-        title: req.body.title,
-        content: req.body.content,
-        isRead: req.body.isRead,
-        link: req.body.link,
-    })
-
 module.exports = mongoose.model('Notification', notificationSchema)

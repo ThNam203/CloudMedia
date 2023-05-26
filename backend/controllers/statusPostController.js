@@ -53,19 +53,30 @@ exports.getStatusPostById = asyncCatch(async (req, res, next) => {
 
 exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
-    req.body.author = userId
+    // req.body.author = userId
     req.body.mediaFiles = []
 
-    if (req.files) {
-        req.files.forEach((item) => req.body.mediaFiles.push(item.location))
+    const newStatusPost = await StatusPost.create({
+        author: userId,
+        description: req.body.description,
+        mediaFiles: [],
+    })
+
+    if (!newStatusPost) {
+        next(new AppError('Unable to create new status post', 500))
+        if (req.files)
+            req.files.forEach((item) => deleteMediaFile(item.location))
+        return
     }
 
-    const newJobPost = await StatusPost.create(req.body)
+    if (req.files) {
+        req.files.forEach((item) =>
+            newStatusPost.mediaFiles.push(item.location)
+        )
+    }
 
-    if (!newJobPost)
-        return next(new AppError('Unable to create a new job post', 500))
-
-    res.status(200).json(newJobPost)
+    await newStatusPost.save()
+    res.status(200).json(newStatusPost)
 })
 
 exports.getAllStatusPostsOfAUser = asyncCatch(async (req, res, next) => {
@@ -76,7 +87,7 @@ exports.getAllStatusPostsOfAUser = asyncCatch(async (req, res, next) => {
     res.status(200).json(statusPosts)
 })
 
-exports.updateJobPostById = asyncCatch(async (req, res, next) => {
+exports.updateStatusPostById = asyncCatch(async (req, res, next) => {
     const { body: statusPostBody } = req
     const { statusPostId } = req.params
 
@@ -95,7 +106,7 @@ exports.updateJobPostById = asyncCatch(async (req, res, next) => {
     res.status(200).json(updatedPost)
 })
 
-exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
+exports.deleteStatusPostById = asyncCatch(async (req, res, next) => {
     const { statusPostId } = req.params
 
     const deletedPost = await StatusPost.findByIdAndDelete(statusPostId)

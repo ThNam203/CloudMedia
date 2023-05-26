@@ -20,12 +20,12 @@ router
     .patch(
         authController.isUser,
         authController.isOwnerOfThePath,
-        statusPostController.updateJobPostById
+        statusPostController.updateStatusPostById
     )
     .delete(
         authController.isUser,
         authController.isOwnerOfThePath,
-        statusPostController.deleteJobPostById
+        statusPostController.deleteStatusPostById
     )
 
 module.exports = router

@@ -13,9 +13,6 @@ const statusPostSchema = new mongoose.Schema(
         mediaFiles: {
             type: [{ type: String }],
         },
-        comments: {
-            type: [{ type: String, ref: 'StatusComment' }],
-        },
         likeCount: {
             type: Number,
             default: 0,

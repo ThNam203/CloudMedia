@@ -7,11 +7,16 @@ const statusCommentSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        content: {
-            type: String,
+        statusPostId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'StatusPost',
+            required: true,
         },
-        mediaFiles: {
-            type: [{ type: String }],
+        content: String,
+        mediaFile: String,
+        likeCount: {
+            type: Number,
+            default: 0,
         },
     },
     {

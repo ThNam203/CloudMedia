@@ -1,5 +1,7 @@
+/* eslint-disable no-continue */
 /* eslint-disable no-plusplus */
 const User = require('../models/User')
+const FriendRequest = require('../models/FriendRequest')
 const asyncCatch = require('../utils/asyncCatch')
 
 function levenshteinDistance(str1, str2) {
@@ -34,7 +36,7 @@ function levenshteinDistance(str1, str2) {
 }
 
 // using fuzzy
-async function emailSearch(query, userId, threshold = 0.5) {
+async function emailSearch(query, userId, threshold = 0.7) {
     if (query.includes('@')) {
         query = query.substring(0, query.indexOf('@')).toLowerCase()
     }
@@ -43,6 +45,7 @@ async function emailSearch(query, userId, threshold = 0.5) {
     const result = []
 
     for (let i = 0; i < users.length; i++) {
+        if (userId === users[i]._id) continue
         const email = users[i].email
             .substring(0, users[i].email.indexOf('@'))
             .toLowerCase()
@@ -65,12 +68,13 @@ async function emailSearch(query, userId, threshold = 0.5) {
 }
 
 // using fuzzy
-async function nameSearch(query, userId, threshold = 0.5) {
+async function nameSearch(query, userId, threshold = 0.6) {
     query = query.toLowerCase()
     const users = await User.find({}).select('name email _id profileImagePath')
     const result = []
 
     for (let i = 0; i < users.length; i++) {
+        if (userId === users[i]._id) continue
         const username = users[i].name.toLowerCase()
         const distance = levenshteinDistance(query, username)
         const maxLength = Math.max(query.length, username.length)
@@ -78,7 +82,19 @@ async function nameSearch(query, userId, threshold = 0.5) {
 
         if (similarityScore >= threshold) {
             users[i] = users[i].toObject()
-            if (users[i].connections && users[i].connections.includes(userId))
+
+            // eslint-disable-next-line no-await-in-loop
+            const isPendingRequest = await FriendRequest.find({
+                senderId: { $in: [userId, users[i]._id] },
+                receiverId: { $in: [userId, users[i]._id] },
+            })
+
+            if (isPendingRequest) {
+                users[i].isFriend = 'pending'
+            } else if (
+                users[i].connections &&
+                users[i].connections.includes(userId)
+            )
                 users[i].isFriend = 'true'
             else users[i].isFriend = 'false'
 

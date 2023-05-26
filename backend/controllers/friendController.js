@@ -58,10 +58,8 @@ exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
     if (isExisted) return next(new AppError('The request is already sent', 400))
 
     // check if already been friend
-    const isFriended = await User.findOne({
-        connections: { $in: [receiver._id] },
-    })
-    if (isFriended) return next(new AppError('Already friend', 400))
+    if (receiver.connections.includes(senderId))
+        return next(new AppError('Already friend', 400))
 
     // create the request in db
     const newFriendRequest = await FriendRequest.create({
