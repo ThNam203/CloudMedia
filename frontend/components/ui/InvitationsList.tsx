@@ -110,26 +110,24 @@ const InvitationsList = () => {
   }, [token, uid]);
 
   return (
-    <View style={{flex: 1, marginBottom: 10}}>
-      <FlatList
-        data={invitations}
-        renderItem={({item}) => (
-          <ItemRequestUser
-            item={item}
-            nameRequest="Accept"
-            nameRequest2="Decline"
-            pressLeft={() => {
-              handleAccept(item.id);
-            }}
-            pressRight={() => {
-              handleDecline(item.id);
-            }}
-          />
-        )}
-        keyExtractor={(item, index) => 'key' + index}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
+    <FlatList
+      data={invitations}
+      renderItem={({item}) => (
+        <ItemRequestUser
+          item={item}
+          nameRequest="Accept"
+          nameRequest2="Decline"
+          pressLeft={() => {
+            handleAccept(item.id);
+          }}
+          pressRight={() => {
+            handleDecline(item.id);
+          }}
+        />
+      )}
+      keyExtractor={(item, index) => 'key' + index}
+      showsVerticalScrollIndicator={false}
+    />
   );
 };
 

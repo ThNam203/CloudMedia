@@ -24,16 +24,13 @@ function InvitationsScreen(props: any) {
       isVisible={props.isVisible}
       style={{margin: 0}}>
       <View style={{flex: 1}}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
-          <View style={styles.modalContent}>
-            <View style={{height: 70}} />
-            <View style={{marginHorizontal: 20}}>
-              <InvitationsList />
-            </View>
+        <View style={styles.modalContent}>
+          <View style={{height: 70}} />
+          <View style={{marginHorizontal: 20}}>
+            <InvitationsList />
           </View>
-        </ScrollView>
+        </View>
       </View>
-
       <View style={styles.topView}>
         <View style={{margin: 20, flexDirection: 'row'}}>
           <TouchableOpacity onPress={toggleModal} style={{marginTop: -3}}>
