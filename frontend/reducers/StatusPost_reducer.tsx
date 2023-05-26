@@ -5,7 +5,6 @@ interface StatusPost {
   author: any;
   name: any;
   profileImagePath: any;
-  comments: [any];
   description: any;
   likeCount: any;
   mediaFiles: [any];
@@ -26,9 +25,13 @@ const StatusPostSlice = createSlice({
   reducers: {
     pushStatusPosts: (state: StatusPosts, action: PayloadAction<any>) => {
       state.arr.push(action.payload);
+      console.log(state.arr);
+    },
+    clearStatusPosts: (state: StatusPosts) => {
+      state.arr = [];
     },
   },
 });
 
-export const {pushStatusPosts} = StatusPostSlice.actions;
+export const {pushStatusPosts, clearStatusPosts} = StatusPostSlice.actions;
 export default StatusPostSlice.reducer;

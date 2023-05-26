@@ -21,6 +21,7 @@ import {nameStorage, storeData} from '../reducers/AsyncStorage';
 import {setStatus} from '../reducers/Loading_reducer';
 import {updateAvatar} from '../reducers/User_reducer';
 import Colors from '../constants/Colors';
+import {Toast} from '../components/ui/Toast';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -55,7 +56,7 @@ function ProfileScreen({navigation}: any) {
         }
       })
       .catch(error => {
-        console.error(error);
+        Toast(error.message);
       });
   };
 
@@ -73,14 +74,14 @@ function ProfileScreen({navigation}: any) {
           console.log(response.data);
           return response.data;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .then((data: any) => {
         dispatch(updateAvatar(data.imagePath));
       })
-      .catch(error => console.error(error))
+      .catch(error => Toast(error.message))
       .finally(() => {
         dispatch(setStatus(false));
       });

@@ -4,7 +4,6 @@ import React, {useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import FriendList from '../components/ui/FriendList';
 import InvitationsScreen from './InvitationsScreen';
-import AddFriendEmail from '../components/ui/AddFriendEmail';
 
 function NetworkScreen({navigation}: any) {
   const [invitationsScreen, setInvitationsScreen] = useState(false);

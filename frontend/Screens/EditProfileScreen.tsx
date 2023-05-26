@@ -15,6 +15,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {user_update} from '../api/user_api';
 import {saveUser} from '../reducers/User_reducer';
+import {Toast} from '../components/ui/Toast';
 function EditProfileScreen(props: any) {
   const [checked, setChecked] = useState(true);
   const toggleCheckbox = () => setChecked(!checked);
@@ -50,11 +51,12 @@ function EditProfileScreen(props: any) {
           dispatch(saveUser(response.data));
           toggleModal();
         } else {
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .catch(error => {
-        console.error(error);
+        Toast(error.message);
       });
   };
 

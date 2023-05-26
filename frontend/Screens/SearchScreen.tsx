@@ -12,122 +12,65 @@ import Icon, {Icons} from '../components/ui/Icons';
 import ItemRequestUser from '../components/ui/ItemRequestUser';
 import {useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {user_info_email} from '../api/user_api';
+import {SearchUsersByEmail, SearchUsersByName} from '../api/Utils';
+import {createRequestByEmail} from '../api/friend_api';
+import {Toast} from '../components/ui/Toast';
 
 export default function SearchScreen({navigation}: any) {
   const [text, setText] = useState('');
 
   const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((stata: RootState) => stata.uid.id);
 
-  const friendsData = [
-    {
-      id: '1',
-      name: 'John Doe',
-      connection: 'Friend',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      connection: 'Family',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '3',
-      name: 'Bob Johnson',
-      connection: 'Colleague',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '4',
-      name: 'Sarah Lee',
-      connection: 'Friend',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '5',
-      name: 'David Brown',
-      connection: 'Classmate',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '6',
-      name: 'Karen Chen',
-      connection: 'Friend',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '7',
-      name: 'Alex Nguyen',
-      connection: 'Coworker',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '8',
-      name: 'Maria Rodriguez',
-      connection: 'Friend',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '9',
-      name: 'Daniel Kim',
-      connection: 'Friend',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-    {
-      id: '10',
-      name: 'Jessica Wong',
-      connection: 'Friend',
-      avatar: require('../assets/images/Spiderman.jpg'),
-    },
-  ];
-
-  const [listData, setListData] = useState(friendsData);
+  const [listData, setListData] = useState([]);
 
   const clearText = () => {
     setText('');
   };
 
+  const handleAddFr = async (email: any) => {
+    console.log(email);
+    createRequestByEmail(email, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          return response.data;
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
+        }
+      })
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        Toast(error.message);
+      });
+  };
+
   useEffect(() => {
     const filtertext = async () => {
-      if (/\S+@\S+\.\S+/.test(text)) {
-        user_info_email(text, token)
-          .then((response: any) => {
-            if (response.status === 200) {
-              return response.data;
-            } else {
-              console.log(response.response.status);
-              throw new Error(response.response.data.errorMessage);
-            }
-          })
-          .then(data => {
-            console.log(data);
-            if (data.profileImagePath !== undefined) {
-              setListData([
-                {
-                  id: 'a' + listData.length,
-                  name: data.name,
-                  connection: 'Superrr',
-                  avatar: {uri: data.profileImagePath},
-                },
-                ...listData,
-              ]);
-            } else {
-              setListData([
-                {
-                  id: 'a' + listData.length,
-                  name: data.name,
-                  connection: 'Superrr',
-                  avatar: null,
-                },
-                ...listData,
-              ]);
-            }
-            // setNameHandle('Add friend');
-          })
-          .catch(error => {
-            console.error(error);
-          });
+      if (text === '') return;
+      try {
+        if (/\S+@\S+\.\S+/.test(text)) {
+          const response: any = await SearchUsersByEmail(text, uid, token);
+          if (response.status === 200) {
+            console.log(response.data);
+            setListData(response.data);
+          } else {
+            console.log(response.status);
+            throw new Error(response.data.errorMessage);
+          }
+        } else {
+          const response: any = await SearchUsersByName(text, uid, token);
+          if (response.status === 200) {
+            setListData(response.data);
+          } else {
+            console.log(response.status);
+            throw new Error(response.data.errorMessage);
+          }
+        }
+      } catch (error: any) {
+        Toast(error.message);
       }
     };
     filtertext();
@@ -159,14 +102,21 @@ export default function SearchScreen({navigation}: any) {
       </View>
       <FlatList
         data={listData}
-        renderItem={({item}) => (
+        renderItem={({item}: any) => (
           <ItemRequestUser
             item={item}
-            nameRequest="Add friend"
+            nameRequest={
+              item.isFriend == 'true'
+                ? 'Friend'
+                : item.isFriend == 'false'
+                ? 'Add Friend'
+                : 'Sent Request'
+            }
             nameRequest2="Cancel"
+            pressLeft={() => handleAddFr(item.email)}
           />
         )}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => 'key' + index}
       />
     </View>
   );

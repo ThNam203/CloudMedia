@@ -18,6 +18,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setStatus} from '../reducers/Loading_reducer';
 import {RootState} from '../reducers/Store';
 import AppLoader from '../components/ui/AppLoader';
+import {Toast} from '../components/ui/Toast';
 
 function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
@@ -48,8 +49,8 @@ function FirstTimeUseScreen({navigation}: any) {
             });
           }
         })
-        .catch(err => {
-          console.log(err);
+        .catch(error => {
+          Toast(error.message);
         })
         .finally(() => {
           dispatch(setStatus(false));

@@ -18,6 +18,34 @@ export default function ShowPosts({item, navigation}: any) {
 
   const [showMore, setShowMore] = useState(false);
 
+  const timeAgo = () => {
+    const dateNow = new Date();
+    const date = new Date(item.updatedAt);
+    const diffInMilliseconds = dateNow.getTime() - date.getTime();
+    const diffInSeconds = Math.round(diffInMilliseconds / 1000);
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    }
+    const diffInMinutes = Math.round(diffInMilliseconds / 60000);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minutes ago`;
+    }
+    const diffInHours = Math.round(diffInMilliseconds / 3600000);
+    if (diffInHours < 24) {
+      return `${diffInHours} hours ago`;
+    }
+    const diffInDays = Math.round(diffInMilliseconds / 86400000);
+    if (diffInDays < 30) {
+      return `${diffInDays} days ago`;
+    }
+    const diffInMonths = Math.round(diffInMilliseconds / 2592000000);
+    if (diffInMonths < 12) {
+      return `${diffInMonths} months ago`;
+    }
+    const diffInYears = Math.round(diffInMilliseconds / 31536000000);
+    return `${diffInYears} years ago`;
+  };
+
   return (
     <View
       style={{
@@ -55,7 +83,7 @@ export default function ShowPosts({item, navigation}: any) {
             UIT Student
           </Text>
           {/* time ago */}
-          <Text style={{fontSize: 11}}>3 hr</Text>
+          <Text style={{fontSize: 11}}>{timeAgo()}</Text>
         </View>
         {
           <View style={{flex: 1, alignItems: 'flex-end'}}>
@@ -72,25 +100,6 @@ export default function ShowPosts({item, navigation}: any) {
               />
             </TouchableOpacity>
           </View>
-          // ) : (
-          //   <TouchableOpacity onPress={() => {}} style={Styles.flexCenter}>
-          //     <Icon
-          //       type={Icons.Entypo}
-          //       name="plus"
-          //       color={Colors.irisBlue}
-          //       size={22}
-          //     />
-          //     <Text
-          //       style={{
-          //         fontSize: 19,
-          //         fontWeight: 'bold',
-          //         color: Colors.skyBlue,
-          //         marginLeft: 5,
-          //       }}>
-          //       Follow
-          //     </Text>
-          //   </TouchableOpacity>
-          // )
         }
       </View>
 
@@ -125,7 +134,7 @@ export default function ShowPosts({item, navigation}: any) {
       ) : null}
       <Pressable
         onPress={() => {
-          navigation.navigate('detailStatus', {item});
+          navigation.navigate('detailStatus', {item, timeAgo: timeAgo()});
         }}
         android_ripple={{color: Colors.gray, borderless: false}}>
         <View
@@ -191,7 +200,9 @@ export default function ShowPosts({item, navigation}: any) {
 
         <TouchableOpacity
           style={{alignItems: 'center'}}
-          onPress={() => navigation.navigate('detailStatus', {item})}>
+          onPress={() =>
+            navigation.navigate('detailStatus', {item, timeAgo: timeAgo()})
+          }>
           <CustomIcon
             name="chatbubble-ellipses-outline"
             size={19}

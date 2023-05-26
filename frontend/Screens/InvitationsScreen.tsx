@@ -23,14 +23,16 @@ function InvitationsScreen(props: any) {
       onBackButtonPress={() => props.setVisible(false)}
       isVisible={props.isVisible}
       style={{margin: 0}}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
-        <View style={styles.modalContent}>
-          <View style={{height: 70}} />
-          <View style={{marginHorizontal: 20}}>
-            <InvitationsList />
+      <View style={{flex: 1}}>
+        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+          <View style={styles.modalContent}>
+            <View style={{height: 70}} />
+            <View style={{marginHorizontal: 20}}>
+              <InvitationsList />
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       <View style={styles.topView}>
         <View style={{margin: 20, flexDirection: 'row'}}>

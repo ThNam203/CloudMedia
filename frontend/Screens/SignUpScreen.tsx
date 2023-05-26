@@ -15,6 +15,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {user_signup} from '../api/user_api';
 import {useDispatch} from 'react-redux';
 import {setStatus} from '../reducers/Loading_reducer';
+import {Toast} from '../components/ui/Toast';
 function SignUpHrScreen(props: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -74,8 +75,8 @@ function SignUpHrScreen(props: any) {
         if (response.status === 204) {
           return response;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .then(data => {
@@ -83,7 +84,7 @@ function SignUpHrScreen(props: any) {
         console.warn('Signup success!');
         props.handleCloseModal(false);
       })
-      .catch(error => console.error(error))
+      .catch(error => Toast(error.message))
       .finally(() => {
         dispatch(setStatus(false));
       });

@@ -9,6 +9,7 @@ import {useDispatch} from 'react-redux';
 import {setToken} from '../reducers/Token_reducer';
 import {setIdFromJwt} from '../reducers/Uid_reducer';
 import {setStatus} from '../reducers/Loading_reducer';
+import {Toast} from '../components/ui/Toast';
 
 function LoginScreen(props: any) {
   const [username, setUsername] = useState('');
@@ -24,12 +25,11 @@ function LoginScreen(props: any) {
       password: password,
     })
       .then((response: any) => {
-        console.log(response.data);
         if (response.status === 200) {
           return response.data;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .then(data => {
@@ -44,7 +44,7 @@ function LoginScreen(props: any) {
         props.handleNavigate(jwtToken);
       })
       .catch(error => {
-        console.error(error);
+        Toast(error.message);
       })
       .finally(() => {
         dispatch(setStatus(false));

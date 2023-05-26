@@ -13,7 +13,11 @@ import {setToken} from '../reducers/Token_reducer';
 import {setIdFromJwt} from '../reducers/Uid_reducer';
 import {useDispatch} from 'react-redux';
 import {getAllStatusPostOfUser} from '../api/statusPost_api';
-import {pushStatusPosts} from '../reducers/StatusPost_reducer';
+import {
+  clearStatusPosts,
+  pushStatusPosts,
+} from '../reducers/StatusPost_reducer';
+import {Toast} from '../components/ui/Toast';
 
 export default function LoadingScreen({navigation, route}: any) {
   const {jwt} = route.params;
@@ -24,6 +28,7 @@ export default function LoadingScreen({navigation, route}: any) {
     try {
       const json = jwt_decode(jwt) as {id: string};
       const idUser = json.id;
+      dispatch(clearStatusPosts());
 
       const response: any = await getAllStatusPostOfUser(idUser, jwt);
       if (response.status === 200) {
@@ -42,16 +47,16 @@ export default function LoadingScreen({navigation, route}: any) {
               }),
             );
           } else {
-            console.log(userInfoResponse.response.status);
-            throw new Error(userInfoResponse.response.data.errorMessage);
+            console.log(userInfoResponse.status);
+            throw new Error(userInfoResponse.data.errorMessage);
           }
         }
       } else {
-        console.log(response.response.status);
-        throw new Error(response.response.data.errorMessage);
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Toast(error.message);
     }
   };
 
@@ -65,11 +70,11 @@ export default function LoadingScreen({navigation, route}: any) {
         const user: UserInfo = response.data;
         dispatch(saveUser(user));
       } else {
-        console.log(response.response.status);
-        throw new Error(response.response.data.errorMessage);
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Toast(error.message);
     }
   };
 
@@ -83,29 +88,11 @@ export default function LoadingScreen({navigation, route}: any) {
         const data = response.data;
         dispatch(setNotifications(data));
       } else {
-        console.log(response.response.status);
-        throw new Error(response.response.data.errorMessage);
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const saveJobs = async (jwt: any) => {
-    try {
-      const json = jwt_decode(jwt) as {id: string};
-      const idUser = json.id;
-
-      const response: any = await getAllJobOfUser(idUser, jwt);
-      if (response.status === 200) {
-        const data = response.data;
-        dispatch(setJobs(data));
-      } else {
-        console.log(response.response.status);
-        throw new Error(response.response.data.errorMessage);
-      }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Toast(error.message);
     }
   };
 
@@ -118,7 +105,6 @@ export default function LoadingScreen({navigation, route}: any) {
         await Promise.all([
           saveInfo(jwt),
           saveNotification(jwt),
-          saveJobs(jwt),
           saveAllStatusPost(jwt),
         ]);
 

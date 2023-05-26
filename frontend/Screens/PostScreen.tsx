@@ -18,6 +18,7 @@ import {setPostShow} from '../reducers/Post_reducer';
 import Colors from '../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPost_api';
+import {Toast} from '../components/ui/Toast';
 
 interface ImageItem {
   uri: string;
@@ -74,7 +75,7 @@ function PostScreen() {
           },
         ]);
       })
-      .catch(err => console.log(err));
+      .catch(error => Toast(error.message));
   };
 
   const choosePhotoFromLibrary = () => {
@@ -93,7 +94,7 @@ function PostScreen() {
         }));
         setMediaFiles([...mediaFiles, ...selectedImages]);
       })
-      .catch(err => console.log(err));
+      .catch(error => Toast(error.message));
   };
 
   useEffect(() => {
