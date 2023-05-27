@@ -20,6 +20,8 @@ export default {
   gold: 'gold',
   line: '#282C35',
   darkGray: '#999999',
+  grayPrimary: '#00000099',
+  bluePrimary: '#0A66C2',
 
   darkOverlayColor: 'rgba(0, 0, 0, 0.4)',
   darkOverlayColor2: 'rgba(0, 0, 0, 0.8)',

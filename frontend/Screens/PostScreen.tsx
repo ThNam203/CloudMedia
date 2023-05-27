@@ -43,6 +43,10 @@ function PostScreen() {
   };
 
   const postStatus = () => {
+    if (description === '' && mediaFiles.length === 0) {
+      Toast('Please enter something');
+      return;
+    }
     createNewPost({mediaFiles, description}, uid, token)
       .then((response: any) => {
         if (response.status === 200) {

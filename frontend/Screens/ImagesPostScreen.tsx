@@ -16,7 +16,7 @@ import {TouchableOpacity} from '@gorhom/bottom-sheet';
 export default function ImagesPostScreen({navigation: {goBack}, route}: any) {
   const scrollX = useRef(new Animated.Value(0)).current;
   let {width: windowWitdh, height: windowHeight} = useWindowDimensions();
-  windowHeight = windowHeight - 300;
+  windowHeight = windowHeight - 150;
 
   const {images} = route.params;
 

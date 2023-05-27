@@ -11,16 +11,16 @@ import {
   Keyboard,
   FlatList,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import Colors from '../constants/Colors';
-import CustomIcon from '../components/data/CustomIcon';
 import {useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {Toast} from '../components/ui/Toast';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createComment, getAllComments} from '../api/statusComment_api';
 import ItemComment from '../components/ui/ItemComment';
+import {getTimeToNow} from '../utils/Utils';
 
 interface ImageItem {
   uri: string;
@@ -35,7 +35,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
   const uid = useSelector((state: RootState) => state.uid.id);
   const token = useSelector((state: RootState) => state.token.key);
 
-  const {item, timeAgo} = route.params;
+  const {item} = route.params;
 
   const [showMore, setShowMore] = useState(false);
 
@@ -48,6 +48,13 @@ export default function DetailStatusScreen({navigation, route}: any) {
   const [comments, setComments] = useState<any[]>([]);
 
   const commentRef = useRef<TextInput>(null);
+
+  const timeAgo = getTimeToNow(item.updatedAt);
+
+  const [lengthMore, setLengthMore] = useState(false);
+  const onTextLayout = useCallback((e: any) => {
+    setLengthMore(e.nativeEvent.lines.length >= 3); //to check the text is more than 3 lines or not
+  }, []);
 
   const postComment = async () => {
     if (comment === '' && mediaFile === undefined) {
@@ -204,19 +211,26 @@ export default function DetailStatusScreen({navigation, route}: any) {
           </View>
 
           {item.description ? (
-            <TouchableOpacity onPress={() => setShowMore(!showMore)}>
+            <View style={{marginVertical: 10, paddingHorizontal: 16}}>
               <Text
+                onTextLayout={onTextLayout}
                 style={{
-                  paddingHorizontal: 16,
                   color: Colors.black,
-                  marginVertical: 10,
                   textAlign: 'justify',
                 }}
-                numberOfLines={showMore ? undefined : 3}
-                ellipsizeMode="tail">
+                numberOfLines={showMore ? undefined : 3}>
                 {item.description}
               </Text>
-            </TouchableOpacity>
+              {lengthMore ? (
+                <Text
+                  onPress={() => {
+                    setShowMore(!showMore);
+                  }}
+                  style={{lineHeight: 20}}>
+                  {showMore ? 'Read less...' : 'Read more...'}
+                </Text>
+              ) : null}
+            </View>
           ) : (
             <View style={{marginTop: 10}} />
           )}
@@ -226,10 +240,39 @@ export default function DetailStatusScreen({navigation, route}: any) {
               onPress={() =>
                 navigation.navigate('imagesPost', {images: item.mediaFiles})
               }>
-              <Image
-                source={{uri: item.mediaFiles[0]}}
-                style={{height: 300, width: deviceWidth}}
-              />
+              <View
+                style={{height: 300, width: deviceWidth, flexDirection: 'row'}}>
+                <Image
+                  source={{uri: item.mediaFiles[0]}}
+                  style={{flex: 1, marginHorizontal: 0.75}}
+                />
+                {item.mediaFiles.length > 1 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      marginHorizontal: 0.75,
+                      flexDirection: 'column',
+                    }}>
+                    <Image
+                      source={{uri: item.mediaFiles[1]}}
+                      style={{flex: 1}}
+                    />
+                    {item.mediaFiles.length > 2 ? (
+                      <View style={{flex: 1, marginTop: 1.5}}>
+                        <Image
+                          source={{uri: item.mediaFiles[2]}}
+                          style={{flex: 1}}
+                        />
+                        {item.mediaFiles.length > 3 ? (
+                          <Text style={Styles.textImageMore}>
+                            +{item.mediaFiles.length - 3}
+                          </Text>
+                        ) : null}
+                      </View>
+                    ) : null}
+                  </View>
+                ) : null}
+              </View>
             </Pressable>
           ) : null}
           <Pressable
@@ -286,7 +329,9 @@ export default function DetailStatusScreen({navigation, route}: any) {
                 paddingHorizontal: 40,
               },
             ]}>
-            <TouchableOpacity onPress={() => {}} style={{alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={() => {}}
+              style={{alignItems: 'center', flexDirection: 'row'}}>
               <Icon
                 type={Icons.Entypo}
                 name="thumbs-up"
@@ -300,36 +345,17 @@ export default function DetailStatusScreen({navigation, route}: any) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={{alignItems: 'center'}}
+              style={{alignItems: 'center', flexDirection: 'row'}}
               onPress={() => {
                 commentRef.current?.focus();
               }}>
-              <CustomIcon
+              <Icon
+                type={Icons.Ionicons}
                 name="chatbubble-ellipses-outline"
                 size={19}
                 color={Colors.gray}
               />
-              <Text>comment</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{alignItems: 'center'}}
-              onPress={() => {
-                commentRef.current?.blur();
-                console.log(comments);
-              }}>
-              <Icon
-                type={Icons.Entypo}
-                name="share"
-                size={19}
-                color={Colors.gray}
-              />
-              <Text>share</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={{alignItems: 'center'}} onPress={() => {}}>
-              <CustomIcon name="send-outline" size={19} color={Colors.gray} />
-              <Text>send</Text>
+              <Text>Comment</Text>
             </TouchableOpacity>
           </View>
           <View style={{flex: 1}}>
@@ -504,5 +530,17 @@ const Styles = StyleSheet.create({
     backgroundColor: 'white',
     elevation: 10,
     paddingVertical: 10,
+  },
+  textImageMore: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    marginTop: 1.5,
+    color: Colors.white,
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
 });

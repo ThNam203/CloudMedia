@@ -25,13 +25,20 @@ const StatusPostSlice = createSlice({
   reducers: {
     pushStatusPosts: (state: StatusPosts, action: PayloadAction<any>) => {
       state.arr.push(action.payload);
-      console.log(state.arr);
     },
     clearStatusPosts: (state: StatusPosts) => {
       state.arr = [];
     },
+    toogleLike: (state: StatusPosts, action: PayloadAction<any>) => {
+      state.arr.filter((item: any) => {
+        if (item._id === action.payload._id) {
+          item.likeCount++;
+        }
+      });
+    },
   },
 });
 
-export const {pushStatusPosts, clearStatusPosts} = StatusPostSlice.actions;
+export const {pushStatusPosts, clearStatusPosts, toogleLike} =
+  StatusPostSlice.actions;
 export default StatusPostSlice.reducer;

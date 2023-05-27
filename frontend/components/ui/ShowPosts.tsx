@@ -8,42 +8,31 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import Icon, {Icons} from '../../components/ui/Icons';
-import CustomIcon from '../data/CustomIcon';
 import Colors from '../../constants/Colors';
+import {getTimeToNow} from '../../utils/Utils';
+import {useDispatch} from 'react-redux';
+import {toogleLike} from '../../reducers/StatusPost_reducer';
 
 export default function ShowPosts({item, navigation}: any) {
   const deviceWidth = Dimensions.get('window').width;
+  const dispatch = useDispatch();
 
   const [showMore, setShowMore] = useState(false);
 
-  const timeAgo = () => {
-    const dateNow = new Date();
-    const date = new Date(item.updatedAt);
-    const diffInMilliseconds = dateNow.getTime() - date.getTime();
-    const diffInSeconds = Math.round(diffInMilliseconds / 1000);
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`;
-    }
-    const diffInMinutes = Math.round(diffInMilliseconds / 60000);
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
-    }
-    const diffInHours = Math.round(diffInMilliseconds / 3600000);
-    if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
-    }
-    const diffInDays = Math.round(diffInMilliseconds / 86400000);
-    if (diffInDays < 30) {
-      return `${diffInDays} days ago`;
-    }
-    const diffInMonths = Math.round(diffInMilliseconds / 2592000000);
-    if (diffInMonths < 12) {
-      return `${diffInMonths} months ago`;
-    }
-    const diffInYears = Math.round(diffInMilliseconds / 31536000000);
-    return `${diffInYears} years ago`;
+  const [lengthMore, setLengthMore] = useState(false);
+  const onTextLayout = useCallback((e: any) => {
+    setLengthMore(e.nativeEvent.lines.length >= 3); //to check the text is more than 3 lines or not
+  }, []);
+
+  const timeAgo = getTimeToNow(item.updatedAt);
+
+  const [isLike, setIsLike] = useState(false); // check user like this post or not
+  // like or unlike
+  const handleLike = () => {
+    dispatch(toogleLike(item));
+    setIsLike((prev: any) => !prev);
   };
 
   return (
@@ -83,7 +72,7 @@ export default function ShowPosts({item, navigation}: any) {
             UIT Student
           </Text>
           {/* time ago */}
-          <Text style={{fontSize: 11}}>{timeAgo()}</Text>
+          <Text style={{fontSize: 11}}>{timeAgo}</Text>
         </View>
         {
           <View style={{flex: 1, alignItems: 'flex-end'}}>
@@ -104,19 +93,26 @@ export default function ShowPosts({item, navigation}: any) {
       </View>
 
       {item.description ? (
-        <TouchableOpacity onPress={() => setShowMore(!showMore)}>
+        <View style={{marginVertical: 10, paddingHorizontal: 16}}>
           <Text
+            onTextLayout={onTextLayout}
             style={{
-              paddingHorizontal: 16,
               color: Colors.black,
-              marginVertical: 10,
               textAlign: 'justify',
             }}
-            numberOfLines={showMore ? undefined : 3}
-            ellipsizeMode="tail">
+            numberOfLines={showMore ? undefined : 3}>
             {item.description}
           </Text>
-        </TouchableOpacity>
+          {lengthMore ? (
+            <Text
+              onPress={() => {
+                setShowMore(!showMore);
+              }}
+              style={{lineHeight: 20}}>
+              {showMore ? 'Read less...' : 'Read more...'}
+            </Text>
+          ) : null}
+        </View>
       ) : (
         <View style={{marginTop: 10}} />
       )}
@@ -126,15 +122,40 @@ export default function ShowPosts({item, navigation}: any) {
           onPress={() =>
             navigation.navigate('imagesPost', {images: item.mediaFiles})
           }>
-          <Image
-            source={{uri: item.mediaFiles[0]}}
-            style={{height: 300, width: deviceWidth}}
-          />
+          <View style={{height: 300, width: deviceWidth, flexDirection: 'row'}}>
+            <Image
+              source={{uri: item.mediaFiles[0]}}
+              style={{flex: 1, marginHorizontal: 0.75}}
+            />
+            {item.mediaFiles.length > 1 ? (
+              <View
+                style={{
+                  flex: 1,
+                  marginHorizontal: 0.75,
+                  flexDirection: 'column',
+                }}>
+                <Image source={{uri: item.mediaFiles[1]}} style={{flex: 1}} />
+                {item.mediaFiles.length > 2 ? (
+                  <View style={{flex: 1, marginTop: 1.5}}>
+                    <Image
+                      source={{uri: item.mediaFiles[2]}}
+                      style={{flex: 1}}
+                    />
+                    {item.mediaFiles.length > 3 ? (
+                      <Text style={Styles.textImageMore}>
+                        +{item.mediaFiles.length - 3}
+                      </Text>
+                    ) : null}
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
         </Pressable>
       ) : null}
       <Pressable
         onPress={() => {
-          navigation.navigate('detailStatus', {item, timeAgo: timeAgo()});
+          navigation.navigate('detailStatus', {item});
         }}
         android_ripple={{color: Colors.gray, borderless: false}}>
         <View
@@ -186,44 +207,34 @@ export default function ShowPosts({item, navigation}: any) {
             paddingHorizontal: 40,
           },
         ]}>
-        <TouchableOpacity onPress={() => {}} style={{alignItems: 'center'}}>
+        <TouchableOpacity
+          onPress={handleLike}
+          style={{alignItems: 'center', flexDirection: 'row'}}>
           <Icon
             type={Icons.Entypo}
             name="thumbs-up"
             size={19}
-            color={item.likeCount ? Colors.skyBlue : Colors.gray}
+            color={isLike ? Colors.skyBlue : Colors.gray}
           />
-          <Text style={{color: item.likeCount ? Colors.skyBlue : Colors.gray}}>
+          <Text
+            style={{
+              color: isLike ? Colors.skyBlue : Colors.gray,
+              marginHorizontal: 5,
+            }}>
             Like
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{alignItems: 'center'}}
-          onPress={() =>
-            navigation.navigate('detailStatus', {item, timeAgo: timeAgo()})
-          }>
-          <CustomIcon
+          style={{alignItems: 'center', flexDirection: 'row'}}
+          onPress={() => navigation.navigate('detailStatus', {item})}>
+          <Icon
+            type={Icons.Ionicons}
             name="chatbubble-ellipses-outline"
             size={19}
             color={Colors.gray}
           />
-          <Text>comment</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={{alignItems: 'center'}} onPress={() => {}}>
-          <Icon
-            type={Icons.Entypo}
-            name="share"
-            size={19}
-            color={Colors.gray}
-          />
-          <Text>share</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={{alignItems: 'center'}} onPress={() => {}}>
-          <CustomIcon name="send-outline" size={19} color={Colors.gray} />
-          <Text>send</Text>
+          <Text style={{marginHorizontal: 5}}>Comment</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -240,5 +251,17 @@ const Styles = StyleSheet.create({
   flexCenter: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  textImageMore: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    marginTop: 1.5,
+    color: Colors.white,
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
 });
