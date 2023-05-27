@@ -25,6 +25,7 @@ const StatusPostSlice = createSlice({
   reducers: {
     pushStatusPosts: (state: StatusPosts, action: PayloadAction<any>) => {
       state.arr.push(action.payload);
+      console.log(state.arr);
     },
     clearStatusPosts: (state: StatusPosts) => {
       state.arr = [];

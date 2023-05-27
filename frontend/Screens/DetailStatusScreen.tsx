@@ -19,7 +19,8 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {Toast} from '../components/ui/Toast';
 import ImagePicker from 'react-native-image-crop-picker';
-import {createComment} from '../api/statusComment_api';
+import {createComment, getAllComments} from '../api/statusComment_api';
+import ItemComment from '../components/ui/ItemComment';
 
 interface ImageItem {
   uri: string;
@@ -44,19 +45,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
 
   const [isFocused, setIsFocused] = useState(false);
 
-  // const [comments, setComments] = useState([{
-  //   id: 1,
-  //   name: 'John Doe',
-  //   profileImagePath: 'https://i.pravatar.cc/150?img=1',
-  //   comment: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies aliquam, nisl nisl lacinia nisl, eget lacinia nisl nisl eget nisl. Donec auctor, nisl eget ultricies aliquam, nisl nisl lacinia nisl, eget lacinia nisl nisl eget nisl.',
-  //   createdAt: '2021-07-01T00:00:00.000Z',
-  // }, {
-  //   id: 2,
-  //   name: 'John Doe',
-  //   profileImagePath: 'https://i.pravatar.cc/150?img=1',
-  //   comment: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies aliquam, nisl nisl lacinia nisl, eget lacinia nisl nisl eget nisl. Donec auctor, nisl eget ultricies aliquam, nisl nisl lacinia nisl, eget lacinia nisl nisl eget nisl.',
-  //   createdAt: '2021-07-01T00:00:00.000Z',
-  // }])
+  const [comments, setComments] = useState<any[]>([]);
 
   const commentRef = useRef<TextInput>(null);
 
@@ -74,13 +63,14 @@ export default function DetailStatusScreen({navigation, route}: any) {
       );
       if (response.status === 200) {
         console.log(response.data);
+        const dataComment: any = response.data;
+        setComments(prevComments => [...prevComments, dataComment]);
       } else {
         console.log(response.status);
         throw new Error(response.data.errorMessage);
       }
     } catch (error: any) {
       Toast(error.message);
-      console.log(error.message);
     }
 
     setComment('');
@@ -129,7 +119,20 @@ export default function DetailStatusScreen({navigation, route}: any) {
       'keyboardDidHide',
       handleKeyboardDismiss,
     );
-
+    const getComments = async () => {
+      try {
+        const response: any = await getAllComments(item._id, token);
+        if (response.status === 200) {
+          setComments(response.data);
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
+        }
+      } catch (error: any) {
+        Toast(error.message);
+      }
+    };
+    getComments();
     return () => {
       keyboardDidHideListener.remove();
     };
@@ -137,7 +140,9 @@ export default function DetailStatusScreen({navigation, route}: any) {
 
   return (
     <View style={Styles.container}>
-      <ScrollView contentContainerStyle={{flexGrow: 1, marginTop: 57}}>
+      <ScrollView
+        contentContainerStyle={{flexGrow: 1, marginTop: 57}}
+        showsVerticalScrollIndicator={false}>
         <View
           style={{
             backgroundColor: Colors.white,
@@ -311,6 +316,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
               style={{alignItems: 'center'}}
               onPress={() => {
                 commentRef.current?.blur();
+                console.log(comments);
               }}>
               <Icon
                 type={Icons.Entypo}
@@ -326,7 +332,17 @@ export default function DetailStatusScreen({navigation, route}: any) {
               <Text>send</Text>
             </TouchableOpacity>
           </View>
-          {/* <FlatList data={item.comments} renderItem= /> */}
+          <View style={{flex: 1}}>
+            {comments.map((comment, index) => (
+              <ItemComment
+                navigation={navigation}
+                item={comment}
+                IdAuthorOfStatus={item.author}
+                key={index}
+              />
+            ))}
+          </View>
+          <View style={{height: 160}} />
         </View>
       </ScrollView>
       <View style={Styles.topView}>
@@ -338,7 +354,6 @@ export default function DetailStatusScreen({navigation, route}: any) {
             style={{marginTop: 3}}>
             <Icon type={Icons.Ionicons} name="arrow-back" />
           </TouchableOpacity>
-          {/* <Text style={[styles.title, {marginLeft: 30}]}>My Jobs</Text> */}
         </View>
       </View>
 
