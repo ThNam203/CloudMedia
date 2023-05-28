@@ -4,7 +4,7 @@ import ItemRequestUser from './ItemRequestUser';
 import {getAllFrRequestOfUser} from '../../api/friend_api';
 import {RootState} from '../../reducers/Store';
 import {useSelector} from 'react-redux';
-import {user_info} from '../../api/user_api';
+import {getInfoUser} from '../../api/userApi';
 import {replyRequestFr} from '../../api/friend_api';
 import {Toast} from './Toast';
 
@@ -48,7 +48,7 @@ const InvitationsList = () => {
   };
 
   const getNameInfo = (id: any) => {
-    return user_info(id)
+    return getInfoUser(id)
       .then((response: any) => {
         if (response.status === 200) {
           return response.data;

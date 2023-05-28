@@ -3,12 +3,12 @@ import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
-import {user_login} from '../api/user_api';
+import {userLogin} from '../api/userApi';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
 import {useDispatch} from 'react-redux';
-import {setToken} from '../reducers/Token_reducer';
-import {setIdFromJwt} from '../reducers/Uid_reducer';
-import {setStatus} from '../reducers/Loading_reducer';
+import {setToken} from '../reducers/TokenReducer';
+import {setIdFromJwt} from '../reducers/UidReducer';
+import {setStatus} from '../reducers/LoadingReducer';
 import {Toast} from '../components/ui/Toast';
 
 function LoginScreen(props: any) {
@@ -20,7 +20,7 @@ function LoginScreen(props: any) {
 
   const handleLogin = async () => {
     dispatch(setStatus(true));
-    user_login({
+    userLogin({
       email: username,
       password: password,
     })

@@ -15,7 +15,7 @@ import LoginScreen from './LoginScreen';
 import {nameStorage, retrieveData} from '../reducers/AsyncStorage';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {setStatus} from '../reducers/Loading_reducer';
+import {setStatus} from '../reducers/LoadingReducer';
 import {RootState} from '../reducers/Store';
 import AppLoader from '../components/ui/AppLoader';
 import {Toast} from '../components/ui/Toast';

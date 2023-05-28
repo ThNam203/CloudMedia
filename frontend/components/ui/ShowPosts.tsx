@@ -13,7 +13,7 @@ import Icon, {Icons} from '../../components/ui/Icons';
 import Colors from '../../constants/Colors';
 import {getTimeToNow} from '../../utils/Utils';
 import {useDispatch} from 'react-redux';
-import {toogleLike} from '../../reducers/StatusPost_reducer';
+import {toogleLike} from '../../reducers/StatusPostReducer';
 import MenuStatus from './MenuStatus';
 
 export default function ShowPosts({item, navigation, pressComment}: any) {

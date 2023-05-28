@@ -13,8 +13,8 @@ import {CheckBox} from '@rneui/themed';
 import Icon, {Icons} from '../components/ui/Icons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {user_update} from '../api/user_api';
-import {saveUser} from '../reducers/User_reducer';
+import {user_update} from '../api/userApi';
+import {saveUser} from '../reducers/UserReducer';
 import {Toast} from '../components/ui/Toast';
 function EditProfileScreen(props: any) {
   const [checked, setChecked] = useState(true);

@@ -14,10 +14,10 @@ import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {setPostShow} from '../reducers/Post_reducer';
+import {setPostShow} from '../reducers/PostReducer';
 import Colors from '../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
-import {createNewPost} from '../api/statusPost_api';
+import {createNewPost} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
 
 interface ImageItem {

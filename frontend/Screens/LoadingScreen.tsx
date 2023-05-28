@@ -3,20 +3,15 @@ import React, {useEffect} from 'react';
 import LottieView from 'lottie-react-native';
 import Colors from '../constants/Colors';
 import jwt_decode from 'jwt-decode';
-import {user_info} from '../api/user_api';
-import {UserInfo, saveUser} from '../reducers/User_reducer';
-import {getAllNotifications} from '../api/notification_api';
-import {setNotifications} from '../reducers/Notification_reducer';
-import {getAllJobOfUser} from '../api/job_api';
-import {setJobs} from '../reducers/Job_reducer';
-import {setToken} from '../reducers/Token_reducer';
-import {setIdFromJwt} from '../reducers/Uid_reducer';
+import {getInfoUser} from '../api/userApi';
+import {UserInfo, saveUser} from '../reducers/UserReducer';
+import {getAllNotifications} from '../api/notificationApi';
+import {setNotifications} from '../reducers/NotificationReducer';
+import {setToken} from '../reducers/TokenReducer';
+import {setIdFromJwt} from '../reducers/UidReducer';
 import {useDispatch} from 'react-redux';
-import {getAllStatusPostOfUser} from '../api/statusPost_api';
-import {
-  clearStatusPosts,
-  pushStatusPosts,
-} from '../reducers/StatusPost_reducer';
+import {getAllStatusPostOfUser} from '../api/statusPostApi';
+import {clearStatusPosts, pushStatusPosts} from '../reducers/StatusPostReducer';
 import {Toast} from '../components/ui/Toast';
 
 export default function LoadingScreen({navigation, route}: any) {
@@ -35,7 +30,7 @@ export default function LoadingScreen({navigation, route}: any) {
         const data = response.data;
 
         for (const post of data) {
-          const userInfoResponse: any = await user_info(post.author);
+          const userInfoResponse: any = await getInfoUser(post.author);
           if (userInfoResponse.status === 200) {
             const infoUser = userInfoResponse.data;
 
@@ -65,7 +60,7 @@ export default function LoadingScreen({navigation, route}: any) {
       const json = jwt_decode(jwt) as {id: string};
       const idUser = json.id;
 
-      const response: any = await user_info(idUser);
+      const response: any = await getInfoUser(idUser);
       if (response.status === 200) {
         const user: UserInfo = response.data;
         dispatch(saveUser(user));

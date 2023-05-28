@@ -18,7 +18,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {Toast} from '../components/ui/Toast';
 import ImagePicker from 'react-native-image-crop-picker';
-import {createComment, getAllComments} from '../api/statusComment_api';
+import {createComment, getAllComments} from '../api/statusCommentApi';
 import ItemComment from '../components/ui/ItemComment';
 import ShowPosts from '../components/ui/ShowPosts';
 

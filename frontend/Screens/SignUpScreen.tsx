@@ -12,9 +12,9 @@ import {
 import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
-import {user_signup} from '../api/user_api';
+import {userSignup} from '../api/userApi';
 import {useDispatch} from 'react-redux';
-import {setStatus} from '../reducers/Loading_reducer';
+import {setStatus} from '../reducers/LoadingReducer';
 import {Toast} from '../components/ui/Toast';
 function SignUpHrScreen(props: any) {
   const [name, setName] = useState('');
@@ -63,7 +63,7 @@ function SignUpHrScreen(props: any) {
       return;
     }
     dispatch(setStatus(true));
-    user_signup({
+    userSignup({
       name,
       email,
       password,

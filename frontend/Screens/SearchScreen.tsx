@@ -7,7 +7,7 @@ import {
   TextInput,
   FlatList,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import ItemRequestUser from '../components/ui/ItemRequestUser';
 import {useSelector} from 'react-redux';
@@ -24,9 +24,15 @@ export default function SearchScreen({navigation}: any) {
 
   const [listData, setListData] = useState([]);
 
+  const searchRef = useRef<TextInput>(null);
+
   const clearText = () => {
     setText('');
   };
+
+  setTimeout(() => {
+    searchRef.current?.focus();
+  }, 100);
 
   const handleAddFr = async (email: any) => {
     console.log(email);
@@ -88,6 +94,7 @@ export default function SearchScreen({navigation}: any) {
             <Icon type={Icons.AntDesign} name="arrowleft" />
           </TouchableOpacity>
           <TextInput
+            ref={searchRef}
             style={styles.input}
             placeholder="Search"
             onChangeText={textinput => setText(textinput)}

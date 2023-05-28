@@ -16,10 +16,10 @@ import UploadPhoto from '../components/ui/UploadPhoto';
 import EditProfileScreen from './EditProfileScreen';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {user_avatarImg, user_logout} from '../api/user_api';
+import {postAvatarImg, userLogout} from '../api/userApi';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
-import {setStatus} from '../reducers/Loading_reducer';
-import {updateAvatar} from '../reducers/User_reducer';
+import {setStatus} from '../reducers/LoadingReducer';
+import {updateAvatar} from '../reducers/UserReducer';
 import Colors from '../constants/Colors';
 import {Toast} from '../components/ui/Toast';
 
@@ -37,7 +37,7 @@ function ProfileScreen({navigation}: any) {
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
-    user_logout(token)
+    userLogout(token)
       .then((response: any) => {
         if (response.status === 204) {
           console.log(response);
@@ -68,7 +68,7 @@ function ProfileScreen({navigation}: any) {
       name: image.filename || 'profile-image',
     });
     dispatch(setStatus(true));
-    user_avatarImg(dataForm, uid, token)
+    postAvatarImg(dataForm, uid, token)
       .then((response: any) => {
         if (response.status === 200) {
           console.log(response.data);
