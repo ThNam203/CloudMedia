@@ -6,7 +6,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../Screens/HomeScreen';
 import NetworkScreen from '../Screens/NetworkScreen';
 import PostScreen from '../Screens/PostScreen';
-import JobsScreen from '../Screens/JobsScreen';
 import NotificationsScreen from '../Screens/NotificationsScreen';
 import Colors from '../constants/Colors';
 import * as Animatable from 'react-native-animatable';
@@ -15,6 +14,7 @@ import Header from '../components/ui/Header';
 import {useDispatch, useSelector} from 'react-redux';
 import {setPostShow} from '../reducers/Post_reducer';
 import {RootState} from '../reducers/Store';
+import ProfileScreen from '../Screens/ProfileScreen';
 
 const TabArr = [
   {
@@ -51,12 +51,12 @@ const TabArr = [
     component: NotificationsScreen,
   },
   {
-    route: 'Jobs',
-    label: 'Jobs',
+    route: 'Profile',
+    label: 'Profile',
     type: Icons.MaterialCommunityIcons,
-    activeIcon: 'briefcase-variant',
-    inActiveIcon: 'briefcase-variant-outline',
-    component: JobsScreen,
+    activeIcon: 'account-circle',
+    inActiveIcon: 'account-circle-outline',
+    component: ProfileScreen,
   },
 ];
 

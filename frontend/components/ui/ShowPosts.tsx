@@ -14,12 +14,14 @@ import Colors from '../../constants/Colors';
 import {getTimeToNow} from '../../utils/Utils';
 import {useDispatch} from 'react-redux';
 import {toogleLike} from '../../reducers/StatusPost_reducer';
+import MenuStatus from './MenuStatus';
 
-export default function ShowPosts({item, navigation}: any) {
+export default function ShowPosts({item, navigation, pressComment}: any) {
   const deviceWidth = Dimensions.get('window').width;
   const dispatch = useDispatch();
 
   const [showMore, setShowMore] = useState(false);
+  const [showOption, setShowOption] = useState(false);
 
   const [lengthMore, setLengthMore] = useState(false);
   const onTextLayout = useCallback((e: any) => {
@@ -31,8 +33,13 @@ export default function ShowPosts({item, navigation}: any) {
   const [isLike, setIsLike] = useState(false); // check user like this post or not
   // like or unlike
   const handleLike = () => {
+    console.log('like');
     dispatch(toogleLike(item));
     setIsLike((prev: any) => !prev);
+  };
+
+  const toggleShowOption = () => {
+    setShowOption((prev: any) => !prev);
   };
 
   return (
@@ -42,6 +49,12 @@ export default function ShowPosts({item, navigation}: any) {
         marginVertical: 5,
         paddingVertical: 10,
       }}>
+      {showOption ? (
+        <View style={{position: 'absolute', top: 30, right: 30, zIndex: 1}}>
+          <MenuStatus toggleShowOption={toggleShowOption} />
+        </View>
+      ) : null}
+
       <View style={Styles.flexCenter}>
         <Image
           source={{uri: item.profileImagePath}}
@@ -74,26 +87,27 @@ export default function ShowPosts({item, navigation}: any) {
           {/* time ago */}
           <Text style={{fontSize: 11}}>{timeAgo}</Text>
         </View>
-        {
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <TouchableOpacity
-              onPress={() => {}}
-              style={{
-                padding: 4,
-              }}>
-              <Icon
-                type={Icons.Entypo}
-                name="dots-three-vertical"
-                size={19}
-                color={Colors.gray}
-              />
-            </TouchableOpacity>
-          </View>
-        }
+
+        <View style={{flex: 1, alignItems: 'flex-end'}}>
+          <TouchableOpacity
+            onPress={toggleShowOption}
+            style={{
+              padding: 4,
+            }}>
+            <Icon
+              type={Icons.Entypo}
+              name="dots-three-vertical"
+              size={19}
+              color={Colors.gray}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {item.description ? (
-        <View style={{marginVertical: 10, paddingHorizontal: 16}}>
+        <TouchableOpacity
+          onPress={() => setShowMore(!showMore)}
+          style={{marginVertical: 10, paddingHorizontal: 16}}>
           <Text
             onTextLayout={onTextLayout}
             style={{
@@ -104,15 +118,11 @@ export default function ShowPosts({item, navigation}: any) {
             {item.description}
           </Text>
           {lengthMore ? (
-            <Text
-              onPress={() => {
-                setShowMore(!showMore);
-              }}
-              style={{lineHeight: 20}}>
+            <Text style={{lineHeight: 20}}>
               {showMore ? 'Read less...' : 'Read more...'}
             </Text>
           ) : null}
-        </View>
+        </TouchableOpacity>
       ) : (
         <View style={{marginTop: 10}} />
       )}
@@ -154,9 +164,7 @@ export default function ShowPosts({item, navigation}: any) {
         </Pressable>
       ) : null}
       <Pressable
-        onPress={() => {
-          navigation.navigate('detailStatus', {item});
-        }}
+        onPress={pressComment}
         android_ripple={{color: Colors.gray, borderless: false}}>
         <View
           style={[
@@ -227,7 +235,7 @@ export default function ShowPosts({item, navigation}: any) {
 
         <TouchableOpacity
           style={{alignItems: 'center', flexDirection: 'row'}}
-          onPress={() => navigation.navigate('detailStatus', {item})}>
+          onPress={pressComment}>
           <Icon
             type={Icons.Ionicons}
             name="chatbubble-ellipses-outline"

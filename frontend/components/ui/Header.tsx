@@ -18,14 +18,13 @@ export default function Header({navigation}: any) {
   return (
     <View style={styles.container}>
       <View style={{paddingLeft: 10}}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('profile');
-          }}>
+        <TouchableOpacity onPress={() => {}}>
           <Image
             source={
               user.profileImagePath
-                ? {uri: user.profileImagePath}
+                ? {
+                    uri: 'https://downloadwap.com/thumbs2/wallpapers/p2/2019/signs/12/f219249013025356.jpg',
+                  }
                 : require('../../assets/images/Spiderman.jpg')
             }
             style={{height: 35, width: 35, borderRadius: 100}}
@@ -43,7 +42,7 @@ export default function Header({navigation}: any) {
       <TouchableOpacity
         style={{marginRight: 10}}
         onPress={() => {
-          navigation.navigate('chat')
+          navigation.navigate('chat');
         }}>
         <Icon type={Icons.Ionicons} name="chatbox-ellipses-outline" />
       </TouchableOpacity>
