@@ -60,7 +60,7 @@ function FirstTimeUseScreen({navigation}: any) {
 
     // Connect to socket.io
     require('../utils/socket');
-    //checkLogin();
+    // checkLogin();
   }, []);
 
   return (
