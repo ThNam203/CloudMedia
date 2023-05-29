@@ -1,37 +1,30 @@
 /* eslint-disable react-native/no-inline-styles */
+import {CheckBox} from '@rneui/themed';
 import React, {useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 
 function CustomCheckBox(props: any) {
   return (
-    <TouchableOpacity
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
+    <CheckBox
+      checked={props.isSelected}
+      onPress={() => props.setSelection(!props.isSelected)}
+      iconType="material-community"
+      checkedIcon="checkbox-marked"
+      uncheckedIcon="checkbox-blank-outline"
+      checkedColor="blue"
+      title={props.title}
+      containerStyle={{
+        padding: 0,
       }}
-      onPress={() => props.setSelection(!props.isSelected)}>
-      <View
-        style={{
-          width: 20,
-          height: 20,
-          borderWidth: 1,
-          borderRadius: 5,
-          marginRight: 10,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        {props.isSelected ? (
-          <View
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: 3,
-              backgroundColor: 'blue',
-            }}
-          />
-        ) : null}
-      </View>
-    </TouchableOpacity>
+      textStyle={{
+        fontWeight: '400',
+        color: '#808080',
+        fontFamily: 'Roboto',
+        fontStyle: 'normal',
+        fontSize: 16,
+        lineHeight: 19,
+      }}
+    />
   );
 }
 

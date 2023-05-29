@@ -1,21 +1,21 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 interface Post {
-  show: boolean;
+  postShow: boolean;
 }
 const initialState: Post = {
-  show: false,
+  postShow: false,
 };
 
-const PostSlice = createSlice({
+const UtilsSlice = createSlice({
   name: 'Post',
   initialState,
   reducers: {
     setPostShow: (state: Post, action: PayloadAction<boolean>) => {
-      state.show = action.payload;
+      state.postShow = action.payload;
     },
   },
 });
 
-export const {setPostShow} = PostSlice.actions;
-export default PostSlice.reducer;
+export const {setPostShow} = UtilsSlice.actions;
+export default UtilsSlice.reducer;

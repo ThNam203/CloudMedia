@@ -21,13 +21,15 @@ export default function Header({navigation}: any) {
         <TouchableOpacity
           onPress={() => {
             // navigation.navigate('videoCall', { isCaller: false });
-            navigation.navigate('profile')
+            // navigation.navigate('profile')
           }}>
           <Image
             source={
-              user.profileImagePath === ''
-                ? require('../../assets/images/Spiderman.jpg')
-                : {uri: user.profileImagePath}
+              user.profileImagePath
+                ? {
+                    uri: 'https://downloadwap.com/thumbs2/wallpapers/p2/2019/signs/12/f219249013025356.jpg',
+                  }
+                : require('../../assets/images/Spiderman.jpg')
             }
             style={{height: 35, width: 35, borderRadius: 100}}
           />
@@ -43,8 +45,9 @@ export default function Header({navigation}: any) {
       </Pressable>
       <TouchableOpacity
         style={{marginRight: 10}}
-        onPress={() => {
-          navigation.navigate('videoCall', { isCaller: true })
+        onPress={() => {\
+          navigation.navigate('chat');\
+          //navigation.navigate('videoCall', { isCaller: true })\
         }}>
         <Icon type={Icons.Ionicons} name="chatbox-ellipses-outline" />
       </TouchableOpacity>

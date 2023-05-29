@@ -3,12 +3,13 @@ import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, View, TextInput} from 'react-native';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import CustomFTG from '../components/ui/CustomFGT';
-import {user_login} from '../api/user_api';
+import {userLogin} from '../api/userApi';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
 import {useDispatch} from 'react-redux';
-import {setToken} from '../reducers/Token_reducer';
-import {setIdFromJwt} from '../reducers/Uid_reducer';
-import {setStatus} from '../reducers/Loading_reducer';
+import {setToken} from '../reducers/TokenReducer';
+import {setIdFromJwt} from '../reducers/UidReducer';
+import {setStatus} from '../reducers/LoadingReducer';
+import {Toast} from '../components/ui/Toast';
 
 function LoginScreen(props: any) {
   const [username, setUsername] = useState('');
@@ -20,35 +21,31 @@ function LoginScreen(props: any) {
   const handleLogin = async () => {
     console.log('login iden ' + username + password)
     dispatch(setStatus(true));
-    user_login({
+    userLogin({
       email: username,
       password: password,
     })
       .then((response: any) => {
-        console.log(response.data)
         if (response.status === 200) {
           return response.data;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .then(data => {
         // connect to socket
-        require('../utils/socket')
-        
+        require('../utils/socket');
+
         // do something with the JWT token
         const jwtToken = data;
         storeData(jwtToken, nameStorage.jwtToken);
-        dispatch(setToken(jwtToken));
-        dispatch(setIdFromJwt(jwtToken));
-        props.saveInfo(jwtToken);
-        // console.log(jwtToken);
+
         storeData(isSelected, nameStorage.isLogin);
-        props.handleNavigate();
+        props.handleNavigate(jwtToken);
       })
       .catch(error => {
-        console.error(error);
+        Toast(error.message);
       })
       .finally(() => {
         dispatch(setStatus(false));
@@ -76,17 +73,14 @@ function LoginScreen(props: any) {
           value={password}
         />
       </View>
-      <View style={{marginTop: 15, width: 300, height: 25}}>
+      <View style={{width: 300, height: 70}}>
         <View style={styles.bottomContainer}>
           <View style={{flexDirection: 'row'}}>
             <CustomCheckBox
               isSelected={isSelected}
               setSelection={setSelection}
+              title={'Remember me'}
             />
-            <Text
-              style={[styles.fontText, {fontWeight: '400', color: '#808080'}]}>
-              Remember me
-            </Text>
           </View>
           <Text
             onPress={() => {}}
@@ -102,7 +96,11 @@ function LoginScreen(props: any) {
           </Text>
         </View>
       </View>
-      <View style={[styles.textInput, {overflow: 'hidden', borderRadius: 15}]}>
+      <View
+        style={[
+          styles.textInput,
+          {overflow: 'hidden', borderRadius: 15, marginTop: 0},
+        ]}>
         <Pressable
           onPress={handleLogin}
           style={styles.button}

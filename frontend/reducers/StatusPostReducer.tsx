@@ -1,0 +1,44 @@
+import {PayloadAction, createSlice} from '@reduxjs/toolkit';
+
+interface StatusPost {
+  _id: any;
+  author: any;
+  name: any;
+  profileImagePath: any;
+  description: any;
+  likeCount: any;
+  mediaFiles: [any];
+  updatedAt: any;
+}
+
+interface StatusPosts {
+  arr: StatusPost[];
+}
+
+const initialState: StatusPosts = {
+  arr: [],
+};
+
+const StatusPostSlice = createSlice({
+  name: 'StatusPost',
+  initialState,
+  reducers: {
+    pushStatusPosts: (state: StatusPosts, action: PayloadAction<any>) => {
+      state.arr.push(action.payload);
+    },
+    clearStatusPosts: (state: StatusPosts) => {
+      state.arr = [];
+    },
+    toogleLike: (state: StatusPosts, action: PayloadAction<any>) => {
+      state.arr.filter((item: any) => {
+        if (item._id === action.payload._id) {
+          item.likeCount++;
+        }
+      });
+    },
+  },
+});
+
+export const {pushStatusPosts, clearStatusPosts, toogleLike} =
+  StatusPostSlice.actions;
+export default StatusPostSlice.reducer;

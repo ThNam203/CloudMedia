@@ -6,15 +6,15 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../Screens/HomeScreen';
 import NetworkScreen from '../Screens/NetworkScreen';
 import PostScreen from '../Screens/PostScreen';
-import JobsScreen from '../Screens/JobsScreen';
 import NotificationsScreen from '../Screens/NotificationsScreen';
 import Colors from '../constants/Colors';
 import * as Animatable from 'react-native-animatable';
 
 import Header from '../components/ui/Header';
-import StillHiringScreen from '../Screens/PostScreen';
-import {useDispatch} from 'react-redux';
-import {setPostShow} from '../reducers/Post_reducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {setPostShow} from '../reducers/UtilsReducer';
+import {RootState} from '../reducers/Store';
+import ProfileScreen from '../Screens/ProfileScreen';
 
 const TabArr = [
   {
@@ -44,18 +44,19 @@ const TabArr = [
   {
     route: 'Notifications',
     label: 'Notifications',
-    type: Icons.Octicons,
-    activeIcon: 'bell-fill',
-    inActiveIcon: 'bell',
+    type: Icons.MaterialCommunityIcons,
+    activeIcon: 'bell',
+    inActiveIcon: 'bell-outline',
+    bellBadge: 'bell-badge-outline',
     component: NotificationsScreen,
   },
   {
-    route: 'Jobs',
-    label: 'Jobs',
+    route: 'Profile',
+    label: 'Profile',
     type: Icons.MaterialCommunityIcons,
-    activeIcon: 'briefcase-variant',
-    inActiveIcon: 'briefcase-variant-outline',
-    component: JobsScreen,
+    activeIcon: 'account-circle',
+    inActiveIcon: 'account-circle-outline',
+    component: ProfileScreen,
   },
 ];
 
@@ -66,6 +67,9 @@ const TabButton = (props: any) => {
   const focused = accessibilityState.selected;
   const viewRef = useRef(null);
 
+  const numberNotification = useSelector(
+    (state: RootState) => state.notifications.numberNoti,
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -94,7 +98,13 @@ const TabButton = (props: any) => {
       <Animatable.View ref={viewRef} duration={1000} style={styles.container}>
         <Icon
           type={item.type}
-          name={focused ? item.activeIcon : item.inActiveIcon}
+          name={
+            focused
+              ? item.activeIcon
+              : numberNotification && item.route === 'Notifications'
+              ? item.bellBadge
+              : item.inActiveIcon
+          }
           color={focused ? Colors.primary : Colors.primaryLite}
         />
       </Animatable.View>
