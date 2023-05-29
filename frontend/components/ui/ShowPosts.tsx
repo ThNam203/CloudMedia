@@ -163,9 +163,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
           </View>
         </Pressable>
       ) : null}
-      <Pressable
-        onPress={pressComment}
-        android_ripple={{color: Colors.gray, borderless: false}}>
+      <Pressable onPress={pressComment}>
         <View
           style={[
             Styles.flexCenter,

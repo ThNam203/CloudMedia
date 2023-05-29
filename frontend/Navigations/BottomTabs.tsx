@@ -12,7 +12,7 @@ import * as Animatable from 'react-native-animatable';
 
 import Header from '../components/ui/Header';
 import {useDispatch, useSelector} from 'react-redux';
-import {setPostShow} from '../reducers/PostReducer';
+import {setPostShow} from '../reducers/UtilsReducer';
 import {RootState} from '../reducers/Store';
 import ProfileScreen from '../Screens/ProfileScreen';
 

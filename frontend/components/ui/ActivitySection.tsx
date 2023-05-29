@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {Dimensions} from 'react-native';
 import {FlatList, StyleSheet, Text, Image, View, Pressable} from 'react-native';
 import {useDispatch} from 'react-redux';
-import {setPostShow} from '../../reducers/PostReducer';
+import {setPostShow} from '../../reducers/UtilsReducer';
 const screenWidth = Dimensions.get('screen').width;
 
 const Post = ({type, content, image, time, user}: any) => {

@@ -15,6 +15,7 @@ export default function HomeScreen({navigation}: any) {
         renderItem={({item}) => (
           <ShowPosts
             item={item}
+            navigation={navigation}
             pressComment={() => {
               navigation.navigate('detailStatus', {item: item});
             }}

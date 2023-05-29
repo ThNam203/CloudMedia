@@ -14,7 +14,7 @@ import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {setPostShow} from '../reducers/PostReducer';
+import {setPostShow} from '../reducers/UtilsReducer';
 import Colors from '../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPostApi';
@@ -32,7 +32,7 @@ function PostScreen() {
   const [description, setDescription] = useState('');
 
   const user = useSelector((state: RootState) => state.userInfo);
-  const postVisible = useSelector((state: RootState) => state.post.show);
+  const postVisible = useSelector((state: RootState) => state.Utils.postShow);
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
 
@@ -119,12 +119,23 @@ function PostScreen() {
           }}
           source={{uri: item.uri}}
         />
-        <View style={{position: 'absolute', top: 5, right: 5}}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 5,
+            right: 5,
+            backgroundColor: Colors.white,
+            borderRadius: 50,
+          }}>
           <TouchableOpacity
             onPress={() =>
               setMediaFiles(mediaFiles.filter(i => i.uri != item.uri))
             }>
-            <Icon type={Icons.FontAwesome} name="close" color={Colors.black} />
+            <Icon
+              type={Icons.AntDesign}
+              name="closecircle"
+              color={Colors.darkOverlayColor}
+            />
           </TouchableOpacity>
         </View>
       </View>

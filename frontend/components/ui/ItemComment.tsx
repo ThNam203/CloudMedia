@@ -147,7 +147,6 @@ export default function ItemComment({navigation, item, IdAuthorOfStatus}: any) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
     margin: 10,
