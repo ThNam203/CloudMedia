@@ -19,6 +19,7 @@ function LoginScreen(props: any) {
   const dispatch = useDispatch();
 
   const handleLogin = async () => {
+    console.log('login iden ' + username + password)
     dispatch(setStatus(true));
     userLogin({
       email: username,

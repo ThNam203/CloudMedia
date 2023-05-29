@@ -18,7 +18,11 @@ export default function Header({navigation}: any) {
   return (
     <View style={styles.container}>
       <View style={{paddingLeft: 10}}>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity
+          onPress={() => {
+            // navigation.navigate('videoCall', { isCaller: false });
+            // navigation.navigate('profile')
+          }}>
           <Image
             source={
               user.profileImagePath
@@ -41,8 +45,9 @@ export default function Header({navigation}: any) {
       </Pressable>
       <TouchableOpacity
         style={{marginRight: 10}}
-        onPress={() => {
-          navigation.navigate('chat');
+        onPress={() => {\
+          navigation.navigate('chat');\
+          //navigation.navigate('videoCall', { isCaller: true })\
         }}>
         <Icon type={Icons.Ionicons} name="chatbox-ellipses-outline" />
       </TouchableOpacity>

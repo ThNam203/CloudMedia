@@ -51,6 +51,8 @@ const ChatRoom = ({ route }: any) => {
       });
       setChatMessages(messages)
     }
+
+    socket.emit('joinRoom', { chatRoomId })
     
     socket.on('newMessage', (newRawMessage: any) => {
       const newMessage = new Message(newRawMessage._id, newRawMessage.message, newRawMessage.senderId, newRawMessage.createdAt)
