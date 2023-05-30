@@ -33,12 +33,17 @@ export default function ItemRequestUser({
           <View
             style={{
               borderRadius: 10,
-              backgroundColor: isFriend == 'false' ? '#000ed2' : Colors.gray,
+              backgroundColor:
+                isFriend == 'false' || nameRequest == 'Accept'
+                  ? '#000ed2'
+                  : Colors.gray,
               overflow: 'hidden',
               width: 130,
             }}>
             <Pressable
-              disabled={isFriend == 'false' ? false : true}
+              disabled={
+                isFriend == 'false' || nameRequest == 'Accept' ? false : true
+              }
               onPress={pressLeft}
               android_ripple={{color: '#0073ff'}}
               style={{

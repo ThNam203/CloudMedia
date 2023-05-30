@@ -45,8 +45,8 @@ export default function NotificationsScreen({navigation}: any) {
       }}>
       <Image
         source={
-          item.logo
-            ? {uri: item.logo}
+          item.sender?.profileImagePath
+            ? {uri: item.sender.profileImagePath}
             : require('../assets/images/Spiderman.jpg')
         }
         style={{height: 70, width: 70, marginRight: 20, borderRadius: 35}}

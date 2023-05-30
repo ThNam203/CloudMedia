@@ -47,6 +47,17 @@ export default function SearchScreen({navigation}: any) {
       })
       .then(data => {
         console.log(data);
+        setListData((prev: any) => {
+          return prev.map((item: any) => {
+            if (item.email === email) {
+              return {
+                ...item,
+                isFriend: 'pending',
+              };
+            }
+            return item;
+          });
+        });
       })
       .catch(error => {
         Toast(error.message);

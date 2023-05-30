@@ -146,7 +146,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
                 }}>
                 <Image source={{uri: item.mediaFiles[1]}} style={{flex: 1}} />
                 {item.mediaFiles.length > 2 ? (
-                  <View style={{flex: 1, marginTop: 1.5}}>
+                  <View style={{flex: 1, marginVertical: 1.5}}>
                     <Image
                       source={{uri: item.mediaFiles[2]}}
                       style={{flex: 1}}
@@ -183,8 +183,10 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
             <Text>{item.likeCount} likes</Text>
           </View>
           <View style={Styles.flexCenter}>
-            {item.comments > 0 ? <Text>{item.comments} comments</Text> : null}
-            {item.comments > 0 && item.shares > 0 ? (
+            {item.commentCount > 0 ? (
+              <Text>{item.commentCount} comments</Text>
+            ) : null}
+            {item.commentCount > 0 && item.shares > 0 ? (
               <Icon
                 type={Icons.Entypo}
                 name="dot-single"
