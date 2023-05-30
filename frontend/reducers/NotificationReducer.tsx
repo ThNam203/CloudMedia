@@ -6,6 +6,11 @@ interface Notification {
   logo: any;
   notificationType: any;
   content: any;
+  sender: {
+    _id: any;
+    name: any;
+    profileImagePath: any;
+  };
   isRead: boolean;
   updatedAt: any;
 }
@@ -27,7 +32,7 @@ const NotificationSlice = createSlice({
     setNotifications: (state: Notifications, action: PayloadAction<any>) => {
       state.numberNoti = 0;
       action.payload.map((item: any) => {
-        state.arr.push(item);
+        state.arr.unshift(item);
         if (!item.isRead) {
           state.numberNoti++;
         }

@@ -14,13 +14,14 @@ import {
 import React, {useEffect, useRef, useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import Colors from '../constants/Colors';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {Toast} from '../components/ui/Toast';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createComment, getAllComments} from '../api/statusCommentApi';
 import ItemComment from '../components/ui/ItemComment';
 import ShowPosts from '../components/ui/ShowPosts';
+import {imcrementComment} from '../reducers/StatusPostReducer';
 
 interface ImageItem {
   uri: string;
@@ -47,6 +48,8 @@ export default function DetailStatusScreen({navigation, route}: any) {
 
   const commentRef = useRef<TextInput>(null);
 
+  const dispatch = useDispatch();
+
   const postComment = async () => {
     if (comment === '' && mediaFile === undefined) {
       Toast('Comment is empty');
@@ -63,6 +66,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
         console.log(response.data);
         const dataComment: any = response.data;
         setComments(prevComments => [...prevComments, dataComment]);
+        dispatch(imcrementComment(item._id));
       } else {
         console.log(response.status);
         throw new Error(response.data.errorMessage);
@@ -143,6 +147,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
         showsVerticalScrollIndicator={false}>
         <ShowPosts
           item={item}
+          navigation={navigation}
           pressComment={() => {
             commentRef.current?.focus();
           }}
