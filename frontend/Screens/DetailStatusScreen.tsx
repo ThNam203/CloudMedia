@@ -18,10 +18,17 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {Toast} from '../components/ui/Toast';
 import ImagePicker from 'react-native-image-crop-picker';
-import {createComment, getAllComments} from '../api/statusCommentApi';
+import {
+  createComment,
+  deleteComment,
+  getAllComments,
+} from '../api/statusCommentApi';
 import ItemComment from '../components/ui/ItemComment';
 import ShowPosts from '../components/ui/ShowPosts';
-import {imcrementComment} from '../reducers/StatusPostReducer';
+import {
+  decrementComment,
+  imcrementComment,
+} from '../reducers/StatusPostReducer';
 
 interface ImageItem {
   uri: string;
@@ -49,6 +56,22 @@ export default function DetailStatusScreen({navigation, route}: any) {
   const commentRef = useRef<TextInput>(null);
 
   const dispatch = useDispatch();
+
+  const handleDeleteComment = async (id: string) => {
+    try {
+      const response: any = await deleteComment(item._id, id, token);
+      console.log(response);
+      if (response.status == 204) {
+        Toast('Delete comment successfully');
+        setComments(prevComments =>
+          prevComments.filter(item => item._id !== id),
+        );
+        dispatch(decrementComment(item._id));
+      } else throw new Error(response.data.errorMessage);
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
 
   const postComment = async () => {
     if (comment === '' && mediaFile === undefined) {
@@ -158,6 +181,9 @@ export default function DetailStatusScreen({navigation, route}: any) {
               navigation={navigation}
               item={comment}
               IdAuthorOfStatus={item.author}
+              handleDeleteComment={() => {
+                handleDeleteComment(comment._id);
+              }}
               key={index}
             />
           ))}

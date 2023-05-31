@@ -10,14 +10,14 @@ import Colors from '../../constants/Colors';
 import Icon, {Icons} from './Icons';
 
 export default function MenuStatus(props: any) {
-  const {toggleShowOption} = props;
+  const {handleEdit, handleDelete} = props;
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={toggleShowOption} style={styles.contentButton}>
+      <TouchableOpacity onPress={handleEdit} style={styles.contentButton}>
         <Icon type={Icons.Feather} name="edit" size={20} color={Colors.gray} />
         <Text style={{marginLeft: 10}}>Edit</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={toggleShowOption} style={styles.contentButton}>
+      <TouchableOpacity onPress={handleDelete} style={styles.contentButton}>
         <Icon type={Icons.Feather} name="trash" size={20} color={Colors.gray} />
         <Text style={{marginLeft: 10}}>Delete</Text>
       </TouchableOpacity>

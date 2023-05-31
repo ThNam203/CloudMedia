@@ -12,9 +12,12 @@ import React, {useCallback, useState} from 'react';
 import Icon, {Icons} from '../../components/ui/Icons';
 import Colors from '../../constants/Colors';
 import {getTimeToNow} from '../../utils/Utils';
-import {useDispatch} from 'react-redux';
-import {toogleLike} from '../../reducers/StatusPostReducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {deleteAStatusPost, toogleLike} from '../../reducers/StatusPostReducer';
 import MenuStatus from './MenuStatus';
+import {RootState} from '../../reducers/Store';
+import {Toast} from './Toast';
+import {deleteAStatusPostApi} from '../../api/statusPostApi';
 
 export default function ShowPosts({item, navigation, pressComment}: any) {
   const deviceWidth = Dimensions.get('window').width;
@@ -22,6 +25,8 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
 
   const [showMore, setShowMore] = useState(false);
   const [showOption, setShowOption] = useState(false);
+  const uid = useSelector((state: RootState) => state.uid.id);
+  const jwt = useSelector((state: RootState) => state.token.key);
 
   const [lengthMore, setLengthMore] = useState(false);
   const onTextLayout = useCallback((e: any) => {
@@ -39,7 +44,29 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   };
 
   const toggleShowOption = () => {
-    setShowOption((prev: any) => !prev);
+    if (item.author === uid) {
+      setShowOption((prev: any) => !prev);
+    }
+  };
+
+  const handleEdit = () => {
+    navigation.navigate('editPost', {item});
+    toggleShowOption();
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response: any = await deleteAStatusPostApi(uid, jwt, item._id);
+      if (response.status === 204) {
+        dispatch(deleteAStatusPost(item._id));
+        Toast('Delete Success');
+      } else {
+        Toast('Delete Fail');
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error);
+    }
   };
 
   return (
@@ -51,7 +78,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
       }}>
       {showOption ? (
         <View style={{position: 'absolute', top: 30, right: 30, zIndex: 1}}>
-          <MenuStatus toggleShowOption={toggleShowOption} />
+          <MenuStatus handleEdit={handleEdit} handleDelete={handleDelete} />
         </View>
       ) : null}
 

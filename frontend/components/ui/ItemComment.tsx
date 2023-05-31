@@ -10,18 +10,32 @@ import React, {useCallback, useEffect, useState} from 'react';
 import Colors from '../../constants/Colors';
 import Icon, {Icons} from './Icons';
 import {getTimeToNow} from '../../utils/Utils';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../reducers/Store';
 
-export default function ItemComment({navigation, item, IdAuthorOfStatus}: any) {
+export default function ItemComment(props: any) {
+  const {navigation, item, IdAuthorOfStatus, handleDeleteComment} = props;
   const [showMore, setShowMore] = useState(false);
   const {author, content, mediaFile, createdAt} = item;
   const [isLike, setIsLike] = useState(false);
   const [likeCount, setLikeCount] = useState(item.likeCount);
   const [lengthMore, setLengthMore] = useState(false);
+
   const onTextLayout = useCallback((e: any) => {
     setLengthMore(e.nativeEvent.lines.length >= 3); //to check the text is more than 3 lines or not
   }, []);
 
   const timeAgo = getTimeToNow(createdAt);
+
+  const [showOption, setShowOption] = useState(false);
+
+  const uid = useSelector((state: RootState) => state.uid.id);
+
+  const toggleShowOption = () => {
+    if (uid === author._id || uid === IdAuthorOfStatus) {
+      setShowOption((prev: any) => !prev);
+    }
+  };
 
   const toogleLike = () => {
     if (isLike) {
@@ -32,8 +46,21 @@ export default function ItemComment({navigation, item, IdAuthorOfStatus}: any) {
     setIsLike((prev: any) => !prev);
   };
 
+  useEffect(() => {
+    setShowOption(false);
+  }, [item]);
+
   return (
     <View style={styles.container}>
+      {showOption ? (
+        <View style={{position: 'absolute', top: 30, right: 30, zIndex: 1}}>
+          <View style={styles.option}>
+            <TouchableOpacity onPress={handleDeleteComment}>
+              <Text style={{fontSize: 12}}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : null}
       <View style={{marginTop: 7}}>
         <Image
           source={
@@ -60,7 +87,7 @@ export default function ItemComment({navigation, item, IdAuthorOfStatus}: any) {
                 alignItems: 'center',
                 marginRight: -5,
               }}>
-              <TouchableOpacity style={{padding: 3}}>
+              <TouchableOpacity onPress={toggleShowOption} style={{padding: 3}}>
                 <Icon
                   type={Icons.Entypo}
                   name="dots-three-vertical"
@@ -187,5 +214,15 @@ const styles = StyleSheet.create({
     marginTop: 5,
     paddingLeft: 10,
     alignItems: 'center',
+  },
+  option: {
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    backgroundColor: Colors.white,
+    padding: 10,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    elevation: 5,
   },
 });
