@@ -80,6 +80,7 @@ export default function SearchScreen({navigation}: any) {
         } else {
           const response: any = await SearchUsersByName(text, uid, token);
           if (response.status === 200) {
+            console.log(response.data);
             setListData(response.data);
           } else {
             console.log(response.status);

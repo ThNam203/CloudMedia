@@ -28,6 +28,18 @@ const StatusPostSlice = createSlice({
       state.arr.push(action.payload);
       console.log(state.arr);
     },
+    updateAStatusPost: (state: StatusPosts, action: PayloadAction<any>) => {
+      const status: any = state.arr.find(
+        (item: any) => item._id === action.payload._id,
+      );
+      status.description = action.payload.description;
+    },
+    deleteAStatusPost: (state: StatusPosts, action: PayloadAction<any>) => {
+      const index = state.arr.findIndex(
+        (item: any) => item._id === action.payload,
+      );
+      state.arr.splice(index, 1);
+    },
     clearStatusPosts: (state: StatusPosts) => {
       state.arr = [];
     },
@@ -45,9 +57,23 @@ const StatusPostSlice = createSlice({
         }
       });
     },
+    decrementComment: (state: StatusPosts, action: PayloadAction<any>) => {
+      state.arr.filter((item: any) => {
+        if (item._id === action.payload) {
+          item.commentCount--;
+        }
+      });
+    },
   },
 });
 
-export const {pushStatusPosts, clearStatusPosts, toogleLike, imcrementComment} =
-  StatusPostSlice.actions;
+export const {
+  pushStatusPosts,
+  updateAStatusPost,
+  deleteAStatusPost,
+  clearStatusPosts,
+  toogleLike,
+  imcrementComment,
+  decrementComment,
+} = StatusPostSlice.actions;
 export default StatusPostSlice.reducer;

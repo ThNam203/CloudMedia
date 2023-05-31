@@ -55,8 +55,8 @@ export const createNewPost = async (data: any, userId: any, token: any) => {
   }
 };
 
-export const updateStatusPost = async (
-  dataForm: any,
+export const updateStatusPostApi = async (
+  data: any,
   userId: any,
   token: any,
   statusPost: any,
@@ -66,9 +66,8 @@ export const updateStatusPost = async (
       method: 'PUT',
       headers: {
         Authorization: 'Bearer ' + token,
-        'Content-Type': 'multipart/form-data',
       },
-      data: dataForm,
+      data: data,
     });
     return result;
   } catch (error) {
@@ -76,7 +75,7 @@ export const updateStatusPost = async (
   }
 };
 
-export const deleteAStatusPost = async (
+export const deleteAStatusPostApi = async (
   userId: any,
   token: any,
   statusPost: any,
