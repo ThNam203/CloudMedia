@@ -8,7 +8,7 @@ import {getInfoUser} from '../../api/userApi';
 import {replyRequestFr} from '../../api/friend_api';
 import {Toast} from './Toast';
 
-const InvitationsList = () => {
+const InvitationsList = (props: any) => {
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
 

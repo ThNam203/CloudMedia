@@ -51,7 +51,7 @@ export default function EditPostScreen({navigation, route}: any) {
   const updateStatus = async () => {
     try {
       const response: any = await updateStatusPostApi(
-        description,
+        {description: description},
         uid,
         jwt,
         item._id,

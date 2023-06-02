@@ -38,8 +38,11 @@ const NotificationSlice = createSlice({
         }
       });
     },
+    setNumberNoti: (state: Notifications) => {
+      state.numberNoti = 0;
+    },
   },
 });
 
-export const {setNotifications} = NotificationSlice.actions;
+export const {setNotifications, setNumberNoti} = NotificationSlice.actions;
 export default NotificationSlice.reducer;

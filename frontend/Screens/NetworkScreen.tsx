@@ -4,13 +4,20 @@ import React, {useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import FriendList from '../components/ui/FriendList';
 import InvitationsScreen from './InvitationsScreen';
+import MyNetworksScreen from './MyNetworksScreen';
 
 function NetworkScreen({navigation}: any) {
   const [invitationsScreen, setInvitationsScreen] = useState(false);
+  const [myNetworksScreen, setMyNetworksScreen] = useState(false);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
+      <MyNetworksScreen
+        navigation={navigation}
+        isVisible={myNetworksScreen}
+        setVisible={setMyNetworksScreen}
+      />
+      <TouchableOpacity onPress={() => setMyNetworksScreen(!myNetworksScreen)}>
         <View style={styles.manageNetworkView}>
           <Text style={styles.title}>Manage my network</Text>
           <Icon type={Icons.AntDesign} name={'right'} />
@@ -18,6 +25,7 @@ function NetworkScreen({navigation}: any) {
       </TouchableOpacity>
       <View style={{backgroundColor: '#eeeeee', height: 10}} />
       <InvitationsScreen
+        navigation={navigation}
         isVisible={invitationsScreen}
         setVisible={setInvitationsScreen}
       />
