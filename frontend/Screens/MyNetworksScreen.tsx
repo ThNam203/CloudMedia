@@ -8,7 +8,6 @@ import {
 import React, {useEffect, useState} from 'react';
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
-import {FlatList} from 'react-native-gesture-handler';
 import ShowNetwork from '../components/ui/ShowNetwork';
 import {RootState} from '../reducers/Store';
 import {useSelector} from 'react-redux';

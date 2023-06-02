@@ -18,6 +18,7 @@ import DetailStatusScreen from '../Screens/DetailStatusScreen';
 import VideoCallScreen from '../Screens/chatScreens/NOTWORKING_VideoCall';
 import TestCallScreen from '../Screens/chatScreens/TestCallScreen';
 import EditPostScreen from '../Screens/EditPostScreen';
+import ProfileOfUserScreen from '../Screens/ProfileOfUserScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,7 @@ export default function Routers() {
         />
 
         <Stack.Screen name="profile" component={ProfileScreen} />
+        <Stack.Screen name="profileOther" component={ProfileOfUserScreen} />
         <Stack.Screen
           name="search"
           component={SearchScreen}

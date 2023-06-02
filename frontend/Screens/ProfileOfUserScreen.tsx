@@ -1,104 +1,47 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
 import {
+  View,
+  Text,
+  StyleSheet,
   Dimensions,
+  ScrollView,
   Image,
   Pressable,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
 } from 'react-native';
-import ActivitySection from '../components/ui/ActivitySection';
-import UploadPhoto from '../components/ui/UploadPhoto';
-
-import EditProfileScreen from './EditProfileScreen';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../reducers/Store';
-import {postAvatarImg, userLogout} from '../api/userApi';
-import {nameStorage, storeData} from '../reducers/AsyncStorage';
-import {setStatus} from '../reducers/LoadingReducer';
-import {updateAvatar} from '../reducers/UserReducer';
+import React, {useEffect, useState} from 'react';
 import Colors from '../constants/Colors';
+import {useDispatch} from 'react-redux';
+import ActivitySection from '../components/ui/ActivitySection';
+import {getInfoUser} from '../api/userApi';
 import {Toast} from '../components/ui/Toast';
 
 const screenWidth = Dimensions.get('window').width;
 
-function ProfileScreen({navigation}: any) {
-  const [isModalVisible, setModalVisible] = useState(false);
+export default function ProfileOfUserScreen(props: any) {
+  const {navigation, route} = props;
+  const {id} = route.params;
 
-  const [editProfile, setEditProfile] = useState(false);
+  const [user, setUser] = useState<any>({});
 
-  const user = useSelector((state: RootState) => state.userInfo);
-  const token = useSelector((state: RootState) => state.token.key);
-  const uid = useSelector((state: RootState) => state.uid.id);
-
-  const dispatch = useDispatch();
-
-  const handleLogout = async () => {
-    userLogout(token)
-      .then((response: any) => {
-        if (response.status === 204) {
-          console.log(response);
-          storeData(false, nameStorage.isLogin)
-            .then(() => {
-              navigation.reset({
-                index: 0,
-                routes: [{name: 'login'}],
-              });
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        } else {
-          throw new Error('Logout failed.');
-        }
-      })
-      .catch(error => {
-        Toast(error.message);
-      });
-  };
-
-  const postImage = (image: any) => {
-    const dataForm = new FormData();
-    dataForm.append('profile-image', {
-      uri: image.path,
-      type: image.mime,
-      name: image.filename || 'profile-image',
-    });
-    dispatch(setStatus(true));
-    postAvatarImg(dataForm, uid, token)
-      .then((response: any) => {
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        const response: any = await getInfoUser(id);
         if (response.status === 200) {
-          console.log(response.data);
-          return response.data;
+          setUser(response.data);
         } else {
           console.log(response.status);
           throw new Error(response.data.errorMessage);
         }
-      })
-      .then((data: any) => {
-        dispatch(updateAvatar(data.imagePath));
-      })
-      .catch(error => Toast(error.message))
-      .finally(() => {
-        dispatch(setStatus(false));
-      });
-  };
-
+      } catch (error: any) {
+        Toast(error.message);
+      }
+    };
+    getUserInfo();
+  }, []);
+  // return null;
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <View style={styles.container}>
-        <UploadPhoto
-          isVisible={isModalVisible}
-          setVisible={setModalVisible}
-          postImage={postImage}
-        />
-        <EditProfileScreen
-          isVisible={editProfile}
-          setVisible={setEditProfile}
-        />
         <View style={styles.backgroundAvatarContainer}>
           <Image
             source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
@@ -120,28 +63,7 @@ function ProfileScreen({navigation}: any) {
               }
               style={styles.avatarImage}
             />
-            <View style={styles.buttonAddImageOuter}>
-              <TouchableOpacity
-                style={styles.buttonAddImage}
-                onPress={() => setModalVisible(!isModalVisible)}>
-                <Image
-                  source={require('../assets/images/Add.png')}
-                  style={{width: 25, height: 25, marginTop: 3}}
-                />
-              </TouchableOpacity>
-            </View>
           </View>
-          <TouchableOpacity
-            style={{
-              alignSelf: 'flex-start',
-              margin: 10,
-            }}
-            onPress={() => setEditProfile(!editProfile)}>
-            <Image
-              style={{height: 28, width: 28}}
-              source={require('../assets/images/la_pen.png')}
-            />
-          </TouchableOpacity>
         </View>
         <View>
           <Text style={styles.textName}>{user.name}</Text>
@@ -187,6 +109,9 @@ function ProfileScreen({navigation}: any) {
                 alignItems: 'center',
               }}>
               <Pressable
+                onPress={() => {
+                  navigation.goBack();
+                }}
                 android_ripple={{color: '#00043d'}}
                 style={{
                   backgroundColor: 'transparent',
@@ -260,37 +185,11 @@ function ProfileScreen({navigation}: any) {
             <ActivitySection />
           </View>
         </View>
-        <View
-          style={{
-            overflow: 'hidden',
-            borderRadius: 15,
-            width: 300,
-            alignSelf: 'center',
-            marginBottom: 10,
-          }}>
-          <Pressable
-            onPress={handleLogout}
-            style={styles.btnLogout}
-            android_ripple={{color: '#613FC2', borderless: false}}>
-            <Text
-              style={[
-                styles.fontText,
-                {
-                  fontWeight: '700',
-                  lineHeight: 20,
-                  alignSelf: 'center',
-                  color: '#ffffff',
-                },
-              ]}>
-              Log out
-            </Text>
-          </Pressable>
-        </View>
       </View>
     </ScrollView>
   );
 }
-export default ProfileScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

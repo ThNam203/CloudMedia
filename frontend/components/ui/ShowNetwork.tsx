@@ -7,6 +7,10 @@ import Icon, {Icons} from './Icons';
 export default function ShowNetwork(props: any) {
   const {item, navigation} = props;
 
+  const navigateToProfile = () => {
+    navigation.navigate('profileOther', {id: item._id});
+  };
+
   return (
     <View
       style={{
@@ -72,7 +76,7 @@ export default function ShowNetwork(props: any) {
         <View style={{height: 20}} />
       )}
       <TouchableOpacity
-        onPress={() => {}}
+        onPress={navigateToProfile}
         style={{
           position: 'absolute',
           bottom: 10,
