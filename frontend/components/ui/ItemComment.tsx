@@ -50,6 +50,10 @@ export default function ItemComment(props: any) {
     setShowOption(false);
   }, [item]);
 
+  const navigateToProfile = () => {
+    navigation.navigate('profileOther', {id: author._id});
+  };
+
   return (
     <View style={styles.container}>
       {showOption ? (
@@ -61,7 +65,7 @@ export default function ItemComment(props: any) {
           </View>
         </View>
       ) : null}
-      <View style={{marginTop: 7}}>
+      <TouchableOpacity onPress={navigateToProfile} style={{marginTop: 7}}>
         <Image
           source={
             author.profileImagePath
@@ -70,12 +74,14 @@ export default function ItemComment(props: any) {
           }
           style={{width: 50, height: 50, borderRadius: 25}}
         />
-      </View>
+      </TouchableOpacity>
       <View style={styles.mainContent}>
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={styles.textName}>{author.name || 'Lalalie'}</Text>
+              <Text onPress={navigateToProfile} style={styles.textName}>
+                {author.name || 'Lalalie'}
+              </Text>
               {author._id === IdAuthorOfStatus && (
                 <Text style={styles.author}>Author</Text>
               )}

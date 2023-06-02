@@ -69,6 +69,10 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
     }
   };
 
+  const navigateToProfile = () => {
+    navigation.navigate('profileOther', {id: item.author});
+  };
+
   return (
     <View
       style={{
@@ -83,18 +87,21 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
       ) : null}
 
       <View style={Styles.flexCenter}>
-        <Image
-          source={{uri: item.profileImagePath}}
-          style={{
-            height: 60,
-            width: 60,
-            borderRadius: 100,
-            marginHorizontal: 10,
-          }}
-        />
+        <TouchableOpacity onPress={navigateToProfile}>
+          <Image
+            source={{uri: item.profileImagePath}}
+            style={{
+              height: 60,
+              width: 60,
+              borderRadius: 100,
+              marginHorizontal: 10,
+            }}
+          />
+        </TouchableOpacity>
         <View>
           <View style={Styles.flexCenter}>
             <Text
+              onPress={navigateToProfile}
               style={{fontSize: 16, color: Colors.black, fontWeight: 'bold'}}>
               {item.name}
             </Text>

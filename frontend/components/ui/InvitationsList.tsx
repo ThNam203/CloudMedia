@@ -9,15 +9,16 @@ import {replyRequestFr} from '../../api/friend_api';
 import {Toast} from './Toast';
 
 const InvitationsList = (props: any) => {
+  const {navigation} = props;
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
 
   const [invitations, setInvitations] = useState<
-    {id: string; name: string; avatar: any; connection: any}[]
+    {idRq: string; _id: string; name: string; avatar: any; connection: any}[]
   >([]);
 
   const deleteInvitation = (id: any) => {
-    const newInvitations = invitations.filter(obj => obj.id !== id);
+    const newInvitations = invitations.filter(obj => obj.idRq !== id);
     setInvitations(newInvitations);
   };
 
@@ -89,7 +90,8 @@ const InvitationsList = (props: any) => {
           return getNameInfo(item.senderId)
             .then((infoUser: any) => {
               return {
-                id: item._id,
+                idRq: item._id,
+                _id: item.senderId,
                 name: infoUser.name,
                 profileImagePath: infoUser.profileImagePath,
                 datebetween: diffInHours + 'h',
@@ -115,13 +117,14 @@ const InvitationsList = (props: any) => {
       renderItem={({item}) => (
         <ItemRequestUser
           item={item}
+          navigation={navigation}
           nameRequest="Accept"
           nameRequest2="Decline"
           pressLeft={() => {
-            handleAccept(item.id);
+            handleAccept(item.idRq);
           }}
           pressRight={() => {
-            handleDecline(item.id);
+            handleDecline(item.idRq);
           }}
         />
       )}

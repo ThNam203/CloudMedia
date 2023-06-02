@@ -124,6 +124,7 @@ export default function SearchScreen({navigation}: any) {
         renderItem={({item}: any) => (
           <ItemRequestUser
             item={item}
+            navigation={navigation}
             nameRequest={
               item.isFriend == 'true'
                 ? 'Friend'

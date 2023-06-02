@@ -2,18 +2,30 @@
 import {View, Text, Image, Pressable} from 'react-native';
 import React from 'react';
 import Colors from '../../constants/Colors';
+import {TouchableOpacity} from 'react-native';
 
 export default function ItemRequestUser({
   item,
+  navigation,
   pressLeft,
   pressRight,
   nameRequest,
   nameRequest2,
 }: any) {
   const {_id, name, profileImagePath, isFriend} = item;
+
+  const navigateToProfile = () => {
+    navigation.navigate('profileOther', {id: _id});
+  };
+
   return (
-    <View
-      style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 10}}>
+    <TouchableOpacity
+      onPress={navigateToProfile}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+      }}>
       <Image
         source={
           profileImagePath
@@ -89,6 +101,6 @@ export default function ItemRequestUser({
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }

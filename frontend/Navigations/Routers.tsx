@@ -19,17 +19,26 @@ import VideoCallScreen from '../Screens/chatScreens/NOTWORKING_VideoCall';
 import TestCallScreen from '../Screens/chatScreens/TestCallScreen';
 import EditPostScreen from '../Screens/EditPostScreen';
 import ProfileOfUserScreen from '../Screens/ProfileOfUserScreen';
+import MyNetworksScreen from '../Screens/MyNetworksScreen';
+import InvitationsScreen from '../Screens/InvitationsScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function Routers() {
+  // Get the loading status from the Redux store
   const isLoading = useSelector((state: RootState) => state.loading.status);
+
   return (
     <>
+      {/* Navigation stack */}
       <Stack.Navigator screenOptions={{headerShown: false}}>
+        {/* Login screen */}
         <Stack.Screen name="login" component={FirstTimeUseScreen} />
 
+        {/* Main screen with bottom tabs */}
         <Stack.Screen name="main" component={BottomTabs} />
+
+        {/* Detail status screen */}
         <Stack.Screen
           name="detailStatus"
           component={DetailStatusScreen}
@@ -37,6 +46,8 @@ export default function Routers() {
             animation: 'slide_from_right',
           }}
         />
+
+        {/* Images post screen */}
         <Stack.Screen
           name="imagesPost"
           component={ImagesPostScreen}
@@ -46,6 +57,8 @@ export default function Routers() {
             animation: 'none',
           }}
         />
+
+        {/* Edit post screen */}
         <Stack.Screen
           name="editPost"
           component={EditPostScreen}
@@ -54,8 +67,31 @@ export default function Routers() {
           }}
         />
 
+        {/* My networks screen */}
+        <Stack.Screen
+          name="myNetworks"
+          component={MyNetworksScreen}
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        {/* Invitations screen */}
+        <Stack.Screen
+          name="invitations"
+          component={InvitationsScreen}
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        {/* Profile screen */}
         <Stack.Screen name="profile" component={ProfileScreen} />
+
+        {/* Profile of user screen */}
         <Stack.Screen name="profileOther" component={ProfileOfUserScreen} />
+
+        {/* Search screen */}
         <Stack.Screen
           name="search"
           component={SearchScreen}
@@ -63,6 +99,8 @@ export default function Routers() {
             animation: 'none',
           }}
         />
+
+        {/* Chat screen */}
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="chatRoom" component={ChatRoom} />
 
@@ -70,7 +108,11 @@ export default function Routers() {
 
         <Stack.Screen name="videoCall" component={VideoCallScreen} />
       </Stack.Navigator>
+
+      {/* Show the app loader if isLoading is true */}
       {isLoading ? <AppLoader /> : null}
+
+      {/* Post screen */}
       <PostScreen />
     </>
   );

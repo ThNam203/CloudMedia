@@ -14,17 +14,15 @@ import {useSelector} from 'react-redux';
 import {Toast} from '../components/ui/Toast';
 import {getInfoUser} from '../api/userApi';
 
-export default function MyNetworksScreen(props: any) {
-  const {navigation, isVisible, setVisible} = props;
-
+export default function MyNetworksScreen({navigation}: any) {
   const connectionsId = useSelector(
     (state: RootState) => state.userInfo.connections,
   );
 
   const [connections, setConnection] = useState<any[]>([]);
 
-  const toggleModal = () => {
-    setVisible(!isVisible);
+  const navigateBack = () => {
+    navigation.goBack();
   };
 
   useEffect(() => {
@@ -47,11 +45,7 @@ export default function MyNetworksScreen(props: any) {
   }, []);
 
   return (
-    <Modal
-      onBackdropPress={() => setVisible(false)}
-      onBackButtonPress={() => setVisible(false)}
-      isVisible={isVisible}
-      style={{margin: 0}}>
+    <View style={{flex: 1}}>
       <View style={{flex: 1}}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -69,13 +63,13 @@ export default function MyNetworksScreen(props: any) {
       </View>
       <View style={styles.topView}>
         <View style={{margin: 20, flexDirection: 'row'}}>
-          <TouchableOpacity onPress={toggleModal} style={{marginTop: -3}}>
+          <TouchableOpacity onPress={navigateBack} style={{marginTop: -3}}>
             <Icon type={Icons.Ionicons} name="arrow-back" size={35} />
           </TouchableOpacity>
           <Text style={styles.title}>My Network</Text>
         </View>
       </View>
-    </Modal>
+    </View>
   );
 }
 
