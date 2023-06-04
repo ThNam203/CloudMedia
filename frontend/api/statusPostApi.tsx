@@ -92,3 +92,21 @@ export const deleteAStatusPostApi = async (
     return error;
   }
 };
+
+export const toggleLikeStatusApi = async (
+  userId: any,
+  token: any,
+  statusPost: any,
+) => {
+  try {
+    const result = await ApiManager(`/${userId}/post/${statusPost}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};

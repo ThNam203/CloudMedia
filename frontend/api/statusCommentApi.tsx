@@ -75,3 +75,21 @@ export const deleteComment = async (
     return error;
   }
 };
+
+export const toggleLikeCommentApi = async (
+  statusPostId: any,
+  commentId: any,
+  token: any,
+) => {
+  try {
+    const result = await ApiManager(`/s/${statusPostId}/${commentId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};

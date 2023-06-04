@@ -6,7 +6,10 @@ import jwt_decode from 'jwt-decode';
 import {getInfoUser} from '../api/userApi';
 import {UserInfo, saveUser} from '../reducers/UserReducer';
 import {getAllNotifications} from '../api/notificationApi';
-import {setNotifications} from '../reducers/NotificationReducer';
+import {
+  clearNotifications,
+  setNotifications,
+} from '../reducers/NotificationReducer';
 import {setToken} from '../reducers/TokenReducer';
 import {setIdFromJwt} from '../reducers/UidReducer';
 import {useDispatch} from 'react-redux';
@@ -48,6 +51,7 @@ export default function LoadingScreen({navigation, route}: any) {
         }
       } else {
         console.log(response.status);
+        console.log(response.data.errorMessage);
         throw new Error(response.data.errorMessage);
       }
     } catch (error: any) {
@@ -77,7 +81,7 @@ export default function LoadingScreen({navigation, route}: any) {
     try {
       const json = jwt_decode(jwt) as {id: string};
       const idUser = json.id;
-
+      dispatch(clearNotifications());
       const response: any = await getAllNotifications(idUser, jwt);
       if (response.status === 200) {
         const data = response.data;

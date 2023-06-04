@@ -6,6 +6,7 @@ interface StatusPost {
   name: any;
   profileImagePath: any;
   description: any;
+  isLiked: any;
   likeCount: any;
   commentCount: any;
   mediaFiles: [any];
@@ -43,9 +44,14 @@ const StatusPostSlice = createSlice({
       state.arr = [];
     },
     toogleLike: (state: StatusPosts, action: PayloadAction<any>) => {
-      state.arr.filter((item: any) => {
-        if (item._id === action.payload._id) {
-          item.likeCount++;
+      state.arr.find((item: any) => {
+        if (item._id === action.payload) {
+          item.isLiked = !item.isLiked;
+          if (item.isLiked) {
+            item.likeCount++;
+          } else {
+            item.likeCount--;
+          }
         }
       });
     },

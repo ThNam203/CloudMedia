@@ -178,6 +178,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
         <View style={{flex: 1, marginVertical: 5, paddingVertical: 10}}>
           {comments.map((comment, index) => (
             <ItemComment
+              statusId={item._id}
               navigation={navigation}
               item={comment}
               IdAuthorOfStatus={item.author}

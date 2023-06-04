@@ -17,7 +17,10 @@ import {deleteAStatusPost, toogleLike} from '../../reducers/StatusPostReducer';
 import MenuStatus from './MenuStatus';
 import {RootState} from '../../reducers/Store';
 import {Toast} from './Toast';
-import {deleteAStatusPostApi} from '../../api/statusPostApi';
+import {
+  deleteAStatusPostApi,
+  toggleLikeStatusApi,
+} from '../../api/statusPostApi';
 
 export default function ShowPosts({item, navigation, pressComment}: any) {
   const deviceWidth = Dimensions.get('window').width;
@@ -34,13 +37,20 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   }, []);
 
   const timeAgo = getTimeToNow(item.updatedAt);
-
-  const [isLike, setIsLike] = useState(false); // check user like this post or not
+  // check user like this post or not
   // like or unlike
-  const handleLike = () => {
-    console.log('like');
-    dispatch(toogleLike(item));
-    setIsLike((prev: any) => !prev);
+  const handleLike = async () => {
+    try {
+      const response: any = await toggleLikeStatusApi(uid, jwt, item._id);
+      if (response.status === 204) {
+        dispatch(toogleLike(item._id));
+      } else {
+        // throw new Error(response.data.errorMessage);
+        console.log(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
   };
 
   const toggleShowOption = () => {
@@ -256,11 +266,11 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
             type={Icons.Entypo}
             name="thumbs-up"
             size={19}
-            color={isLike ? Colors.skyBlue : Colors.gray}
+            color={item.isLiked ? Colors.skyBlue : Colors.gray}
           />
           <Text
             style={{
-              color: isLike ? Colors.skyBlue : Colors.gray,
+              color: item.isLiked ? Colors.skyBlue : Colors.gray,
               marginHorizontal: 5,
             }}>
             Like

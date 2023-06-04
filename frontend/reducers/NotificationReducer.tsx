@@ -41,8 +41,12 @@ const NotificationSlice = createSlice({
     setNumberNoti: (state: Notifications) => {
       state.numberNoti = 0;
     },
+    clearNotifications: (state: Notifications) => {
+      state.arr = [];
+    },
   },
 });
 
-export const {setNotifications, setNumberNoti} = NotificationSlice.actions;
+export const {setNotifications, setNumberNoti, clearNotifications} =
+  NotificationSlice.actions;
 export default NotificationSlice.reducer;
