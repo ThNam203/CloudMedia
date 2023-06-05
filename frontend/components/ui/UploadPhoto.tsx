@@ -4,6 +4,7 @@ import {Pressable, StyleSheet, Text, View} from 'react-native';
 import Modal from 'react-native-modal';
 import ImagePicker from 'react-native-image-crop-picker';
 import Colors from '../../constants/Colors';
+import {Toast} from './Toast';
 
 function UploadPhoto(props: any) {
   const toggleModal = () => {
@@ -23,7 +24,7 @@ function UploadPhoto(props: any) {
         // console.log(image);
         // props.setPhoto(image.path);
       })
-      .catch(err => console.log(err));
+      .catch(error => Toast(error.message));
   };
   const choosePhotoFromLibrary = () => {
     toggleModal();
@@ -38,7 +39,7 @@ function UploadPhoto(props: any) {
         // console.log(image);
         // props.setPhoto(image.path);
       })
-      .catch(err => console.log(err));
+      .catch(error => Toast(error.message));
   };
 
   return (
@@ -48,11 +49,9 @@ function UploadPhoto(props: any) {
       isVisible={props.isVisible}
       swipeDirection="down"
       onSwipeComplete={toggleModal}
-      animationIn="bounceInUp"
-      animationOut="bounceOutDown"
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
       backdropOpacity={0.4}
-      animationInTiming={900}
-      animationOutTiming={500}
       backdropTransitionInTiming={1000}
       backdropTransitionOutTiming={500}
       style={styles.modal}>

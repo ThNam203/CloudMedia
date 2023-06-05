@@ -1,9 +1,11 @@
 import {configureStore} from '@reduxjs/toolkit';
-import tokenReducer from './Token_reducer';
-import UidReducer from './Uid_reducer';
-import LoadingReducer from './Loading_reducer';
-import UserReducer from './User_reducer';
-import PostReducer from './Post_reducer';
+import tokenReducer from './TokenReducer';
+import UidReducer from './UidReducer';
+import LoadingReducer from './LoadingReducer';
+import UserReducer from './UserReducer';
+import UtilsReducer from './UtilsReducer';
+import NotificationReducer from './NotificationReducer';
+import StatusReducer from './StatusPostReducer';
 
 export const Store = configureStore({
   reducer: {
@@ -11,7 +13,9 @@ export const Store = configureStore({
     uid: UidReducer,
     loading: LoadingReducer,
     userInfo: UserReducer,
-    post: PostReducer,
+    Utils: UtilsReducer,
+    notifications: NotificationReducer,
+    statusPost: StatusReducer,
   },
 });
 

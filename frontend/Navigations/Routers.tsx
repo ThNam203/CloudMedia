@@ -10,8 +10,14 @@ import PostScreen from '../Screens/PostScreen';
 import SearchScreen from '../Screens/SearchScreen';
 import ChatScreen from '../Screens/chatScreens/ChatScreen';
 import ChatRoom from '../Screens/chatScreens/ChatRoom';
+
+import LoadingScreen from '../Screens/LoadingScreen';
+import ImagesPostScreen from '../Screens/ImagesPostScreen';
+import DetailStatusScreen from '../Screens/DetailStatusScreen';
+
 import VideoCallScreen from '../Screens/chatScreens/NOTWORKING_VideoCall';
 import TestCallScreen from '../Screens/chatScreens/TestCallScreen';
+import EditPostScreen from '../Screens/EditPostScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,12 +27,46 @@ export default function Routers() {
     <>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="login" component={FirstTimeUseScreen} />
+
         <Stack.Screen name="main" component={BottomTabs} />
+        <Stack.Screen
+          name="detailStatus"
+          component={DetailStatusScreen}
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+        <Stack.Screen
+          name="imagesPost"
+          component={ImagesPostScreen}
+          options={{
+            // presentation: 'modal',
+            animationTypeForReplace: 'push',
+            animation: 'none',
+          }}
+        />
+        <Stack.Screen
+          name="editPost"
+          component={EditPostScreen}
+          options={{
+            animation: 'none',
+          }}
+        />
+
         <Stack.Screen name="profile" component={ProfileScreen} />
-        <Stack.Screen name="search" component={SearchScreen} />
+        <Stack.Screen
+          name="search"
+          component={SearchScreen}
+          options={{
+            animation: 'none',
+          }}
+        />
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="chatRoom" component={ChatRoom} />
-        <Stack.Screen name="videoCall" component={VideoCallScreen}/>
+
+        <Stack.Screen name="loading" component={LoadingScreen} />
+
+        <Stack.Screen name="videoCall" component={VideoCallScreen} />
       </Stack.Navigator>
       {isLoading ? <AppLoader /> : null}
       <PostScreen />

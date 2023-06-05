@@ -1,6 +1,6 @@
 import ApiManager from './ApiManager';
 
-export const user_login = async (data: any) => {
+export const userLogin = async (data: any) => {
   try {
     const result = await ApiManager('/login', {
       method: 'POST',
@@ -15,7 +15,7 @@ export const user_login = async (data: any) => {
   }
 };
 
-export const user_signup = async (data: any) => {
+export const userSignup = async (data: any) => {
   try {
     const result = await ApiManager('/signup', {
       method: 'POST',
@@ -30,7 +30,7 @@ export const user_signup = async (data: any) => {
   }
 };
 
-export const user_logout = async (token: any) => {
+export const userLogout = async (token: any) => {
   try {
     const result = await ApiManager('/logout', {
       method: 'POST',
@@ -44,7 +44,7 @@ export const user_logout = async (token: any) => {
   }
 };
 
-export const user_info = async (data: any) => {
+export const getInfoUser = async (data: any) => {
   try {
     const result = await ApiManager(`/${data}`, {
       method: 'GET',
@@ -55,11 +55,7 @@ export const user_info = async (data: any) => {
   }
 };
 
-export const user_avatarImg = async (
-  dataForm: any,
-  userId: any,
-  token: any,
-) => {
+export const postAvatarImg = async (dataForm: any, userId: any, token: any) => {
   try {
     const result = await ApiManager(`/${userId}/profile-image`, {
       method: 'POST',
@@ -83,20 +79,6 @@ export const user_update = async (data: any, userId: any, token: any) => {
         Authorization: 'Bearer ' + token,
       },
       data: data,
-    });
-    return result;
-  } catch (error) {
-    return error;
-  }
-};
-
-export const user_info_email = async (email: any, token: any) => {
-  try {
-    const result = await ApiManager(`/u/${email}`, {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer ' + token,
-      },
     });
     return result;
   } catch (error) {

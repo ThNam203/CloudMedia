@@ -5,33 +5,45 @@ import Colors from '../../constants/Colors';
 
 export default function ItemRequestUser({
   item,
-  nameRequest,
-  nameRequest2,
   pressLeft,
   pressRight,
+  nameRequest,
+  nameRequest2,
 }: any) {
+  const {_id, name, profileImagePath, isFriend} = item;
   return (
     <View
       style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 10}}>
       <Image
-        source={item.avatar}
+        source={
+          profileImagePath
+            ? {uri: profileImagePath}
+            : require('../../assets/images/Spiderman.jpg')
+        }
         style={{width: 80, height: 80, borderRadius: 40, marginRight: 10}}
       />
       <View>
         <Text style={{fontSize: 18, fontWeight: 'bold', color: 'black'}}>
-          {item.name}
+          {name}
         </Text>
-        <Text style={{color: 'gray'}}>{`${item.datebetween}h`}</Text>
+        {item.datebetween && (
+          <Text style={{color: 'gray'}}>{`${item.datebetween}`}</Text>
+        )}
         <View style={{flexDirection: 'row'}}>
           <View
             style={{
               borderRadius: 10,
-              backgroundColor: nameRequest === 'Sent' ? Colors.gray : '#000ed2',
+              backgroundColor:
+                isFriend == 'false' || nameRequest == 'Accept'
+                  ? '#000ed2'
+                  : Colors.gray,
               overflow: 'hidden',
               width: 130,
             }}>
             <Pressable
-              disabled={nameRequest === 'Sent' ? true : false}
+              disabled={
+                isFriend == 'false' || nameRequest == 'Accept' ? false : true
+              }
               onPress={pressLeft}
               android_ripple={{color: '#0073ff'}}
               style={{

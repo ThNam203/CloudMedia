@@ -12,9 +12,10 @@ import {
 import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
-import {user_signup} from '../api/user_api';
+import {userSignup} from '../api/userApi';
 import {useDispatch} from 'react-redux';
-import {setStatus} from '../reducers/Loading_reducer';
+import {setStatus} from '../reducers/LoadingReducer';
+import {Toast} from '../components/ui/Toast';
 function SignUpHrScreen(props: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -62,7 +63,7 @@ function SignUpHrScreen(props: any) {
       return;
     }
     dispatch(setStatus(true));
-    user_signup({
+    userSignup({
       name,
       email,
       password,
@@ -74,8 +75,8 @@ function SignUpHrScreen(props: any) {
         if (response.status === 204) {
           return response;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .then(data => {
@@ -83,7 +84,7 @@ function SignUpHrScreen(props: any) {
         console.warn('Signup success!');
         props.handleCloseModal(false);
       })
-      .catch(error => console.error(error))
+      .catch(error => Toast(error.message))
       .finally(() => {
         dispatch(setStatus(false));
       });
@@ -225,7 +226,7 @@ function SignUpHrScreen(props: any) {
           keyboardType="number-pad"
         />
       </View>
-      <View style={{marginTop: 15, width: 300, height: 25}}>
+      <View style={{marginTop: 15, height: 40}}>
         <View style={styles.bottomContainer}>
           <View>
             <CustomCheckBox
@@ -234,7 +235,10 @@ function SignUpHrScreen(props: any) {
             />
           </View>
           <Text
-            style={[styles.fontText, {fontWeight: '400', color: '#808080'}]}>
+            style={[
+              styles.fontText,
+              {fontWeight: '400', color: '#808080', marginTop: 8},
+            ]}>
             I agree to{' '}
             <Text
               onPress={() => {}}
@@ -251,7 +255,11 @@ function SignUpHrScreen(props: any) {
           </Text>
         </View>
       </View>
-      <View style={[styles.textInput, {overflow: 'hidden', borderRadius: 15}]}>
+      <View
+        style={[
+          styles.textInput,
+          {overflow: 'hidden', borderRadius: 15, marginTop: 0},
+        ]}>
         <Pressable
           style={styles.button}
           onPress={handleSignUp}

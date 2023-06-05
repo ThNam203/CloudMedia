@@ -51,7 +51,7 @@ const UserSlice = createSlice({
       state.chatRooms = action.payload.chatRooms || [];
       state.userRole = action.payload.userRole;
       state.profileImagePath = action.payload.profileImagePath || '';
-      /// spread operator ('...') is fail. fuck
+      /// spread operator ('...') is fail.
     },
     updateAvatar: (state: UserInfo, action: PayloadAction<string>) => {
       state.profileImagePath = action.payload;
