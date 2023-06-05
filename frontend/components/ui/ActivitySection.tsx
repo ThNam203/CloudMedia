@@ -9,34 +9,33 @@ import {Toast} from './Toast';
 import {getAllStatusPostOfUser} from '../../api/statusPostApi';
 import {RootState} from '../../reducers/Store';
 import {getTimeToNow} from '../../utils/Utils';
+import {useFocusEffect} from '@react-navigation/native';
 const screenWidth = Dimensions.get('screen').width;
 
-const Post = ({content, mediaFiles, time, user}: any) => {
+const Post = ({navigation, item}: any) => {
+  const navigateToDetail = () => {
+    navigation.replace('detailStatus', {item: item});
+  };
+
   return (
-    <View style={styles.post}>
-      <Text style={styles.time}>{time}</Text>
+    <Pressable style={styles.post} onPress={navigateToDetail}>
+      <Text style={styles.time}>{getTimeToNow(item.createdAt)}</Text>
       <Text style={styles.user}>
-        {user.name}{' '}
+        {item.author.name}{' '}
         <Text style={{fontWeight: 'normal', color: '#999'}}>posted this</Text>
       </Text>
-      {mediaFiles ? (
-        <View style={{flexDirection: 'row'}}>
-          {mediaFiles.map((image: any, index: number) => (
-            <Image
-              key={index}
-              style={[
-                styles.image,
-                {width: screenWidth / mediaFiles.length - 10},
-              ]}
-              source={{uri: image}}
-            />
-          ))}
+
+      <View style={{flexDirection: 'row'}}>
+        {item.mediaFiles[0] && (
+          <Image style={styles.image} source={{uri: item.mediaFiles[0]}} />
+        )}
+        <View style={{flex: 1}}>
+          <Text style={styles.content} numberOfLines={5}>
+            {item.description}
+          </Text>
         </View>
-      ) : null}
-      <Text style={styles.content} numberOfLines={2}>
-        {content}
-      </Text>
-    </View>
+      </View>
+    </Pressable>
   );
 };
 
@@ -47,18 +46,25 @@ const ActivitySection = (props: any) => {
 
   const jwt = useSelector((state: RootState) => state.token.key);
 
-  useEffect(() => {
-    const getPosts = async () => {
-      try {
-        const response: any = await getAllStatusPostOfUser(userId, jwt);
-        if (response.status === 200) setPosts(response.data.reverse());
-        else throw new Error(response.data.errorMessage);
-      } catch (error: any) {
-        Toast(error.message);
-      }
-    };
-    getPosts();
-  }, []);
+  const getPosts = async () => {
+    try {
+      const response: any = await getAllStatusPostOfUser(userId, jwt);
+      if (response.status === 200) setPosts(response.data.reverse());
+      else throw new Error(response.data.errorMessage);
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getPosts();
+
+      return () => {
+        // Cleanup or cancel any pending requests if needed
+      };
+    }, []),
+  );
 
   return (
     <View style={{margin: 25}}>
@@ -97,15 +103,8 @@ const ActivitySection = (props: any) => {
       </View>
       <FlatList
         data={posts.slice(0, 2)}
-        renderItem={({item}) => (
-          <Post
-            content={item.description}
-            mediaFiles={item.mediaFiles}
-            time={getTimeToNow(item.createdAt)}
-            user={item.author}
-          />
-        )}
-        keyExtractor={item => item.time}
+        renderItem={({item}) => <Post navigation={navigation} item={item} />}
+        keyExtractor={(item, index) => 'key' + index}
         showsVerticalScrollIndicator={false}
         scrollEnabled={false}
       />
@@ -139,6 +138,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
     marginBottom: 10,
+    padding: 5,
   },
   image: {
     width: 100,

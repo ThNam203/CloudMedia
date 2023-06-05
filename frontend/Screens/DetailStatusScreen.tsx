@@ -181,7 +181,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
               statusId={item._id}
               navigation={navigation}
               item={comment}
-              IdAuthorOfStatus={item.author}
+              IdAuthorOfStatus={item.author._id}
               handleDeleteComment={() => {
                 handleDeleteComment(comment._id);
               }}

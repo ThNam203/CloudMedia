@@ -41,9 +41,10 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   // like or unlike
   const handleLike = async () => {
     try {
+      dispatch(toogleLike(item._id));
       const response: any = await toggleLikeStatusApi(uid, jwt, item._id);
       if (response.status === 204) {
-        dispatch(toogleLike(item._id));
+        console.log('success');
       } else {
         // throw new Error(response.data.errorMessage);
         console.log(response.data.errorMessage);
