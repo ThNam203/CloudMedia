@@ -95,7 +95,7 @@ export default function ProfileOfUserScreen(props: any) {
                 marginTop: 10,
               },
             ]}>
-            0 connections
+            {`${user.connections} connections`}
           </Text>
           <View
             style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
@@ -182,7 +182,7 @@ export default function ProfileOfUserScreen(props: any) {
             style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
           />
           <View>
-            <ActivitySection />
+            <ActivitySection navigation={navigation} userId={id} />
           </View>
         </View>
       </View>

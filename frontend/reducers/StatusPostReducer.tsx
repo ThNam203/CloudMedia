@@ -2,9 +2,11 @@ import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 interface StatusPost {
   _id: any;
-  author: any;
-  name: any;
-  profileImagePath: any;
+  author: {
+    _id: any;
+    name: any;
+    profileImagePath: any;
+  };
   description: any;
   isLiked: any;
   likeCount: any;

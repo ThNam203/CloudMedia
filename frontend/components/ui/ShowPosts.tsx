@@ -54,7 +54,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   };
 
   const toggleShowOption = () => {
-    if (item.author === uid) {
+    if (item.author._id === uid) {
       setShowOption((prev: any) => !prev);
     }
   };
@@ -80,7 +80,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   };
 
   const navigateToProfile = () => {
-    navigation.navigate('profileOther', {id: item.author});
+    navigation.navigate('profileOther', {id: item.author._id});
   };
 
   return (
@@ -99,7 +99,11 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
       <View style={Styles.flexCenter}>
         <TouchableOpacity onPress={navigateToProfile}>
           <Image
-            source={{uri: item.profileImagePath}}
+            source={
+              item.author.profileImagePath
+                ? {uri: item.author.profileImagePath}
+                : require('../../assets/images/Spiderman.jpg')
+            }
             style={{
               height: 60,
               width: 60,
@@ -113,7 +117,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
             <Text
               onPress={navigateToProfile}
               style={{fontSize: 16, color: Colors.black, fontWeight: 'bold'}}>
-              {item.name}
+              {item.author.name}
             </Text>
             <Text style={{fontWeight: 'bold'}}>
               <Icon

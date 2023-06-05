@@ -12,14 +12,15 @@ import {
 } from '../reducers/NotificationReducer';
 import {setToken} from '../reducers/TokenReducer';
 import {setIdFromJwt} from '../reducers/UidReducer';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {getAllStatusPostOfUser} from '../api/statusPostApi';
 import {clearStatusPosts, pushStatusPosts} from '../reducers/StatusPostReducer';
 import {Toast} from '../components/ui/Toast';
+import {RootState} from '../reducers/Store';
 
 export default function LoadingScreen({navigation, route}: any) {
   const {jwt} = route.params;
-
+  const user = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
 
   const saveAllStatusPost = async (jwt: any) => {
@@ -33,21 +34,7 @@ export default function LoadingScreen({navigation, route}: any) {
         const data = response.data;
 
         for (const post of data) {
-          const userInfoResponse: any = await getInfoUser(post.author);
-          if (userInfoResponse.status === 200) {
-            const infoUser = userInfoResponse.data;
-
-            dispatch(
-              pushStatusPosts({
-                ...post,
-                name: infoUser.name,
-                profileImagePath: infoUser.profileImagePath,
-              }),
-            );
-          } else {
-            console.log(userInfoResponse.status);
-            throw new Error(userInfoResponse.data.errorMessage);
-          }
+          dispatch(pushStatusPosts(post));
         }
       } else {
         console.log(response.status);

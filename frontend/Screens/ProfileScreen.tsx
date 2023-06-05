@@ -173,7 +173,7 @@ function ProfileScreen({navigation}: any) {
                 marginTop: 10,
               },
             ]}>
-            0 connections
+            {`${user.connections.length} connections`}
           </Text>
           <View
             style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
@@ -257,7 +257,7 @@ function ProfileScreen({navigation}: any) {
             style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
           />
           <View>
-            <ActivitySection />
+            <ActivitySection navigation={navigation} userId={uid} />
           </View>
         </View>
         <View

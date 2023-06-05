@@ -1,57 +1,64 @@
 /* eslint-disable react-native/no-inline-styles */
 import {TouchableOpacity} from '@gorhom/bottom-sheet';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dimensions} from 'react-native';
 import {FlatList, StyleSheet, Text, Image, View, Pressable} from 'react-native';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setPostShow} from '../../reducers/UtilsReducer';
+import {Toast} from './Toast';
+import {getAllStatusPostOfUser} from '../../api/statusPostApi';
+import {RootState} from '../../reducers/Store';
+import {getTimeToNow} from '../../utils/Utils';
 const screenWidth = Dimensions.get('screen').width;
 
-const Post = ({type, content, image, time, user}: any) => {
-  const renderImage = () => {
-    if (image) {
-      return <Image style={styles.image} source={{uri: image}} />;
-    }
-    return null;
-  };
-
+const Post = ({content, mediaFiles, time, user}: any) => {
   return (
     <View style={styles.post}>
       <Text style={styles.time}>{time}</Text>
       <Text style={styles.user}>
-        {user}{' '}
+        {user.name}{' '}
         <Text style={{fontWeight: 'normal', color: '#999'}}>posted this</Text>
       </Text>
-      {renderImage()}
-      <Text style={styles.content}>{content}</Text>
+      {mediaFiles ? (
+        <View style={{flexDirection: 'row'}}>
+          {mediaFiles.map((image: any, index: number) => (
+            <Image
+              key={index}
+              style={[
+                styles.image,
+                {width: screenWidth / mediaFiles.length - 10},
+              ]}
+              source={{uri: image}}
+            />
+          ))}
+        </View>
+      ) : null}
+      <Text style={styles.content} numberOfLines={2}>
+        {content}
+      </Text>
     </View>
   );
 };
 
-const ActivitySection = () => {
+const ActivitySection = (props: any) => {
   const dispatch = useDispatch();
+  const {navigation, userId} = props;
+  const [posts, setPosts] = useState<any[]>([]);
 
-  const [posts, setPosts] = useState([
-    {
-      type: 'text',
-      content: 'This is a text post.',
-      time: '12:00 PM',
-      user: 'John Doe',
-    },
-    {
-      type: 'image',
-      content: 'Hello',
-      image: 'https://upload.wikimedia.org/wikipedia/vi/2/2c/Nobita.png',
-      time: '1:00 PM',
-      user: 'Jane Doe',
-    },
-    {
-      type: 'text',
-      content: 'This is another text post.',
-      time: '2:00 PM',
-      user: 'John Smith',
-    },
-  ]);
+  const jwt = useSelector((state: RootState) => state.token.key);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      try {
+        const response: any = await getAllStatusPostOfUser(userId, jwt);
+        if (response.status === 200) setPosts(response.data.reverse());
+        else throw new Error(response.data.errorMessage);
+      } catch (error: any) {
+        Toast(error.message);
+      }
+    };
+    getPosts();
+  }, []);
 
   return (
     <View style={{margin: 25}}>
@@ -92,11 +99,10 @@ const ActivitySection = () => {
         data={posts.slice(0, 2)}
         renderItem={({item}) => (
           <Post
-            type={item.type}
-            content={item.content}
-            image={item.image}
-            time={item.time}
-            user={item.user}
+            content={item.description}
+            mediaFiles={item.mediaFiles}
+            time={getTimeToNow(item.createdAt)}
+            user={item.author}
           />
         )}
         keyExtractor={item => item.time}

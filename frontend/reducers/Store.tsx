@@ -17,6 +17,11 @@ export const Store = configureStore({
     notifications: NotificationReducer,
     statusPost: StatusReducer,
   },
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: false,
+    }),
 });
 
 export type RootState = ReturnType<typeof Store.getState>;

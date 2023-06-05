@@ -1,12 +1,8 @@
 import ApiManager from './ApiManager';
 
-export const getAStatusPostById = async (
-  userId: any,
-  token: any,
-  statusPost: any,
-) => {
+export const getAStatusPostById = async (token: any, statusPost: any) => {
   try {
-    const result = await ApiManager(`/${userId}/post/${statusPost}`, {
+    const result = await ApiManager(`/s/${statusPost}`, {
       method: 'GET',
       headers: {
         Authorization: 'Bearer ' + token,
