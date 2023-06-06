@@ -29,6 +29,7 @@ import {
   decrementComment,
   imcrementComment,
 } from '../reducers/StatusPostReducer';
+import {useFocusEffect} from '@react-navigation/native';
 
 interface ImageItem {
   uri: string;
@@ -43,7 +44,14 @@ export default function DetailStatusScreen({navigation, route}: any) {
   const uid = useSelector((state: RootState) => state.uid.id);
   const token = useSelector((state: RootState) => state.token.key);
 
-  const {item} = route.params;
+  const {idPost} = route.params;
+
+  const item: any = useSelector((state: RootState) => {
+    return (
+      state.statusPost.HomePage.find(item => item._id === idPost) ||
+      state.statusPost.sub.find(item => item._id === idPost)
+    );
+  });
 
   const [comment, setComment] = useState('');
 
@@ -134,6 +142,20 @@ export default function DetailStatusScreen({navigation, route}: any) {
       .catch(error => Toast(error.message));
   };
 
+  const getComments = async () => {
+    try {
+      const response: any = await getAllComments(item._id, token);
+      if (response.status === 200) {
+        setComments(response.data);
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
   const handleKeyboardDismiss = () => {
     setIsFocused(false);
     commentRef.current?.blur();
@@ -144,24 +166,20 @@ export default function DetailStatusScreen({navigation, route}: any) {
       'keyboardDidHide',
       handleKeyboardDismiss,
     );
-    const getComments = async () => {
-      try {
-        const response: any = await getAllComments(item._id, token);
-        if (response.status === 200) {
-          setComments(response.data);
-        } else {
-          console.log(response.status);
-          throw new Error(response.data.errorMessage);
-        }
-      } catch (error: any) {
-        Toast(error.message);
-      }
-    };
-    getComments();
     return () => {
       keyboardDidHideListener.remove();
     };
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getComments();
+
+      return () => {
+        // Cleanup or cancel any pending requests if needed
+      };
+    }, []),
+  );
 
   return (
     <View style={Styles.container}>

@@ -5,7 +5,9 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 
 export default function HomeScreen({navigation}: any) {
-  const StatusData = useSelector((state: RootState) => state.statusPost.arr);
+  const StatusData = useSelector(
+    (state: RootState) => state.statusPost.HomePage,
+  );
 
   return (
     <View>
@@ -17,7 +19,7 @@ export default function HomeScreen({navigation}: any) {
             item={item}
             navigation={navigation}
             pressComment={() => {
-              navigation.navigate('detailStatus', {item: item});
+              navigation.navigate('detailStatus', {idPost: item._id});
             }}
           />
         )}

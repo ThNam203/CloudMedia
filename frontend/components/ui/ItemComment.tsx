@@ -65,7 +65,7 @@ export default function ItemComment(props: any) {
   }, [item]);
 
   const navigateToProfile = () => {
-    navigation.navigate('profileOther', {id: author._id});
+    navigation.push('profileOther', {id: author._id});
   };
 
   return (

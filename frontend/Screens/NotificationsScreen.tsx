@@ -71,7 +71,7 @@ export default function NotificationsScreen({navigation}: any) {
       </View>
       <View>
         <Text style={{fontSize: 13, marginBottom: 5}}>
-          {getTimeToNow(item.updatedAt)}h
+          {getTimeToNow(item.createdAt)}h
         </Text>
         <TouchableOpacity onPress={() => {}}>
           <Icon

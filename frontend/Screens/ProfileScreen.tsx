@@ -22,6 +22,7 @@ import {setStatus} from '../reducers/LoadingReducer';
 import {updateAvatar} from '../reducers/UserReducer';
 import Colors from '../constants/Colors';
 import {Toast} from '../components/ui/Toast';
+import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -86,6 +87,10 @@ function ProfileScreen({navigation}: any) {
         dispatch(setStatus(false));
       });
   };
+
+  // useEffect(() => {
+  //   dispatch(clearStatusPostsSub());
+  // }, []);
 
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>

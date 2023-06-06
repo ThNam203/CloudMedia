@@ -10,11 +10,15 @@ import {getAllStatusPostOfUser} from '../../api/statusPostApi';
 import {RootState} from '../../reducers/Store';
 import {getTimeToNow} from '../../utils/Utils';
 import {useFocusEffect} from '@react-navigation/native';
+import {
+  clearStatusPostsSub,
+  pushStatusPostsSub,
+} from '../../reducers/StatusPostReducer';
 const screenWidth = Dimensions.get('screen').width;
 
 const Post = ({navigation, item}: any) => {
   const navigateToDetail = () => {
-    navigation.replace('detailStatus', {item: item});
+    navigation.push('detailStatus', {idPost: item._id});
   };
 
   return (
@@ -49,8 +53,11 @@ const ActivitySection = (props: any) => {
   const getPosts = async () => {
     try {
       const response: any = await getAllStatusPostOfUser(userId, jwt);
-      if (response.status === 200) setPosts(response.data.reverse());
-      else throw new Error(response.data.errorMessage);
+      if (response.status === 200) {
+        setPosts(response.data.reverse());
+        for (const postsub of response.data)
+          dispatch(pushStatusPostsSub(postsub));
+      } else throw new Error(response.data.errorMessage);
     } catch (error: any) {
       Toast(error.message);
     }
@@ -59,6 +66,7 @@ const ActivitySection = (props: any) => {
   useFocusEffect(
     React.useCallback(() => {
       getPosts();
+      // dispatch(clearStatusPostsSub());
 
       return () => {
         // Cleanup or cancel any pending requests if needed
@@ -109,6 +117,7 @@ const ActivitySection = (props: any) => {
         scrollEnabled={false}
       />
       <TouchableOpacity
+        onPress={() => navigation.navigate('postOfUser', {userId: userId})}
         style={{justifyContent: 'center', alignItems: 'center'}}>
         <Text
           style={[styles.title, {fontWeight: 'normal', marginVertical: 20}]}>

@@ -13,6 +13,8 @@ import {useDispatch} from 'react-redux';
 import ActivitySection from '../components/ui/ActivitySection';
 import {getInfoUser} from '../api/userApi';
 import {Toast} from '../components/ui/Toast';
+import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
+import Header from '../components/ui/Header';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -21,6 +23,7 @@ export default function ProfileOfUserScreen(props: any) {
   const {id} = route.params;
 
   const [user, setUser] = useState<any>({});
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -36,11 +39,13 @@ export default function ProfileOfUserScreen(props: any) {
         Toast(error.message);
       }
     };
+    // dispatch(clearStatusPostsSub());
     getUserInfo();
   }, []);
   // return null;
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <Header navigation={navigation} />
       <View style={styles.container}>
         <View style={styles.backgroundAvatarContainer}>
           <Image

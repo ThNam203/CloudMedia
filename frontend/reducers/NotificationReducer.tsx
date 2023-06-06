@@ -12,7 +12,7 @@ interface Notification {
     profileImagePath: any;
   };
   isRead: boolean;
-  updatedAt: any;
+  createdAt: any;
 }
 
 interface Notifications {

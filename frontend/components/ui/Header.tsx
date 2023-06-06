@@ -5,16 +5,14 @@ import {
   TextInput,
   TouchableOpacity,
   Pressable,
+  Image,
+  Text,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../constants/Colors';
 import Icon, {Icons} from './Icons';
-import {Image, Text} from 'react-native-animatable';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../reducers/Store';
 
 export default function Header({navigation}: any) {
-  const user = useSelector((state: RootState) => state.userInfo);
   return (
     <View style={styles.container}>
       <View style={{paddingLeft: 10}}>
@@ -22,15 +20,12 @@ export default function Header({navigation}: any) {
           onPress={() => {
             // navigation.navigate('videoCall', { isCaller: false });
             // navigation.navigate('profile')
+            navigation.navigate('main', {screen: 'Home'});
           }}>
           <Image
-            source={
-              user.profileImagePath
-                ? {
-                    uri: 'https://downloadwap.com/thumbs2/wallpapers/p2/2019/signs/12/f219249013025356.jpg',
-                  }
-                : require('../../assets/images/Spiderman.jpg')
-            }
+            source={{
+              uri: 'https://downloadwap.com/thumbs2/wallpapers/p2/2019/signs/12/f219249013025356.jpg',
+            }}
             style={{height: 35, width: 35, borderRadius: 100}}
           />
         </TouchableOpacity>

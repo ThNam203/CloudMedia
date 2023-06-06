@@ -21,6 +21,7 @@ import EditPostScreen from '../Screens/EditPostScreen';
 import ProfileOfUserScreen from '../Screens/ProfileOfUserScreen';
 import MyNetworksScreen from '../Screens/MyNetworksScreen';
 import InvitationsScreen from '../Screens/InvitationsScreen';
+import PostOfUserSreen from '../Screens/PostOfUserSreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -89,7 +90,22 @@ export default function Routers() {
         <Stack.Screen name="profile" component={ProfileScreen} />
 
         {/* Profile of user screen */}
-        <Stack.Screen name="profileOther" component={ProfileOfUserScreen} />
+        <Stack.Screen
+          name="profileOther"
+          component={ProfileOfUserScreen}
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        {/* Post of user screen */}
+        <Stack.Screen
+          name="postOfUser"
+          component={PostOfUserSreen}
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
 
         {/* Search screen */}
         <Stack.Screen
