@@ -11,7 +11,11 @@ interface StatusPost {
   isLiked: any;
   likeCount: any;
   commentCount: any;
-  mediaFiles: [any];
+  mediaFiles?: {
+    location: any;
+    fileType: any;
+    name: any;
+  };
   createdAt: any;
 }
 

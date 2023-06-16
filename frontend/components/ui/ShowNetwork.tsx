@@ -24,7 +24,11 @@ export default function ShowNetwork(props: any) {
       }}>
       <View style={{flex: 1, width: '100%', alignItems: 'center'}}>
         <Image
-          source={require('../../assets/images/DefaultBackgroundAvatar.jpg')}
+          source={
+            item.backgroundImagePath
+              ? {uri: item.backgroundImagePath}
+              : require('../../assets/images/DefaultBackgroundAvatar.jpg')
+          }
           style={{
             width: '100%',
             height: 70,
@@ -32,14 +36,28 @@ export default function ShowNetwork(props: any) {
             borderTopLeftRadius: 10,
           }}
         />
-        <Image
-          source={
-            item.profileImagePath
-              ? {uri: item.profileImagePath}
-              : require('../../assets/images/Spiderman.jpg')
-          }
-          style={{borderRadius: 100, height: 100, width: 100, marginTop: -50}}
-        />
+        <View
+          style={{
+            elevation: 5,
+            height: 100,
+            width: 100,
+            marginTop: -40,
+            borderRadius: 100,
+          }}>
+          <Image
+            source={
+              item.profileImagePath
+                ? {uri: item.profileImagePath}
+                : require('../../assets/images/Spiderman.jpg')
+            }
+            style={{
+              borderRadius: 100,
+              flex: 1,
+              width: undefined,
+              height: undefined,
+            }}
+          />
+        </View>
         <Text
           style={{
             fontSize: 19,
@@ -63,7 +81,7 @@ export default function ShowNetwork(props: any) {
         </Text>
       </View>
       <View style={{height: 65, alignItems: 'center'}}>
-        {item.connections.length > 0 ? (
+        {item.connections?.length > 0 ? (
           <View style={styles.flexCenter}>
             <Icon
               icon="ellipsis-horizontal-circle"

@@ -10,14 +10,17 @@ import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
 import ShowNetwork from '../components/ui/ShowNetwork';
 import {RootState} from '../reducers/Store';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Toast} from '../components/ui/Toast';
 import {getInfoUser} from '../api/userApi';
+import {getAllFrOfUser} from '../api/friend_api';
+import {setStatus} from '../reducers/LoadingReducer';
 
 export default function MyNetworksScreen({navigation}: any) {
-  const connectionsId = useSelector(
-    (state: RootState) => state.userInfo.connections,
-  );
+  const uid = useSelector((state: RootState) => state.uid.id);
+  const jwt = useSelector((state: RootState) => state.token.key);
+
+  const dispatch = useDispatch();
 
   const [connections, setConnection] = useState<any[]>([]);
 
@@ -27,19 +30,22 @@ export default function MyNetworksScreen({navigation}: any) {
 
   useEffect(() => {
     const getInfoConnection = async () => {
-      for (const id of connectionsId) {
-        try {
-          const response: any = await getInfoUser(id);
-          if (response.status === 200) {
-            setConnection(prev => [...prev, response.data]);
-          } else {
-            console.log(response.status);
-            throw new Error(response.data.errorMessage);
-          }
-        } catch (error: any) {
-          Toast(error.message);
+      // for (const id of connectionsId) {
+      try {
+        dispatch(setStatus(true));
+        // const response: any = await getInfoUser(id);
+        const response: any = await getAllFrOfUser(uid, jwt);
+        dispatch(setStatus(false));
+        if (response.status === 200) {
+          setConnection(prev => response.data);
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
+      } catch (error: any) {
+        Toast(error.message);
       }
+      // }
     };
     getInfoConnection();
   }, []);
@@ -107,6 +113,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
+    elevation: 10,
   },
   connectionsContainer: {
     width: '90%',

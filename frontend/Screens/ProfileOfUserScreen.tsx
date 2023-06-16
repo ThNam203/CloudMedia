@@ -9,12 +9,13 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Colors from '../constants/Colors';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ActivitySection from '../components/ui/ActivitySection';
 import {getInfoUser} from '../api/userApi';
 import {Toast} from '../components/ui/Toast';
 import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
 import Header from '../components/ui/Header';
+import {RootState} from '../reducers/Store';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -24,6 +25,10 @@ export default function ProfileOfUserScreen(props: any) {
 
   const [user, setUser] = useState<any>({});
   const dispatch = useDispatch();
+
+  const myUser = useSelector((state: RootState) => state.userInfo);
+
+  const [isFriend, setIsFriend] = useState(false);
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -39,9 +44,17 @@ export default function ProfileOfUserScreen(props: any) {
         Toast(error.message);
       }
     };
+
+    for (let idConnection of myUser.connections) {
+      if (idConnection === id) {
+        setIsFriend(true);
+        break;
+      }
+    }
+
     // dispatch(clearStatusPostsSub());
     getUserInfo();
-  }, []);
+  }, [myUser]);
   // return null;
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -49,7 +62,11 @@ export default function ProfileOfUserScreen(props: any) {
       <View style={styles.container}>
         <View style={styles.backgroundAvatarContainer}>
           <Image
-            source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
+            source={
+              user.backgroundImagePath
+                ? {uri: user.backgroundImagePath}
+                : require('../assets/images/DefaultBackgroundAvatar.jpg')
+            }
             style={styles.backgroundAvatarImage}
           />
         </View>
@@ -100,7 +117,7 @@ export default function ProfileOfUserScreen(props: any) {
                 marginTop: 10,
               },
             ]}>
-            {`${user.connections} connections`}
+            {`${user.connections?.length} connections`}
           </Text>
           <View
             style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
@@ -126,7 +143,7 @@ export default function ProfileOfUserScreen(props: any) {
                 }}>
                 <Text
                   style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
-                  Open to
+                  {isFriend ? 'Unfriend' : 'Add friend'}
                 </Text>
               </Pressable>
             </View>
@@ -200,11 +217,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backgroundAvatarContainer: {
-    height: 90,
+    height: 120,
     width: screenWidth,
   },
   backgroundAvatarImage: {
-    height: 90,
+    height: 120,
     width: screenWidth,
     opacity: 0.75,
   },

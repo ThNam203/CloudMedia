@@ -32,8 +32,9 @@ export default function LoadingScreen({navigation, route}: any) {
       const response: any = await getAllStatusPostOfUser(idUser, jwt);
       if (response.status === 200) {
         const data = response.data;
-
+        console.log(data);
         for (const post of data) {
+          console.log(post.mediaFiles);
           dispatch(pushStatusPosts(post));
         }
       } else {

@@ -9,7 +9,7 @@ export default function PostOfUserSreen({navigation, route}: any) {
   const StatusData = useSelector((state: RootState) => state.statusPost.sub);
   const {userId} = route.params;
   return (
-    <View>
+    <View style={{flex: 1}}>
       <Header navigation={navigation} />
       <FlatList
         data={StatusData}
@@ -27,6 +27,7 @@ export default function PostOfUserSreen({navigation, route}: any) {
           );
         }}
       />
+      <View style={{height: 5}} />
     </View>
   );
 }

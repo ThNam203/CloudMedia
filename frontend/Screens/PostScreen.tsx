@@ -19,6 +19,8 @@ import Colors from '../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
+import {setStatus} from '../reducers/LoadingReducer';
+// import VideoPlayer from 'react-native-video-player';
 
 interface ImageItem {
   uri: string;
@@ -47,6 +49,7 @@ function PostScreen() {
       Toast('Please enter something');
       return;
     }
+    dispatch(setStatus(true));
     createNewPost({mediaFiles, description}, uid, token)
       .then((response: any) => {
         if (response.status === 200) {
@@ -57,7 +60,9 @@ function PostScreen() {
           throw new Error(response.response.data.errorMessage);
         }
       })
-      .then((data: any) => {})
+      .then((data: any) => {
+        dispatch(setStatus(false));
+      })
       .catch(error => console.error(error));
     toggleModal();
   };
@@ -88,6 +93,7 @@ function PostScreen() {
       waitAnimationEnd: false,
       compressImageQuality: 0.8,
       maxFiles: 10,
+      mediaType: 'photo',
     })
       .then(images => {
         console.log(images);
@@ -101,16 +107,34 @@ function PostScreen() {
       .catch(error => Toast(error.message));
   };
 
+  const selectVideo = () => {
+    ImagePicker.openPicker({
+      mediaType: 'video',
+    })
+      .then((video: any) => {
+        console.log(video);
+        setMediaFiles([
+          ...mediaFiles,
+          {
+            uri: video.path,
+            type: video.mime,
+            name: video.path.split('/').pop(),
+          },
+        ]);
+      })
+      .catch(error => Toast(error.message));
+  };
+
   useEffect(() => {
     setDescription('');
     setMediaFiles([]);
   }, [postVisible]);
 
-  // item image
-  const ItemImageView = ({item}: any) => {
+  // item
+  const MedifafileView = ({item}: any) => {
     return (
       <View style={{flex: 1}}>
-        <Image
+        {/* <Image
           style={{
             height: 120,
             width: 160,
@@ -118,7 +142,15 @@ function PostScreen() {
             margin: 5,
           }}
           source={{uri: item.uri}}
-        />
+        /> */}
+        {/* <VideoPlayer
+          video={{
+            uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+          }}
+          videoWidth={1600}
+          videoHeight={900}
+          thumbnail={{uri: 'https://i.picsum.photos/id/866/1600/900.jpg'}}
+        /> */}
         <View
           style={{
             position: 'absolute',
@@ -179,7 +211,7 @@ function PostScreen() {
         <View style={{backgroundColor: Colors.white}}>
           <FlatList
             data={mediaFiles}
-            renderItem={({item}) => <ItemImageView item={item} />}
+            renderItem={({item}) => <MedifafileView item={item} />}
             keyExtractor={(_, index) => index.toString()}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
@@ -253,7 +285,7 @@ function PostScreen() {
           <TouchableOpacity onPress={takePhotoFromCamera}>
             <Icon type={Icons.Entypo} name="camera" size={25} />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={selectVideo}>
             <Icon
               type={Icons.Ionicons}
               name="ios-videocam"

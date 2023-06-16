@@ -11,6 +11,7 @@ interface Notification {
     name: any;
     profileImagePath: any;
   };
+  link: any;
   isRead: boolean;
   createdAt: any;
 }

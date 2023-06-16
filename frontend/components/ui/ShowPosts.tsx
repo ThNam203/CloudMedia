@@ -183,7 +183,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
           }>
           <View style={{height: 300, width: deviceWidth, flexDirection: 'row'}}>
             <Image
-              source={{uri: item.mediaFiles[0]}}
+              source={{uri: item.mediaFiles[0].location}}
               style={{flex: 1, marginHorizontal: 0.75}}
             />
             {item.mediaFiles.length > 1 ? (
@@ -193,11 +193,14 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
                   marginHorizontal: 0.75,
                   flexDirection: 'column',
                 }}>
-                <Image source={{uri: item.mediaFiles[1]}} style={{flex: 1}} />
+                <Image
+                  source={{uri: item.mediaFiles[1].location}}
+                  style={{flex: 1}}
+                />
                 {item.mediaFiles.length > 2 ? (
-                  <View style={{flex: 1, marginVertical: 1.5}}>
+                  <View style={{flex: 1, marginVertical: 1}}>
                     <Image
-                      source={{uri: item.mediaFiles[2]}}
+                      source={{uri: item.mediaFiles[2].location}}
                       style={{flex: 1}}
                     />
                     {item.mediaFiles.length > 3 ? (

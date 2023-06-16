@@ -71,6 +71,22 @@ export const postAvatarImg = async (dataForm: any, userId: any, token: any) => {
   }
 };
 
+export const postBackgrImg = async (dataForm: any, userId: any, token: any) => {
+  try {
+    const result = await ApiManager(`/${userId}/background-image`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'multipart/form-data',
+      },
+      data: dataForm,
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const user_update = async (data: any, userId: any, token: any) => {
   try {
     const result = await ApiManager(`/${userId}`, {

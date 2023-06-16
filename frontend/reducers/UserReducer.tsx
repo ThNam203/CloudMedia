@@ -10,10 +10,11 @@ export interface UserInfo {
     name: string;
     linkToWebsite: string;
   };
-  connections: [];
-  chatRooms: [];
+  connections: any[];
+  chatRooms: any[];
   userRole: string;
   profileImagePath: string;
+  backgroundImagePath?: string;
 }
 const initialState: UserInfo = {
   name: '',
@@ -29,6 +30,7 @@ const initialState: UserInfo = {
   chatRooms: [],
   userRole: '',
   profileImagePath: '',
+  backgroundImagePath: '',
 };
 
 const UserSlice = createSlice({
@@ -51,13 +53,26 @@ const UserSlice = createSlice({
       state.chatRooms = action.payload.chatRooms || [];
       state.userRole = action.payload.userRole;
       state.profileImagePath = action.payload.profileImagePath || '';
+      state.backgroundImagePath = action.payload.backgroundImagePath || '';
       /// spread operator ('...') is fail.
     },
     updateAvatar: (state: UserInfo, action: PayloadAction<string>) => {
       state.profileImagePath = action.payload;
     },
+    updateBackground: (state: UserInfo, action: PayloadAction<string>) => {
+      state.backgroundImagePath = action.payload;
+    },
+    addFriend: (state: UserInfo, action: PayloadAction<any>) => {
+      state.connections.push(action.payload);
+    },
+    unfriend: (state: UserInfo, action: PayloadAction<any>) => {
+      state.connections = state.connections.filter(
+        (item: any) => item._id !== action.payload,
+      );
+    },
   },
 });
 
-export const {saveUser, updateAvatar} = UserSlice.actions;
+export const {saveUser, updateAvatar, updateBackground, addFriend, unfriend} =
+  UserSlice.actions;
 export default UserSlice.reducer;

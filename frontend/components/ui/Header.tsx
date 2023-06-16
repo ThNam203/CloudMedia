@@ -41,7 +41,7 @@ export default function Header({navigation}: any) {
       <TouchableOpacity
         style={{marginRight: 10}}
         onPress={() => {
-          // navigation.navigate('chat');
+          navigation.navigate('chat');
           //navigation.navigate('videoCall', { isCaller: true })\
         }}>
         <Icon type={Icons.Ionicons} name="chatbox-ellipses-outline" />

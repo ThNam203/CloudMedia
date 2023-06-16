@@ -31,7 +31,10 @@ const Post = ({navigation, item}: any) => {
 
       <View style={{flexDirection: 'row'}}>
         {item.mediaFiles[0] && (
-          <Image style={styles.image} source={{uri: item.mediaFiles[0]}} />
+          <Image
+            style={styles.image}
+            source={{uri: item.mediaFiles[0].location}}
+          />
         )}
         <View style={{flex: 1}}>
           <Text style={styles.content} numberOfLines={5}>

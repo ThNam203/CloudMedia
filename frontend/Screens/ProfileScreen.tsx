@@ -16,18 +16,20 @@ import UploadPhoto from '../components/ui/UploadPhoto';
 import EditProfileScreen from './EditProfileScreen';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {postAvatarImg, userLogout} from '../api/userApi';
+import {postAvatarImg, postBackgrImg, userLogout} from '../api/userApi';
 import {nameStorage, storeData} from '../reducers/AsyncStorage';
 import {setStatus} from '../reducers/LoadingReducer';
-import {updateAvatar} from '../reducers/UserReducer';
+import {updateAvatar, updateBackground} from '../reducers/UserReducer';
 import Colors from '../constants/Colors';
 import {Toast} from '../components/ui/Toast';
 import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
+import Icon, {Icons} from '../components/ui/Icons';
 
 const screenWidth = Dimensions.get('window').width;
 
 function ProfileScreen({navigation}: any) {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isModelBackGrVisible, setIsModelBackGrVisible] = useState(false);
 
   const [editProfile, setEditProfile] = useState(false);
 
@@ -88,6 +90,33 @@ function ProfileScreen({navigation}: any) {
       });
   };
 
+  const postBackgroundImage = (image: any) => {
+    const dataForm = new FormData();
+    dataForm.append('background-image', {
+      uri: image.path,
+      type: image.mime,
+      name: image.filename || 'profile-image',
+    });
+    dispatch(setStatus(true));
+    postBackgrImg(dataForm, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          return response.data;
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
+        }
+      })
+      .then((data: any) => {
+        dispatch(updateBackground(data.backgroundImagePath));
+      })
+      .catch(error => Toast(error.message))
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
+  };
+
   // useEffect(() => {
   //   dispatch(clearStatusPostsSub());
   // }, []);
@@ -98,7 +127,18 @@ function ProfileScreen({navigation}: any) {
         <UploadPhoto
           isVisible={isModalVisible}
           setVisible={setModalVisible}
+          height={140}
+          width={140}
+          isCirle={true}
           postImage={postImage}
+        />
+        <UploadPhoto
+          isVisible={isModelBackGrVisible}
+          setVisible={setIsModelBackGrVisible}
+          height={120}
+          width={screenWidth}
+          isCirle={false}
+          postImage={postBackgroundImage}
         />
         <EditProfileScreen
           isVisible={editProfile}
@@ -106,9 +146,31 @@ function ProfileScreen({navigation}: any) {
         />
         <View style={styles.backgroundAvatarContainer}>
           <Image
-            source={require('../assets/images/DefaultBackgroundAvatar.jpg')}
+            source={
+              user.backgroundImagePath
+                ? {uri: user.backgroundImagePath}
+                : require('../assets/images/DefaultBackgroundAvatar.jpg')
+            }
             style={styles.backgroundAvatarImage}
           />
+          <View style={{position: 'absolute', top: 10, right: 5}}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: Colors.white,
+                borderRadius: 50,
+                padding: 5,
+                elevation: 5,
+              }}
+              onPress={() => {
+                setIsModelBackGrVisible(!isModelBackGrVisible);
+              }}>
+              <Icon
+                name="camera"
+                type={Icons.Entypo}
+                style={{width: 25, height: 25}}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         <View
           style={{
@@ -217,6 +279,9 @@ function ProfileScreen({navigation}: any) {
                 marginHorizontal: 10,
               }}>
               <Pressable
+                onPress={() => {
+                  dispatch(setStatus(true));
+                }}
                 android_ripple={{color: '#0d8fe0ff'}}
                 style={{
                   backgroundColor: 'transparent',
@@ -301,11 +366,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backgroundAvatarContainer: {
-    height: 90,
+    height: 120,
     width: screenWidth,
   },
   backgroundAvatarImage: {
-    height: 90,
+    height: 120,
     width: screenWidth,
     opacity: 0.75,
   },
