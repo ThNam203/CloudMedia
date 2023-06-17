@@ -20,7 +20,8 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
 import {setStatus} from '../reducers/LoadingReducer';
-// import VideoPlayer from 'react-native-video-player';
+import Video from 'react-native-video';
+import VideoPlayer from 'react-native-video-controls';
 
 interface ImageItem {
   uri: string;
@@ -133,7 +134,7 @@ function PostScreen() {
   // item
   const MedifafileView = ({item}: any) => {
     return (
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, borderWidth: 2}}>
         {/* <Image
           style={{
             height: 120,
@@ -143,14 +144,13 @@ function PostScreen() {
           }}
           source={{uri: item.uri}}
         /> */}
-        {/* <VideoPlayer
-          video={{
-            uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          }}
-          videoWidth={1600}
-          videoHeight={900}
-          thumbnail={{uri: 'https://i.picsum.photos/id/866/1600/900.jpg'}}
-        /> */}
+        <View style={{height: 200, backgroundColor: 'gray', width: 300}}>
+          <VideoPlayer
+            controls={true}
+            source={{uri: 'https://vjs.zencdn.net/v/oceans.mp4'}}
+            style={{width: '100%', height: '100%'}}
+          />
+        </View>
         <View
           style={{
             position: 'absolute',

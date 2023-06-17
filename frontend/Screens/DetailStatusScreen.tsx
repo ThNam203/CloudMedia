@@ -31,7 +31,7 @@ import {
 } from '../reducers/StatusPostReducer';
 import {useFocusEffect} from '@react-navigation/native';
 
-interface ImageItem {
+interface MediaItem {
   uri: string;
   type: string;
   name: string;
@@ -55,7 +55,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
 
   const [comment, setComment] = useState('');
 
-  const [mediaFile, setMediaFile] = useState<ImageItem>();
+  const [mediaFile, setMediaFile] = useState<MediaItem>();
 
   const [isFocused, setIsFocused] = useState(false);
 
