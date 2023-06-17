@@ -24,6 +24,7 @@ const sendNotificationOnReply = (sender, receiver, isAccept) => {
 
     Notification.create({
         userId: sender._id,
+        sender: receiver._id,
         notificationType: 'FriendRequest',
         content: message,
     })
@@ -35,6 +36,7 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
 
     Notification.create({
         userId: receiverId,
+        sender: sender._id,
         notificationType: 'FriendRequest',
         content,
     })
@@ -45,14 +47,16 @@ exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
     const { receiverEmail } = req.body
 
     const receiver = await User.findOne({ email: receiverEmail })
+
+    // check if you are you
     if (!receiver) return next(new AppError(`Email not found`, 400))
     if (receiver._id === senderId)
-        return next(new AppError('Unable to add friend to yourself', 400))
+        return next(new AppError('Unable to add yourself', 400))
 
     // check if friend request is pending
     const isExisted = await FriendRequest.findOne({
-        senderId,
-        receiverId: receiver._id,
+        senderId: { $in: [receiver._id, senderId] },
+        receiverId: { $in: [receiver._id, senderId] },
     })
 
     if (isExisted) return next(new AppError('The request is already sent', 400))

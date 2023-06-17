@@ -41,11 +41,17 @@ async function emailSearch(query, userId, threshold = 0.7) {
         query = query.substring(0, query.indexOf('@')).toLowerCase()
     }
     query = query.toLowerCase()
-    const users = await User.find({}).select('name email _id profileImagePath')
+    const users = await User.find({}).select(
+        'name email _id profileImagePath connections'
+    )
     const result = []
 
+    const friendRequests = await FriendRequest.find({
+        $or: [{ senderId: userId }, { receiverId: userId }],
+    })
+
     for (let i = 0; i < users.length; i++) {
-        if (userId === users[i]._id) continue
+        if (userId === users[i]._id.toString()) continue
         const email = users[i].email
             .substring(0, users[i].email.indexOf('@'))
             .toLowerCase()
@@ -55,12 +61,33 @@ async function emailSearch(query, userId, threshold = 0.7) {
         const similarityScore = 1 - distance / maxLength
 
         if (similarityScore >= threshold) {
-            users[i] = users[i].toObject()
-            if (users[i].connections && users[i].connections.includes(userId))
-                users[i].isFriend = 'true'
-            else users[i].isFriend = 'false'
+            const otherUser = users[i].toObject()
 
-            result.push(users[i])
+            let connections
+            if (otherUser.connections) {
+                connections = otherUser.connections.map((connection) =>
+                    connection.toString()
+                )
+            }
+
+            if (connections && connections.includes(userId))
+                otherUser.isFriend = 'true'
+            else {
+                let isPendingFriend = false
+                friendRequests.forEach((request) => {
+                    if (
+                        request.senderId === otherUser._id.toString() ||
+                        request.receiverId === otherUser._id.toString()
+                    )
+                        isPendingFriend = true
+                })
+
+                if (isPendingFriend) otherUser.isFriend = 'pending'
+                else otherUser.isFriend = 'false'
+            }
+
+            delete otherUser.connections
+            result.push(otherUser)
         }
     }
 
@@ -68,37 +95,50 @@ async function emailSearch(query, userId, threshold = 0.7) {
 }
 
 // using fuzzy
-async function nameSearch(query, userId, threshold = 0.6) {
+async function nameSearch(query, userId, threshold = 0.2) {
     query = query.toLowerCase()
     const users = await User.find({}).select('name email _id profileImagePath')
     const result = []
 
+    const friendRequests = await FriendRequest.find({
+        $or: [{ senderId: userId }, { receiverId: userId }],
+    })
+
     for (let i = 0; i < users.length; i++) {
-        if (userId === users[i]._id) continue
+        if (userId === users[i]._id.toString()) continue
         const username = users[i].name.toLowerCase()
         const distance = levenshteinDistance(query, username)
         const maxLength = Math.max(query.length, username.length)
         const similarityScore = 1 - distance / maxLength
 
         if (similarityScore >= threshold) {
-            users[i] = users[i].toObject()
+            const otherUser = users[i].toObject()
 
-            // eslint-disable-next-line no-await-in-loop
-            const isPendingRequest = await FriendRequest.find({
-                senderId: { $in: [userId, users[i]._id] },
-                receiverId: { $in: [userId, users[i]._id] },
-            })
+            let connections
+            if (otherUser.connections) {
+                connections = otherUser.connections.map((connection) =>
+                    connection.toString()
+                )
+            }
 
-            if (isPendingRequest) {
-                users[i].isFriend = 'pending'
-            } else if (
-                users[i].connections &&
-                users[i].connections.includes(userId)
-            )
-                users[i].isFriend = 'true'
-            else users[i].isFriend = 'false'
+            if (connections && connections.includes(userId))
+                otherUser.isFriend = 'true'
+            else {
+                let isPendingFriend = false
+                friendRequests.forEach((request) => {
+                    if (
+                        request.senderId === otherUser._id.toString() ||
+                        request.receiverId === otherUser._id.toString()
+                    )
+                        isPendingFriend = true
+                })
 
-            result.push(users[i])
+                if (isPendingFriend) otherUser.isFriend = 'pending'
+                else otherUser.isFriend = 'false'
+            }
+
+            delete otherUser.connections
+            result.push(otherUser)
         }
     }
 

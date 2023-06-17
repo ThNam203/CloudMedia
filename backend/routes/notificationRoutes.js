@@ -13,6 +13,11 @@ router
         authController.isOwnerOfThePath,
         notificationController.getAllNotificationsOfAUser
     )
+    .patch(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        notificationController.readAllNotifications
+    )
 
 router
     .route('/:notificationId')

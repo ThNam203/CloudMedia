@@ -1,25 +1,27 @@
 const express = require('express')
 const statusCommentController = require('../controllers/statusCommentController')
 const authController = require('../controllers/authController')
+const s3Controller = require('../controllers/s3Controller')
 
 const router = express.Router({
     mergeParams: true,
 })
 
 router
-    .route('')
+    .route('/')
     .get(
         authController.isUser,
         statusCommentController.getAllCommentsOfStatusPost
     )
     .post(
         authController.isUser,
-        statusCommentController.uploadMediaFile.single('media-file'),
+        s3Controller.uploadMediaFiles.single('media-file'),
         statusCommentController.createNewComment
     )
 
 router
     .route('/:commentId')
-    .get(authController.isUser, statusCommentController.getCommentById)
+    .put(authController.isUser, statusCommentController.toggleLikeComment)
+    .delete(authController.isUser, statusCommentController.deleteComment)
 
 module.exports = router

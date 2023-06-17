@@ -14,14 +14,21 @@ const statusCommentSchema = new mongoose.Schema(
         },
         content: String,
         mediaFile: String,
-        likeCount: {
-            type: Number,
-            default: 0,
-        },
+        likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     },
     {
         timestamps: true,
+        toJSON: {
+            virtuals: true,
+        },
+        toObject: {
+            virtuals: true,
+        },
     }
 )
+
+statusCommentSchema.virtual('likeCount').get(function () {
+    return this.likedUsers ? this.likedUsers.length : 0
+})
 
 module.exports = mongoose.model('StatusComment', statusCommentSchema)

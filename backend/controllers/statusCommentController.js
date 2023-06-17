@@ -1,7 +1,6 @@
-const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3')
-const multer = require('multer')
-const uuid = require('uuid')
-const multerS3 = require('multer-s3')
+const jwt = require('jsonwebtoken')
+const s3Controller = require('./s3Controller')
+
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 const User = require('../models/User')
@@ -9,14 +8,29 @@ const StatusPost = require('../models/StatusPost')
 const StatusComment = require('../models/StatusComment')
 const Notification = require('../models/Notification')
 
+const getUserIdFromJWT = (req, next) => {
+    //// GET THE USERID FROM AUTHORIZATION HEADER
+    if (
+        !req.headers.authorization ||
+        !req.headers.authorization.startsWith('Bearer')
+    )
+        return next(new AppError('Missing authorization header', 401))
+
+    const token = req.headers.authorization.split(' ')[1]
+    const tokenData = jwt.decode(token)
+    return tokenData.id
+}
+
 const sendNotificationOnSomeoneComment = async (
     statusPostId,
     commentAuthorId
 ) => {
     const statusPost = await StatusPost.findById(statusPostId)
     const commentor = await User.findById(commentAuthorId)
+    if (statusPost.author === commentAuthorId) return
     await Notification.create({
         userId: statusPost.author,
+        sender: commentor,
         notificationType: 'Comment',
         content: `${commentor.name} has commented about your status`,
         isRead: false,
@@ -24,60 +38,47 @@ const sendNotificationOnSomeoneComment = async (
     })
 }
 
-const s3Client = new S3Client({
-    region: 'ap-southeast-1',
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-})
+// exports.getCommentById = asyncCatch(async (req, res, next) => {
+//     const { commentId } = req.params
+//     const comment = await StatusComment.findById(commentId).populate(
+//         'author',
+//         '_id profileImagePath email'
+//     )
+//     if (!comment) return next(new AppError('Unable to get the comment', 500))
 
-exports.uploadMediaFile = multer({
-    storage: multerS3({
-        s3: s3Client,
-        bucket: 'workwise',
-        acl: 'public-read',
-        contentType: multerS3.AUTO_CONTENT_TYPE,
-        key: function (req, file, cb) {
-            cb(null, uuid.v4())
-        },
-    }),
-})
+//     const userId = await getUserIdFromJWT(req, next)
+//     const objectComment = comment.toObject()
+//     if (comment.likedUsers.includes(userId)) objectComment.isLiked = true
+//     else objectComment.isLiked = false
+//     delete comment.likedUsers
 
-const deleteMediaFile = (path) => {
-    const command = new DeleteObjectCommand({
-        Bucket: 'workwise',
-        Key: path.substring(path.lastIndexOf('/') + 1, path.length),
-    })
-
-    s3Client.send(command).catch(() => {})
-}
-
-exports.getCommentById = asyncCatch(async (req, res, next) => {
-    const { commentId } = req.params
-    const comment = await StatusComment.findById(commentId).populate(
-        'author',
-        '_id profileImagePath email'
-    )
-    if (!comment) return next(new AppError('Unable to get the comment', 500))
-    res.status(200).json(comment)
-})
+//     res.status(200).json(comment)
+// })
 
 exports.createNewComment = asyncCatch(async (req, res, next) => {
-    const { statusPostId, userId } = req.params
-    const { content } = req.body
+    const { statusPostId } = req.params
+    const { content, userId } = req.body
+
+    const statusPost = await StatusPost.findById(statusPostId)
+    if (!statusPost)
+        return next(new AppError('Unable to find status post', 404))
+
     const newComment = await StatusComment.create({
         author: userId,
         statusPostId: statusPostId,
         content: content,
-        mediaFile: req.file.location,
+        mediaFile: req.file ? req.file.location : null,
     })
 
     if (!newComment) {
         next(new AppError('Unable to create comment', 500))
-        deleteMediaFile(req.file.location)
+        s3Controller.deleteMediaFile(req.file.location)
         return
     }
+
+    // update the comment count of status post
+    statusPost.commentCount += 1
+    statusPost.save()
 
     sendNotificationOnSomeoneComment(statusPostId, userId)
     await newComment.populate('author', '_id profileImagePath email')
@@ -85,38 +86,54 @@ exports.createNewComment = asyncCatch(async (req, res, next) => {
 })
 
 exports.deleteComment = asyncCatch(async (req, res, next) => {
-    const { commentId } = req.params
+    const { commentId, statusPostId } = req.params
 
     const deletedComment = await StatusComment.findByIdAndDelete(commentId)
     if (!deletedComment)
         return next(new AppError('Unable to remove the comment', 500))
 
-    await deleteMediaFile(deletedComment.mediaFile)
+    StatusPost.findById(statusPostId).then((query) => {
+        query.commentCount -= 1
+        query.save()
+    })
+
+    if (deletedComment.mediaFile)
+        s3Controller.deleteMediaFile(deletedComment.mediaFile)
+    res.status(204).end()
+})
+
+exports.toggleLikeComment = asyncCatch(async (req, res, next) => {
+    const { commentId } = req.params
+
+    const userId = await getUserIdFromJWT(req, next)
+    if (!userId) return next(new AppError('Invalid user id', 400))
+
+    const comment = await StatusComment.findById(commentId)
+
+    const indexOfTheLiked = comment.likedUsers.indexOf(userId)
+    if (indexOfTheLiked === -1) comment.likedUsers.push(userId)
+    else comment.likedUsers.splice(indexOfTheLiked, 1)
+    await comment.save()
     res.status(204).end()
 })
 
 exports.getAllCommentsOfStatusPost = asyncCatch(async (req, res, next) => {
     const { statusPostId } = req.params
+
+    const userId = await getUserIdFromJWT(req, next)
+    if (!userId) return next(new AppError('Invalid user id', 400))
+
     const comments = await StatusComment.find({
         statusPostId: statusPostId,
-    }).populate('author', '_id profileImagePath email')
-    res.status(200).json(comments)
+    }).populate('author', '_id name profileImagePath email')
+
+    const objectComments = comments.map((comment) => {
+        const objectComment = comment.toObject()
+        if (comment.likedUsers.includes(userId)) objectComment.isLiked = true
+        else objectComment.isLiked = false
+        delete comment.likedUsers
+        return objectComment
+    })
+
+    res.status(200).json(objectComments)
 })
-
-// exports.updateComment = asyncCatch(async (req, res, next) => {
-//     const { commentId } = req.params
-
-//     const updatedPost = await StatusPost.findByIdAndUpdate(
-//         statusPostId,
-//         statusPostBody,
-//         {
-//             new: true,
-//             runValidators: true,
-//         }
-//     )
-
-//     if (!updatedPost)
-//         return next(new AppError('Unable to update status post', 500))
-
-//     res.status(200).json(updatedPost)
-// })
