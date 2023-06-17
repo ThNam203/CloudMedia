@@ -12,39 +12,45 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
-import chatApi from '../../api/chatApi'
+import chatApi from '../../api/chatApi';
 
 interface ChatRoom {
   _id: string;
   members: string[];
 }
 
-const ChatScreen = () => {
-  const navigation = useNavigation();
-  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
+const ChatScreen = ({navigation}: any) => {
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
 
   useEffect(() => {
     const getChatRooms = async () => {
-      const chatRoomsData = await chatApi.getAllChatRooms(uid, token)
-      const chatRooms: ChatRoom[] = chatRoomsData.data.map((chatroomData: any) => {
-        const { _id, members } = chatroomData;
-        return { _id, members };
-      });
-      setChatRooms(chatRooms)
-    }
+      const chatRoomsData = await chatApi.getAllChatRooms(uid, token);
+      console.log(chatRoomsData.data);
+      const chatRooms: ChatRoom[] = chatRoomsData.data.map(
+        (chatroomData: any) => {
+          const {_id, members} = chatroomData;
+          return {_id, members};
+        },
+      );
+      setChatRooms(chatRooms);
+    };
 
-    getChatRooms()
-  }, [])
+    getChatRooms();
+  }, []);
 
-  const renderItem = ({ item }: any) => {
-    const imageSource = item.logoPath ? { uri: item.logoPath } : { uri: 'https://images.unsplash.com/photo-1683339708262-b1208394ffec?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80'};
+  const renderItem = ({item}: any) => {
+    const imageSource = item.logoPath
+      ? {uri: item.logoPath}
+      : {
+          uri: 'https://images.unsplash.com/photo-1683339708262-b1208394ffec?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80',
+        };
     return (
       <TouchableOpacity
         style={styles.userContainer}
         onPress={() => {
-          navigation.navigate('chatRoom', { chatRoomId: item._id });
+          navigation.navigate('chatRoom', {chatRoomId: item._id});
         }}>
         <Image style={styles.roomImage} source={imageSource} />
         <Text style={styles.roomName}>THIS IS A ROOM</Text>
@@ -57,7 +63,7 @@ const ChatScreen = () => {
       <FlatList
         data={chatRooms}
         renderItem={renderItem}
-        keyExtractor={item => item._id}
+        keyExtractor={(item, index) => 'key' + index}
       />
     </View>
   );

@@ -20,7 +20,12 @@ class Message {
   public senderId: string;
   public createdAt: string;
 
-  constructor(id: string, message: string, senderId: string, createdAt: string) {
+  constructor(
+    id: string,
+    message: string,
+    senderId: string,
+    createdAt: string,
+  ) {
     this.id = id;
     this.message = message;
     this.senderId = senderId;
@@ -28,46 +33,58 @@ class Message {
   }
 }
 
-const ChatRoom = ({ route }: any) => {
-  const { chatRoomId } = route.params
+const ChatRoom = ({route}: any) => {
+  const {chatRoomId} = route.params;
   const uid = useSelector((state: RootState) => state.uid.id);
   const jwt = useSelector((state: RootState) => state.token.key);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
-  
-  const flatListRef = useRef(null);
+
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
-    if (flatListRef.current !== null)
-      flatListRef.current.scrollToEnd();
-  }, [chatMessages])
+    setTimeout(() => {
+      if (flatListRef.current !== null) {
+        console.log('scroll to end');
+        flatListRef.current.scrollToEnd();
+      }
+    }, 2000);
+  }, [chatMessages]);
 
   useEffect(() => {
     const getAllMessages = async () => {
-      const rawMessages = await chatApi.getMessagesFromAChatRoom(jwt, chatRoomId)
+      const rawMessages = await chatApi.getMessagesFromAChatRoom(
+        jwt,
+        chatRoomId,
+      );
       const messages: Message[] = rawMessages.data.map((rawMessage: any) => {
-        const { _id, message, senderId, createdAt } = rawMessage
-        return { _id, message, senderId, createdAt }
+        const {_id, message, senderId, createdAt} = rawMessage;
+        return {_id, message, senderId, createdAt};
       });
-      setChatMessages(messages)
-    }
+      setChatMessages(messages);
+    };
 
-    socket.emit('joinRoom', { chatRoomId })
-    
+    socket.emit('joinRoom', {chatRoomId});
+
     socket.on('newMessage', (newRawMessage: any) => {
-      const newMessage = new Message(newRawMessage._id, newRawMessage.message, newRawMessage.senderId, newRawMessage.createdAt)
+      const newMessage = new Message(
+        newRawMessage._id,
+        newRawMessage.message,
+        newRawMessage.senderId,
+        newRawMessage.createdAt,
+      );
       setChatMessages(prevChatMessages => [...prevChatMessages, newMessage]);
     });
 
-    getAllMessages()
-  }, [])
+    getAllMessages();
+  }, []);
 
   const handleNewMessage = () => {
     const newMessage = {
       chatRoomId: chatRoomId,
       message,
       senderId: uid,
-    }
+    };
 
     socket.emit('newMessage', newMessage);
     setMessage('');
@@ -83,7 +100,7 @@ const ChatRoom = ({ route }: any) => {
               <MessageComponent chat={item} userId={uid} />
             )}
             ref={flatListRef}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => 'key' + index}
             contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}
           />
         ) : (
@@ -95,7 +112,8 @@ const ChatRoom = ({ route }: any) => {
         <TextInput
           style={styles.messageInput}
           value={message}
-          onChangeText={value => setMessage(value)} />
+          onChangeText={value => setMessage(value)}
+        />
         <Pressable style={styles.btnSendMessage} onPress={handleNewMessage}>
           <View>
             <Text style={{color: '#f2f0f1', fontSize: 20}}>SEND</Text>
