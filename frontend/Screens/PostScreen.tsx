@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
@@ -69,6 +70,10 @@ function PostScreen() {
   };
 
   const takePhotoFromCamera = () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
     ImagePicker.openCamera({
       // height: 140,
       // width: 140,
@@ -89,6 +94,10 @@ function PostScreen() {
   };
 
   const choosePhotoFromLibrary = () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
     ImagePicker.openPicker({
       multiple: true,
       waitAnimationEnd: false,
@@ -109,13 +118,16 @@ function PostScreen() {
   };
 
   const selectVideo = () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'image/jpeg') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
     ImagePicker.openPicker({
       mediaType: 'video',
     })
       .then((video: any) => {
         console.log(video);
         setMediaFiles([
-          ...mediaFiles,
           {
             uri: video.path,
             type: video.mime,
@@ -133,24 +145,33 @@ function PostScreen() {
 
   // item
   const MedifafileView = ({item}: any) => {
+    const screenWidth = Dimensions.get('window').width;
     return (
-      <View style={{flex: 1, borderWidth: 2}}>
-        {/* <Image
-          style={{
-            height: 120,
-            width: 160,
-            borderRadius: 3,
-            margin: 5,
-          }}
-          source={{uri: item.uri}}
-        /> */}
-        <View style={{height: 200, backgroundColor: 'gray', width: 300}}>
-          <VideoPlayer
-            controls={true}
-            source={{uri: 'https://vjs.zencdn.net/v/oceans.mp4'}}
-            style={{width: '100%', height: '100%'}}
+      <View style={{flex: 1}}>
+        {item.type === 'video/mp4' ? (
+          <View
+            style={{height: 230, backgroundColor: 'gray', width: screenWidth}}>
+            <VideoPlayer
+              controls={true}
+              // disableVolume={true}
+              disableFullscreen={true}
+              disableBack={true}
+              source={{uri: item.uri}}
+              style={{width: '100%', height: '100%'}}
+            />
+          </View>
+        ) : (
+          <Image
+            style={{
+              height: 120,
+              width: 160,
+              borderRadius: 3,
+              margin: 5,
+            }}
+            source={{uri: item.uri}}
           />
-        </View>
+        )}
+
         <View
           style={{
             position: 'absolute',
