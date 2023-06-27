@@ -42,10 +42,12 @@ export default function Routers() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (Object.keys(socket).length)
+    if (Object.keys(socket).length) {
+      console.log('socket connected!');
       socket.on('newNotification', () => {
         console.log('co noti moi');
       });
+    }
   }, [socket]);
 
   return (
