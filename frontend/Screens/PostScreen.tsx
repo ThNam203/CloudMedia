@@ -21,7 +21,6 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
 import {setStatus} from '../reducers/LoadingReducer';
-import Video from 'react-native-video';
 import VideoPlayer from 'react-native-video-controls';
 
 interface ImageItem {
@@ -51,8 +50,17 @@ function PostScreen() {
       Toast('Please enter something');
       return;
     }
+    toggleModal();
     dispatch(setStatus(true));
-    createNewPost({mediaFiles, description}, uid, token)
+
+    const dataForm = new FormData();
+
+    for (let i = 0; i < mediaFiles.length; i++)
+      dataForm.append('media-files', mediaFiles[i]);
+
+    dataForm.append('description', description);
+
+    createNewPost(dataForm, uid, token)
       .then((response: any) => {
         if (response.status === 200) {
           console.log(response.data);
@@ -64,9 +72,9 @@ function PostScreen() {
       })
       .then((data: any) => {
         dispatch(setStatus(false));
+        Toast('Post successfully!');
       })
       .catch(error => console.error(error));
-    toggleModal();
   };
 
   const takePhotoFromCamera = () => {

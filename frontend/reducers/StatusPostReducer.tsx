@@ -16,6 +16,7 @@ interface StatusPost {
     fileType: any;
     name: any;
   };
+  sharedLink: any;
   createdAt: any;
 }
 

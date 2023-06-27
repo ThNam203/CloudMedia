@@ -22,6 +22,7 @@ import ProfileOfUserScreen from '../Screens/ProfileOfUserScreen';
 import MyNetworksScreen from '../Screens/MyNetworksScreen';
 import InvitationsScreen from '../Screens/InvitationsScreen';
 import PostOfUserSreen from '../Screens/PostOfUserSreen';
+import SharePost from '../components/ui/SharePost';
 
 const Stack = createNativeStackNavigator();
 
@@ -130,6 +131,7 @@ export default function Routers() {
 
       {/* Post screen */}
       <PostScreen />
+      <SharePost />
     </>
   );
 }

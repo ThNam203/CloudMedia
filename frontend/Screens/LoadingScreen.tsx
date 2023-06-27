@@ -13,8 +13,12 @@ import {
 import {setToken} from '../reducers/TokenReducer';
 import {setIdFromJwt} from '../reducers/UidReducer';
 import {useDispatch, useSelector} from 'react-redux';
-import {getAllStatusPostOfUser} from '../api/statusPostApi';
-import {clearStatusPosts, pushStatusPosts} from '../reducers/StatusPostReducer';
+import {getAStatusPostById, getAllStatusPostOfUser} from '../api/statusPostApi';
+import {
+  clearStatusPosts,
+  pushStatusPosts,
+  pushStatusPostsSub,
+} from '../reducers/StatusPostReducer';
 import {Toast} from '../components/ui/Toast';
 import {RootState} from '../reducers/Store';
 
@@ -32,10 +36,18 @@ export default function LoadingScreen({navigation, route}: any) {
       const response: any = await getAllStatusPostOfUser(idUser, jwt);
       if (response.status === 200) {
         const data = response.data;
-        console.log(data);
+        // console.log(data);
         for (const post of data) {
-          console.log(post.mediaFiles);
           dispatch(pushStatusPosts(post));
+          if (post.sharedLink) {
+            const res: any = await getAStatusPostById(jwt, post.sharedLink);
+            if (res.status === 200) {
+              // console.log(res.data);
+              dispatch(pushStatusPostsSub(res.data));
+            } else {
+              throw new Error(res.data.errorMessage);
+            }
+          }
         }
       } else {
         console.log(response.status);

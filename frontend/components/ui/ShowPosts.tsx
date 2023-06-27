@@ -22,6 +22,7 @@ import {
   toggleLikeStatusApi,
 } from '../../api/statusPostApi';
 import VideoPlayer from 'react-native-video-controls';
+import {setShareLink, setShareShow} from '../../reducers/UtilsReducer';
 
 export default function ShowPosts({item, navigation, pressComment}: any) {
   const deviceWidth = Dimensions.get('window').width;
@@ -82,8 +83,18 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
     }
   };
 
+  const handleShare = () => {
+    if (item.sharedLink) dispatch(setShareLink(item.sharedLink));
+    else dispatch(setShareLink(item._id));
+    dispatch(setShareShow(true));
+  };
+
   const navigateToProfile = () => {
     navigation.navigate('profileOther', {id: item.author._id});
+  };
+
+  const navigateToPostShared = () => {
+    navigation.navigate('detailStatus', {idPost: item.sharedLink});
   };
 
   return (
@@ -228,6 +239,24 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
           )}
         </Pressable>
       ) : null}
+      {item.sharedLink ? (
+        <View style={{paddingHorizontal: 16}}>
+          <TouchableOpacity onPress={navigateToPostShared}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Icon
+                type={Icons.Entypo}
+                name="link"
+                size={16}
+                color={Colors.irisBlue}
+              />
+              <Text style={{color: Colors.irisBlue, marginLeft: 5}}>
+                {item.sharedLink}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+
       <Pressable onPress={pressComment}>
         <View
           style={[
@@ -308,6 +337,18 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
             color={Colors.gray}
           />
           <Text style={{marginHorizontal: 5}}>Comment</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{alignItems: 'center', flexDirection: 'row'}}
+          onPress={handleShare}>
+          <Icon
+            type={Icons.FontAwesome}
+            name="share"
+            size={19}
+            color={Colors.gray}
+          />
+          <Text style={{marginHorizontal: 5}}>Share</Text>
         </TouchableOpacity>
       </View>
     </View>

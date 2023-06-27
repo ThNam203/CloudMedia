@@ -113,7 +113,7 @@ export default function EditPostScreen({navigation, route}: any) {
             opacity: 0.8,
           }}>
           <Image
-            source={{uri: item.mediaFiles[0]}}
+            source={{uri: item.mediaFiles[0].location}}
             style={{flex: 1, marginHorizontal: 0.75}}
           />
           {item.mediaFiles.length > 1 ? (
@@ -123,10 +123,16 @@ export default function EditPostScreen({navigation, route}: any) {
                 marginHorizontal: 0.75,
                 flexDirection: 'column',
               }}>
-              <Image source={{uri: item.mediaFiles[1]}} style={{flex: 1}} />
+              <Image
+                source={{uri: item.mediaFiles[1].location}}
+                style={{flex: 1}}
+              />
               {item.mediaFiles.length > 2 ? (
                 <View style={{flex: 1, marginVertical: 1.5}}>
-                  <Image source={{uri: item.mediaFiles[2]}} style={{flex: 1}} />
+                  <Image
+                    source={{uri: item.mediaFiles[2].location}}
+                    style={{flex: 1}}
+                  />
                   {item.mediaFiles.length > 3 ? (
                     <Text style={styles.textImageMore}>
                       +{item.mediaFiles.length - 3}
