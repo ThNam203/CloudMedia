@@ -31,7 +31,7 @@ const Post = ({navigation, item}: any) => {
 
       <View style={{flexDirection: 'row'}}>
         {item.mediaFiles[0] &&
-          (item.mediaFiles[0].type === 'Image' ? (
+          (item.mediaFiles[0].fileType === 'Image' ? (
             <Image
               style={styles.image}
               source={{uri: item.mediaFiles[0].location}}

@@ -39,7 +39,12 @@ export default function Header({navigation}: any) {
         <Text style={{marginHorizontal: 10, fontSize: 18}}>Search</Text>
       </Pressable>
       <TouchableOpacity
-        style={{marginRight: 10}}
+        style={{
+          padding: 5,
+          marginRight: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
         onPress={() => {
           navigation.navigate('chat');
           //navigation.navigate('videoCall', { isCaller: true })\
@@ -59,8 +64,8 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
   },
   textInput: {
-    marginHorizontal: 20,
-    width: 260,
+    flex: 1,
+    marginHorizontal: 10,
     height: 40,
     backgroundColor: Colors.skyBlue,
     borderRadius: 5,
