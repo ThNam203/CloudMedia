@@ -15,6 +15,7 @@ import {RootState} from '../../reducers/Store';
 import chatApi from '../../api/chatApi';
 import Colors from '../../constants/Colors';
 import {getTimeToNow} from '../../utils/Utils';
+import Icon, {Icons} from '../../components/ui/Icons';
 
 interface ChatRoom {
   _id: string;

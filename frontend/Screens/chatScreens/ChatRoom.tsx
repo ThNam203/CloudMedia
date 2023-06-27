@@ -19,6 +19,7 @@ import Icon, {Icons} from '../../components/ui/Icons';
 import Colors from '../../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Toast} from '../../components/ui/Toast';
+import CallScreen from './CallScreen';
 
 const socket = require('../../utils/socket');
 
@@ -59,6 +60,8 @@ const ChatRoom = ({navigation, route}: any) => {
   const messageRef = useRef<TextInput>(null);
 
   const flatListRef = useRef<FlatList>(null);
+
+  const [callScreen, setCallScreen] = useState(false);
 
   useEffect(() => {
     if (flatListRef.current !== null) {
@@ -154,6 +157,7 @@ const ChatRoom = ({navigation, route}: any) => {
 
   return (
     <View style={{flex: 1}}>
+      <CallScreen isVisible={callScreen} setVisible={setCallScreen} />
       <View style={styles.topView}>
         <View style={{margin: 15, flexDirection: 'row', alignItems: 'center'}}>
           <TouchableOpacity
@@ -165,6 +169,21 @@ const ChatRoom = ({navigation, route}: any) => {
           </TouchableOpacity>
           <Image style={styles.roomImage} source={imageSource} />
           <Text style={styles.roomName}>{title}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <View style={{marginHorizontal: 30}}>
+              <TouchableOpacity
+                onPress={() => {
+                  setCallScreen(!callScreen);
+                }}>
+                <Icon type={Icons.Ionicons} name="call" />
+              </TouchableOpacity>
+            </View>
+            <View>
+              <TouchableOpacity>
+                <Icon type={Icons.Ionicons} name="videocam" />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
       <View style={styles.parentView}>
