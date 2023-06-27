@@ -6,7 +6,7 @@ const User = require('../models/User')
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 
-const io = require('../socket/socket').getIO()
+const socketIO = require('../socket/socket')
 
 const createChatRoomOnAccept = async (firstUser, secondUser) => {
     const newChatRoom = await ChatRoom.create({
@@ -31,6 +31,7 @@ const sendNotificationOnReply = async (sender, receiver, isAccept) => {
         content: message,
     })
 
+    const io = socketIO.getIO()
     if (noti) io.in(sender._id.toString()).emit('newNotification')
 }
 
@@ -45,6 +46,7 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
         content,
     })
 
+    const io = socketIO.getIO()
     if (noti) io.to(senderId.toString()).emit('newNotification')
 }
 

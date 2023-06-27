@@ -8,7 +8,7 @@ const StatusPost = require('../models/StatusPost')
 const StatusComment = require('../models/StatusComment')
 const Notification = require('../models/Notification')
 
-const io = require('../socket/socket').getIO()
+const socketIO = require('../socket/socket')
 
 const getUserIdFromJWT = (req, next) => {
     //// GET THE USERID FROM AUTHORIZATION HEADER
@@ -39,6 +39,7 @@ const sendNotificationOnSomeoneComment = async (
         link: statusPostId,
     })
 
+    const io = socketIO.getIO()
     if (noti) io.in(statusPost.author.toString()).emit('newNotification')
 }
 
