@@ -13,7 +13,7 @@ io.use((socket, next) => {
 })
 
 io.on('connection', (socket) => {
-    socket.join(socket.user)
+    socket.join(socket.handshake.auth.userId)
 
     socket.on('joinRoom', (data) => {
         const chatRoomId = data
