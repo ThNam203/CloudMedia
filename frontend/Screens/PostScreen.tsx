@@ -166,6 +166,7 @@ function PostScreen() {
               disableBack={true}
               source={{uri: item.uri}}
               style={{width: '100%', height: '100%'}}
+              paused={true}
             />
           </View>
         ) : (

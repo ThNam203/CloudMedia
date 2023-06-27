@@ -1,4 +1,4 @@
-import {io} from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { nameStorage, retrieveData } from '../reducers/AsyncStorage';
 import jwt_decode from 'jwt-decode'
 

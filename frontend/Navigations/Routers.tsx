@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabs from './BottomTabs';
 import FirstTimeUseScreen from '../Screens/FirstTimeUseScreen';
 import {RootState} from '../reducers/Store';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import AppLoader from '../components/ui/AppLoader';
 import ProfileScreen from '../Screens/ProfileScreen';
 import PostScreen from '../Screens/PostScreen';
@@ -23,12 +23,30 @@ import MyNetworksScreen from '../Screens/MyNetworksScreen';
 import InvitationsScreen from '../Screens/InvitationsScreen';
 import PostOfUserSreen from '../Screens/PostOfUserSreen';
 import SharePost from '../components/ui/SharePost';
+import {
+  clearNotifications,
+  setNotifications,
+} from '../reducers/NotificationReducer';
+import {getAllNotifications} from '../api/notificationApi';
+import {Toast} from '../components/ui/Toast';
 
 const Stack = createNativeStackNavigator();
 
 export default function Routers() {
+  const socket = require('../utils/socket');
   // Get the loading status from the Redux store
   const isLoading = useSelector((state: RootState) => state.loading.status);
+  const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((state: RootState) => state.uid.id);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (Object.keys(socket).length)
+      socket.on('newNotification', () => {
+        console.log('co noti moi');
+      });
+  }, [socket]);
 
   return (
     <>

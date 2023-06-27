@@ -30,12 +30,18 @@ const Post = ({navigation, item}: any) => {
       </Text>
 
       <View style={{flexDirection: 'row'}}>
-        {item.mediaFiles[0] && (
-          <Image
-            style={styles.image}
-            source={{uri: item.mediaFiles[0].location}}
-          />
-        )}
+        {item.mediaFiles[0] &&
+          (item.mediaFiles[0].type === 'Image' ? (
+            <Image
+              style={styles.image}
+              source={{uri: item.mediaFiles[0].location}}
+            />
+          ) : (
+            <Image
+              style={styles.image}
+              source={require('../../assets/images/Thumbnail.png')}
+            />
+          ))}
         <View style={{flex: 1}}>
           <Text style={styles.content} numberOfLines={5}>
             {item.description}

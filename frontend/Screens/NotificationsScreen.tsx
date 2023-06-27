@@ -164,7 +164,7 @@ export default function NotificationsScreen({navigation}: any) {
     <View
       style={{
         marginTop: 10,
-        paddingHorizontal: 10,
+        paddingHorizontal: 5,
         backgroundColor: 'white',
       }}>
       <FlatList

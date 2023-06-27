@@ -94,7 +94,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   };
 
   const navigateToPostShared = () => {
-    navigation.navigate('detailStatus', {idPost: item.sharedLink});
+    navigation.push('detailStatus', {idPost: item.sharedLink});
   };
 
   return (
@@ -234,6 +234,8 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
                 source={{uri: item.mediaFiles[0].location}}
                 style={{width: '100%', height: '100%'}}
                 disableBack={true}
+                paused={true}
+                thumbnail={require('../../assets/images/Thumbnail.png')}
               />
             </View>
           )}
