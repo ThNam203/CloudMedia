@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
   },
   middleView: {
     flex: 1,
+    marginTop: 100,
     alignItems: 'center',
   },
   bottomView: {
