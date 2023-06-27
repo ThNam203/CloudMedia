@@ -74,6 +74,7 @@ exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
         author: userId,
         description: req.body.description,
         mediaFiles: mediaFiles,
+        sharedLink: req.body.sharedLink,
     })
 
     if (!newStatusPost) {

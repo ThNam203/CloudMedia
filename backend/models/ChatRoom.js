@@ -9,9 +9,9 @@ const chatRoomSchema = new mongoose.Schema({
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         required: true,
     },
-    logoPath: {
-        type: String,
-    },
+    logoPath: String,
+    lastMessage: String,
+    lastMessageTime: Date,
 })
 
 module.exports = mongoose.model('ChatRoom', chatRoomSchema)

@@ -6,6 +6,8 @@ const User = require('../models/User')
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 
+const io = require('../socket/socket').getIO()
+
 const createChatRoomOnAccept = async (firstUser, secondUser) => {
     const newChatRoom = await ChatRoom.create({
         members: [firstUser._id, secondUser._id],
@@ -17,29 +19,33 @@ const createChatRoomOnAccept = async (firstUser, secondUser) => {
     }
 }
 
-const sendNotificationOnReply = (sender, receiver, isAccept) => {
+const sendNotificationOnReply = async (sender, receiver, isAccept) => {
     let message
     if (isAccept) message = `${receiver.name} accepted your friend request`
     else message = `${receiver.name} denied your friend request`
 
-    Notification.create({
+    const noti = await Notification.create({
         userId: sender._id,
         sender: receiver._id,
         notificationType: 'FriendRequest',
         content: message,
     })
+
+    if (noti) io.in(sender._id.toString()).emit('newNotification')
 }
 
 const sendNotificationOnRequest = async (senderId, receiverId) => {
     const sender = await User.findById(senderId)
     const content = `${sender.name} has sent you a friend request`
 
-    Notification.create({
+    const noti = await Notification.create({
         userId: receiverId,
         sender: sender._id,
         notificationType: 'FriendRequest',
         content,
     })
+
+    if (noti) io.to(senderId.toString()).emit('newNotification')
 }
 
 exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
@@ -124,4 +130,67 @@ exports.replyFriendRequest = asyncCatch(async (req, res, next) => {
         sendNotificationOnReply(requestSender, false)
 
     res.status(204).end()
+})
+
+exports.unfriend = asyncCatch(async (req, res, next) => {
+    const { userId, unfriendUserId } = req.params
+
+    const user = await User.findById(userId)
+    const unfriendUser = await User.findById(unfriendUserId)
+
+    let idx = user.connections.findIndex(unfriendUserId)
+    user.connections.splice(idx, 1)
+
+    idx = unfriendUser.connections.findIndex(userId)
+    unfriendUser.connections.splice(idx, 1)
+
+    unfriendUser.save()
+    user.save()
+
+    res.status(204).end()
+})
+
+exports.recommendFriends = asyncCatch(async (req, res, next) => {
+    // Find the user by ID and populate their connections
+    const { userId } = req.params
+    const user = await User.findById(userId)
+
+    if (!user) throw new AppError('User not found', 404)
+
+    const potentialFriends = await User.aggregate([
+        {
+            $match: {
+                _id: { $nin: user.connections, $ne: user._id }, // Exclude existing connections and the user itself
+            },
+        },
+        {
+            $lookup: {
+                from: 'FriendRequest',
+                let: { userId: '$_id' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ['$receiverId', '$$userId'] }, // Match receiverId with the current user's ID
+                                    { $ne: ['$senderId', '$$userId'] }, // Exclude friend requests sent by the current user
+                                ],
+                            },
+                        },
+                    },
+                ],
+                as: 'friendRequests',
+            },
+        },
+        {
+            $match: {
+                friendRequests: { $size: 0 }, // Exclude potential friends who have received friend requests
+            },
+        },
+        {
+            $sample: { size: 20 },
+        },
+    ])
+
+    res.status(200).json(potentialFriends)
 })

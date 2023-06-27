@@ -2,6 +2,7 @@ const express = require('express')
 const usersController = require('../controllers/usersController')
 const authController = require('../controllers/authController')
 const chatController = require('../controllers/chatController')
+const friendController = require('../controllers/friendController')
 const s3Controller = require('../controllers/s3Controller')
 
 const router = express.Router({ mergeParams: true })
@@ -34,6 +35,22 @@ router
         authController.isUser,
         authController.isOwnerOfThePath,
         usersController.getAllFriends
+    )
+
+router
+    .route('/:userId/friend-recommend')
+    .get(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        friendController.recommendFriends
+    )
+
+router
+    .route('/:userId/friend/:unfriendUserId')
+    .delete(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        friendController.unfriend
     )
 
 router

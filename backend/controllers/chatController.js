@@ -46,7 +46,9 @@ exports.getAllChatRooms = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
     let chatrooms
     try {
-        chatrooms = await ChatRoom.find({ members: { $in: [userId] } })
+        chatrooms = await ChatRoom.find({
+            members: { $in: [userId] },
+        }).populate('members', '_id name profileImagePath')
     } catch (err) {
         return next(err)
     }

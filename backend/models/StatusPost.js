@@ -23,6 +23,10 @@ const statusPostSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        sharedLink: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'StatusPost',
+        },
     },
     {
         timestamps: true,

@@ -8,6 +8,8 @@ const StatusPost = require('../models/StatusPost')
 const StatusComment = require('../models/StatusComment')
 const Notification = require('../models/Notification')
 
+const io = require('../socket/socket').getIO()
+
 const getUserIdFromJWT = (req, next) => {
     //// GET THE USERID FROM AUTHORIZATION HEADER
     if (
@@ -28,7 +30,7 @@ const sendNotificationOnSomeoneComment = async (
     const statusPost = await StatusPost.findById(statusPostId)
     const commentor = await User.findById(commentAuthorId)
     if (statusPost.author === commentAuthorId) return
-    await Notification.create({
+    const noti = await Notification.create({
         userId: statusPost.author,
         sender: commentor,
         notificationType: 'Comment',
@@ -36,6 +38,8 @@ const sendNotificationOnSomeoneComment = async (
         isRead: false,
         link: statusPostId,
     })
+
+    if (noti) io.in(statusPost.author.toString()).emit('newNotification')
 }
 
 // exports.getCommentById = asyncCatch(async (req, res, next) => {

@@ -19,6 +19,10 @@ import Colors from '../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
+<<<<<<< Updated upstream
+=======
+import {setStatus} from '../reducers/LoadingReducer';
+>>>>>>> Stashed changes
 
 interface ImageItem {
   uri: string;
