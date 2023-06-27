@@ -4,13 +4,6 @@ const socketIO = require('./socket')
 
 const io = socketIO.getIO()
 
-const joinChatRooms = async (userId, socket) => {
-    const chatrooms = await ChatRoom.find({ members: { $in: [userId] } })
-    chatrooms.forEach((chatroom) => {
-        socket.join(chatroom._id.toString())
-    })
-}
-
 io.use((socket, next) => {
     if (socket.handshake.query) {
         const { callerId } = socket.handshake.query
@@ -20,23 +13,18 @@ io.use((socket, next) => {
 })
 
 io.on('connection', (socket) => {
-    joinChatRooms(socket.handshake.auth.userId, socket)
-    socket.join(1)
+    socket.join(socket.handshake.auth.userId)
 
     socket.on('joinRoom', (data) => {
-        const { chatRoomId } = data
-        if (!socket.rooms.has(chatRoomId)) {
-            socket.join(chatRoomId)
-        }
+        const chatRoomId = data
+        socket.join(chatRoomId)
     })
 
     socket.on('leaveRoom', (data) => {
-        const { chatRoomId } = data
-        if (socket.rooms.has(chatRoomId)) {
-            socket.leave(chatRoomId)
-        }
+        const chatRoomId = data
+        socket.leave(chatRoomId)
     })
-    socket.join(1)
+
     socket.on('offerVideoCall', (data) => {
         const { offerDescription, chatRoomId } = data
         socket.to(chatRoomId).emit('offerVideoCall', {
@@ -78,21 +66,13 @@ io.on('connection', (socket) => {
     })
 
     socket.on('ICEcandidate', (data) => {
-        console.log('ICEcandidate data.calleeId', data.calleeId)
         const { calleeId, rtcMessage } = data
-        console.log('socket.user emit', socket.user)
 
         socket.to(calleeId).emit('ICEcandidate', {
             sender: socket.user,
             rtcMessage: rtcMessage,
         })
     })
-
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
 
     socket.on('newMessage', async (data) => {
         const { chatRoomId, message, senderId } = data
@@ -110,6 +90,10 @@ io.on('connection', (socket) => {
 
         if (!newChatMessage)
             return socket.emit('messageError', 'Unable to send new message')
+
+        chatRoom.lastMessage = message
+        chatRoom.lastMessageTime = Date.now
+        await chatRoom.save()
 
         io.in(chatRoomId).emit('newMessage', newChatMessage)
     })

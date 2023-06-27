@@ -1,39 +1,31 @@
-const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3')
-const multer = require('multer')
-const uuid = require('uuid')
-const multerS3 = require('multer-s3')
+const jwt = require('jsonwebtoken')
+const s3Controller = require('./s3Controller')
+
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
 const User = require('../models/User')
 const StatusPost = require('../models/StatusPost')
+const JWTBlacklist = require('../models/JWTBlacklist')
 
-const s3Client = new S3Client({
-    region: 'ap-southeast-1',
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-})
+const getUserIdFromJWT = async (req, next) => {
+    if (
+        !req.headers.authorization ||
+        !req.headers.authorization.startsWith('Bearer')
+    )
+        return next(new AppError('Missing authorization header', 401))
 
-exports.uploadMediaFiles = multer({
-    storage: multerS3({
-        s3: s3Client,
-        bucket: 'workwise',
-        acl: 'public-read',
-        contentType: multerS3.AUTO_CONTENT_TYPE,
-        key: function (req, file, cb) {
-            cb(null, uuid.v4())
-        },
-    }),
-})
+    const token = req.headers.authorization.split(' ')[1]
+    if (!token) return next(new AppError('Missing JWT token', 401))
 
-const deleteMediaFile = (path) => {
-    const command = new DeleteObjectCommand({
-        Bucket: 'workwise',
-        Key: path.substring(path.lastIndexOf('/') + 1, path.length),
-    })
+    const freshToken = await JWTBlacklist.findOne({ jwtData: token })
+    if (freshToken)
+        return next(
+            new AppError('Invalid request, this token is already revoked', 401)
+        )
 
-    s3Client.send(command).catch(() => {})
+    jwt.verify(token, process.env.JWT_SECRET)
+    const data = jwt.decode(token)
+    return data.id
 }
 
 exports.getStatusPostById = asyncCatch(async (req, res, next) => {
@@ -48,41 +40,83 @@ exports.getStatusPostById = asyncCatch(async (req, res, next) => {
             )
         )
 
+    // userId is the current request user, the author is post's owner
+    const userId = await getUserIdFromJWT(req, next)
+    const isLiked = statusPost.likedUsers.includes(userId)
+    const postObject = statusPost.toObject()
+    postObject.isLiked = isLiked
+    delete postObject.likedUsers
+
     res.status(200).json(statusPost)
 })
 
 exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
-    req.body.author = userId
-    req.body.mediaFiles = []
 
+    const mediaFiles = []
     if (req.files) {
-        req.files.forEach((item) => req.body.mediaFiles.push(item.location))
+        req.files.forEach((file) => {
+            let fileType
+            if (file.mimetype.startsWith('image/')) fileType = 'Image'
+            else if (file.mimetype.startsWith('video/')) fileType = 'Video'
+
+            const newFile = {
+                location: file.location,
+                name: file.originalname,
+                fileType: fileType,
+            }
+
+            mediaFiles.push(newFile)
+        })
     }
 
-    const newJobPost = await StatusPost.create(req.body)
+    const newStatusPost = await StatusPost.create({
+        author: userId,
+        description: req.body.description,
+        mediaFiles: mediaFiles,
+        sharedLink: req.body.sharedLink,
+    })
 
-    if (!newJobPost)
-        return next(new AppError('Unable to create a new job post', 500))
+    if (!newStatusPost) {
+        if (req.files)
+            req.files.forEach((item) =>
+                s3Controller.deleteMediaFile(item.location)
+            )
+        return next(new AppError('Unable to create new status post', 500))
+    }
 
-    res.status(200).json(newJobPost)
+    res.status(200).json(newStatusPost)
 })
 
 exports.getAllStatusPostsOfAUser = asyncCatch(async (req, res, next) => {
-    const { userId } = req.params
-    const user = await User.findById(userId)
-    if (!user) return next(new AppError('Unable to find this user', 404))
-    const statusPosts = await StatusPost.find({ author: userId })
+    const { userId: authorId } = req.params
+    const author = await User.findById(authorId)
+    if (!author) return next(new AppError('Unable to find this user', 404))
+    const statusPostsRaw = await StatusPost.find({
+        author: authorId,
+    }).populate('author', '_id name profileImagePath')
+
+    // userId is the current request user, the author is post's owner
+    const userId = await getUserIdFromJWT(req, next)
+    const statusPosts = statusPostsRaw.map((post) => {
+        const isLiked = post.likedUsers.includes(userId)
+        const postObject = post.toObject()
+        postObject.isLiked = isLiked
+        delete postObject.likedUsers
+        return postObject
+    })
+
     res.status(200).json(statusPosts)
 })
 
-exports.updateJobPostById = asyncCatch(async (req, res, next) => {
-    const { body: statusPostBody } = req
+exports.updateStatusPostById = asyncCatch(async (req, res, next) => {
+    const { description } = req.body
     const { statusPostId } = req.params
 
+    // TODO: Should have a feature to update media-files
     const updatedPost = await StatusPost.findByIdAndUpdate(
         statusPostId,
-        statusPostBody,
+        { description: description },
         {
             new: true,
             runValidators: true,
@@ -95,7 +129,22 @@ exports.updateJobPostById = asyncCatch(async (req, res, next) => {
     res.status(200).json(updatedPost)
 })
 
-exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
+exports.toggleLikeStatusPost = asyncCatch(async (req, res, next) => {
+    const { statusPostId } = req.params
+    const userId = await getUserIdFromJWT(req, next)
+
+    const post = await StatusPost.findById(statusPostId)
+    if (!post) return next(new AppError('Unable to find the status post', 500))
+
+    const indexOfTheLiked = post.likedUsers.indexOf(userId)
+    if (indexOfTheLiked === -1) post.likedUsers.push(userId)
+    else post.likedUsers.splice(indexOfTheLiked, 1)
+    await post.save()
+
+    res.status(204).end()
+})
+
+exports.deleteStatusPostById = asyncCatch(async (req, res, next) => {
     const { statusPostId } = req.params
 
     const deletedPost = await StatusPost.findByIdAndDelete(statusPostId)
@@ -104,7 +153,9 @@ exports.deleteJobPostById = asyncCatch(async (req, res, next) => {
             new AppError('Invalid status post id or already removed', 400)
         )
 
-    deletedPost.mediaFiles.forEach((location) => deleteMediaFile(location))
+    deletedPost.mediaFiles.forEach((location) =>
+        s3Controller.deleteMediaFile(location)
+    )
 
     res.status(204).end()
 })

@@ -2,6 +2,8 @@ const express = require('express')
 const usersController = require('../controllers/usersController')
 const authController = require('../controllers/authController')
 const chatController = require('../controllers/chatController')
+const friendController = require('../controllers/friendController')
+const s3Controller = require('../controllers/s3Controller')
 
 const router = express.Router({ mergeParams: true })
 
@@ -14,8 +16,17 @@ router
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
-        usersController.uploadProfileImage.single('profile-image'),
+        s3Controller.uploadMediaFiles.single('profile-image'),
         usersController.updateProfileImage
+    )
+
+router
+    .route('/:userId/background-image')
+    .post(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        s3Controller.uploadMediaFiles.single('background-image'),
+        usersController.updateUserBackground
     )
 
 router
@@ -26,6 +37,21 @@ router
         usersController.getAllFriends
     )
 
+router
+    .route('/:userId/friend-recommend')
+    .get(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        friendController.recommendFriends
+    )
+
+router
+    .route('/:userId/friend/:unfriendUserId')
+    .delete(
+        authController.isUser,
+        authController.isOwnerOfThePath,
+        friendController.unfriend
+    )
 
 router
     .route('/:userId/chatroom')

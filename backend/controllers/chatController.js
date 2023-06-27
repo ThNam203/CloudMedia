@@ -46,7 +46,9 @@ exports.getAllChatRooms = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
     let chatrooms
     try {
-        chatrooms = await ChatRoom.find({ members: { $in: [userId] } })
+        chatrooms = await ChatRoom.find({
+            members: { $in: [userId] },
+        }).populate('members', '_id name profileImagePath')
     } catch (err) {
         return next(err)
     }
@@ -56,15 +58,19 @@ exports.getAllChatRooms = asyncCatch(async (req, res, next) => {
 
 exports.getMessagesInChatRoomId = asyncCatch(async (req, res, next) => {
     const { chatRoomId } = req.params
-    let { page = 0, limit = 20 } = req.query
-    if (page < 0) page = 0
-    if (limit < 0) limit = 1
-    else if (limit > 100) limit = 100
+    // let { page = 0, limit = 20 } = req.query
+    // if (page < 0) page = 0
+    // if (limit < 0) limit = 1
+    // else if (limit > 100) limit = 100
 
-    const messages = await ChatMessage.find({ chatRoomId })
-        .sort({ createdAt: -1 })
-        .skip(page * limit)
-        .limit(limit)
+    // const messages = await ChatMessage.find({ chatRoomId })
+    //     .sort({ createdAt: -1 })
+    //     .skip(page * limit)
+    //     .limit(limit)
+
+    const messages = await ChatMessage.find({ chatRoomId }).sort({
+        createdAt: -1,
+    })
 
     const reverseMessages = messages.reverse()
 

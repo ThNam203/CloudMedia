@@ -20,8 +20,10 @@ import Colors from '../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
+
 import {setStatus} from '../reducers/LoadingReducer';
 import VideoPlayer from 'react-native-video-controls';
+
 
 interface ImageItem {
   uri: string;
