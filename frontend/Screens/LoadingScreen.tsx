@@ -6,17 +6,25 @@ import jwt_decode from 'jwt-decode';
 import {getInfoUser} from '../api/userApi';
 import {UserInfo, saveUser} from '../reducers/UserReducer';
 import {getAllNotifications} from '../api/notificationApi';
-import {setNotifications} from '../reducers/NotificationReducer';
+import {
+  clearNotifications,
+  setNotifications,
+} from '../reducers/NotificationReducer';
 import {setToken} from '../reducers/TokenReducer';
 import {setIdFromJwt} from '../reducers/UidReducer';
-import {useDispatch} from 'react-redux';
-import {getAllStatusPostOfUser} from '../api/statusPostApi';
-import {clearStatusPosts, pushStatusPosts} from '../reducers/StatusPostReducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {getAStatusPostById, getAllStatusPostOfUser} from '../api/statusPostApi';
+import {
+  clearStatusPosts,
+  pushStatusPosts,
+  pushStatusPostsSub,
+} from '../reducers/StatusPostReducer';
 import {Toast} from '../components/ui/Toast';
+import {RootState} from '../reducers/Store';
 
 export default function LoadingScreen({navigation, route}: any) {
   const {jwt} = route.params;
-
+  const user = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
 
   const saveAllStatusPost = async (jwt: any) => {
@@ -28,26 +36,22 @@ export default function LoadingScreen({navigation, route}: any) {
       const response: any = await getAllStatusPostOfUser(idUser, jwt);
       if (response.status === 200) {
         const data = response.data;
-
+        // console.log(data);
         for (const post of data) {
-          const userInfoResponse: any = await getInfoUser(post.author);
-          if (userInfoResponse.status === 200) {
-            const infoUser = userInfoResponse.data;
-
-            dispatch(
-              pushStatusPosts({
-                ...post,
-                name: infoUser.name,
-                profileImagePath: infoUser.profileImagePath,
-              }),
-            );
-          } else {
-            console.log(userInfoResponse.status);
-            throw new Error(userInfoResponse.data.errorMessage);
+          dispatch(pushStatusPosts(post));
+          if (post.sharedLink) {
+            const res: any = await getAStatusPostById(jwt, post.sharedLink);
+            if (res.status === 200) {
+              // console.log(res.data);
+              dispatch(pushStatusPostsSub(res.data));
+            } else {
+              throw new Error(res.data.errorMessage);
+            }
           }
         }
       } else {
         console.log(response.status);
+        console.log(response.data.errorMessage);
         throw new Error(response.data.errorMessage);
       }
     } catch (error: any) {
@@ -77,7 +81,7 @@ export default function LoadingScreen({navigation, route}: any) {
     try {
       const json = jwt_decode(jwt) as {id: string};
       const idUser = json.id;
-
+      dispatch(clearNotifications());
       const response: any = await getAllNotifications(idUser, jwt);
       if (response.status === 200) {
         const data = response.data;
@@ -92,6 +96,9 @@ export default function LoadingScreen({navigation, route}: any) {
   };
 
   useEffect(() => {
+    // connect socket
+    require('../utils/socket');
+
     dispatch(setToken(jwt));
     dispatch(setIdFromJwt(jwt));
     // get some data

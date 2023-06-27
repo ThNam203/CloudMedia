@@ -46,7 +46,7 @@ export default function ImagesPostScreen({navigation: {goBack}, route}: any) {
             return (
               <Animated.View style={{width: windowWitdh}} key={imageIndex}>
                 <Image
-                  source={{uri: image}}
+                  source={{uri: image.location}}
                   style={styles.card}
                   resizeMode="contain"
                 />

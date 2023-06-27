@@ -1,57 +1,87 @@
 /* eslint-disable react-native/no-inline-styles */
 import {TouchableOpacity} from '@gorhom/bottom-sheet';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dimensions} from 'react-native';
 import {FlatList, StyleSheet, Text, Image, View, Pressable} from 'react-native';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setPostShow} from '../../reducers/UtilsReducer';
+import {Toast} from './Toast';
+import {getAllStatusPostOfUser} from '../../api/statusPostApi';
+import {RootState} from '../../reducers/Store';
+import {getTimeToNow} from '../../utils/Utils';
+import {useFocusEffect} from '@react-navigation/native';
+import {
+  clearStatusPostsSub,
+  pushStatusPostsSub,
+} from '../../reducers/StatusPostReducer';
 const screenWidth = Dimensions.get('screen').width;
 
-const Post = ({type, content, image, time, user}: any) => {
-  const renderImage = () => {
-    if (image) {
-      return <Image style={styles.image} source={{uri: image}} />;
-    }
-    return null;
+const Post = ({navigation, item}: any) => {
+  const navigateToDetail = () => {
+    navigation.push('detailStatus', {idPost: item._id});
   };
 
   return (
-    <View style={styles.post}>
-      <Text style={styles.time}>{time}</Text>
+    <Pressable style={styles.post} onPress={navigateToDetail}>
+      <Text style={styles.time}>{getTimeToNow(item.createdAt)}</Text>
       <Text style={styles.user}>
-        {user}{' '}
+        {item.author.name}{' '}
         <Text style={{fontWeight: 'normal', color: '#999'}}>posted this</Text>
       </Text>
-      {renderImage()}
-      <Text style={styles.content}>{content}</Text>
-    </View>
+
+      <View style={{flexDirection: 'row'}}>
+        {item.mediaFiles[0] &&
+          (item.mediaFiles[0].fileType === 'Image' ? (
+            <Image
+              style={styles.image}
+              source={{uri: item.mediaFiles[0].location}}
+            />
+          ) : (
+            <Image
+              style={styles.image}
+              source={require('../../assets/images/Thumbnail.png')}
+            />
+          ))}
+        <View style={{flex: 1}}>
+          <Text style={styles.content} numberOfLines={5}>
+            {item.description}
+          </Text>
+        </View>
+      </View>
+    </Pressable>
   );
 };
 
-const ActivitySection = () => {
+const ActivitySection = (props: any) => {
   const dispatch = useDispatch();
+  const {navigation, userId} = props;
+  const [posts, setPosts] = useState<any[]>([]);
 
-  const [posts, setPosts] = useState([
-    {
-      type: 'text',
-      content: 'This is a text post.',
-      time: '12:00 PM',
-      user: 'John Doe',
-    },
-    {
-      type: 'image',
-      content: 'Hello',
-      image: 'https://upload.wikimedia.org/wikipedia/vi/2/2c/Nobita.png',
-      time: '1:00 PM',
-      user: 'Jane Doe',
-    },
-    {
-      type: 'text',
-      content: 'This is another text post.',
-      time: '2:00 PM',
-      user: 'John Smith',
-    },
-  ]);
+  const jwt = useSelector((state: RootState) => state.token.key);
+
+  const getPosts = async () => {
+    try {
+      const response: any = await getAllStatusPostOfUser(userId, jwt);
+      if (response.status === 200) {
+        setPosts(response.data.reverse());
+        for (const postsub of response.data)
+          dispatch(pushStatusPostsSub(postsub));
+      } else throw new Error(response.data.errorMessage);
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getPosts();
+      // dispatch(clearStatusPostsSub());
+
+      return () => {
+        // Cleanup or cancel any pending requests if needed
+      };
+    }, []),
+  );
 
   return (
     <View style={{margin: 25}}>
@@ -90,20 +120,13 @@ const ActivitySection = () => {
       </View>
       <FlatList
         data={posts.slice(0, 2)}
-        renderItem={({item}) => (
-          <Post
-            type={item.type}
-            content={item.content}
-            image={item.image}
-            time={item.time}
-            user={item.user}
-          />
-        )}
-        keyExtractor={item => item.time}
+        renderItem={({item}) => <Post navigation={navigation} item={item} />}
+        keyExtractor={(item, index) => 'key' + index}
         showsVerticalScrollIndicator={false}
         scrollEnabled={false}
       />
       <TouchableOpacity
+        onPress={() => navigation.navigate('postOfUser', {userId: userId})}
         style={{justifyContent: 'center', alignItems: 'center'}}>
         <Text
           style={[styles.title, {fontWeight: 'normal', marginVertical: 20}]}>
@@ -133,6 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
     marginBottom: 10,
+    padding: 5,
   },
   image: {
     width: 100,

@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../components/ui/Icons';
@@ -19,10 +20,10 @@ import Colors from '../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {createNewPost} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
-<<<<<<< Updated upstream
-=======
+
 import {setStatus} from '../reducers/LoadingReducer';
->>>>>>> Stashed changes
+import VideoPlayer from 'react-native-video-controls';
+
 
 interface ImageItem {
   uri: string;
@@ -51,7 +52,17 @@ function PostScreen() {
       Toast('Please enter something');
       return;
     }
-    createNewPost({mediaFiles, description}, uid, token)
+    toggleModal();
+    dispatch(setStatus(true));
+
+    const dataForm = new FormData();
+
+    for (let i = 0; i < mediaFiles.length; i++)
+      dataForm.append('media-files', mediaFiles[i]);
+
+    dataForm.append('description', description);
+
+    createNewPost(dataForm, uid, token)
       .then((response: any) => {
         if (response.status === 200) {
           console.log(response.data);
@@ -61,12 +72,18 @@ function PostScreen() {
           throw new Error(response.response.data.errorMessage);
         }
       })
-      .then((data: any) => {})
+      .then((data: any) => {
+        dispatch(setStatus(false));
+        Toast('Post successfully!');
+      })
       .catch(error => console.error(error));
-    toggleModal();
   };
 
   const takePhotoFromCamera = () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
     ImagePicker.openCamera({
       // height: 140,
       // width: 140,
@@ -87,11 +104,16 @@ function PostScreen() {
   };
 
   const choosePhotoFromLibrary = () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
     ImagePicker.openPicker({
       multiple: true,
       waitAnimationEnd: false,
       compressImageQuality: 0.8,
       maxFiles: 10,
+      mediaType: 'photo',
     })
       .then(images => {
         console.log(images);
@@ -105,24 +127,62 @@ function PostScreen() {
       .catch(error => Toast(error.message));
   };
 
+  const selectVideo = () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'image/jpeg') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
+    ImagePicker.openPicker({
+      mediaType: 'video',
+    })
+      .then((video: any) => {
+        console.log(video);
+        setMediaFiles([
+          {
+            uri: video.path,
+            type: video.mime,
+            name: video.path.split('/').pop(),
+          },
+        ]);
+      })
+      .catch(error => Toast(error.message));
+  };
+
   useEffect(() => {
     setDescription('');
     setMediaFiles([]);
   }, [postVisible]);
 
-  // item image
-  const ItemImageView = ({item}: any) => {
+  // item
+  const MedifafileView = ({item}: any) => {
+    const screenWidth = Dimensions.get('window').width;
     return (
       <View style={{flex: 1}}>
-        <Image
-          style={{
-            height: 120,
-            width: 160,
-            borderRadius: 3,
-            margin: 5,
-          }}
-          source={{uri: item.uri}}
-        />
+        {item.type === 'video/mp4' ? (
+          <View
+            style={{height: 230, backgroundColor: 'gray', width: screenWidth}}>
+            <VideoPlayer
+              controls={true}
+              // disableVolume={true}
+              disableFullscreen={true}
+              disableBack={true}
+              source={{uri: item.uri}}
+              style={{width: '100%', height: '100%'}}
+              paused={true}
+            />
+          </View>
+        ) : (
+          <Image
+            style={{
+              height: 120,
+              width: 160,
+              borderRadius: 3,
+              margin: 5,
+            }}
+            source={{uri: item.uri}}
+          />
+        )}
+
         <View
           style={{
             position: 'absolute',
@@ -183,7 +243,7 @@ function PostScreen() {
         <View style={{backgroundColor: Colors.white}}>
           <FlatList
             data={mediaFiles}
-            renderItem={({item}) => <ItemImageView item={item} />}
+            renderItem={({item}) => <MedifafileView item={item} />}
             keyExtractor={(_, index) => index.toString()}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
@@ -257,7 +317,7 @@ function PostScreen() {
           <TouchableOpacity onPress={takePhotoFromCamera}>
             <Icon type={Icons.Entypo} name="camera" size={25} />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={selectVideo}>
             <Icon
               type={Icons.Ionicons}
               name="ios-videocam"

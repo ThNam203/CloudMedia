@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useRef} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -15,6 +15,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setPostShow} from '../reducers/UtilsReducer';
 import {RootState} from '../reducers/Store';
 import ProfileScreen from '../Screens/ProfileScreen';
+import {setNumberNoti} from '../reducers/NotificationReducer';
 
 const TabArr = [
   {
@@ -47,7 +48,6 @@ const TabArr = [
     type: Icons.MaterialCommunityIcons,
     activeIcon: 'bell',
     inActiveIcon: 'bell-outline',
-    bellBadge: 'bell-badge-outline',
     component: NotificationsScreen,
   },
   {
@@ -65,7 +65,7 @@ const Tab = createBottomTabNavigator();
 const TabButton = (props: any) => {
   const {item, onPress, accessibilityState} = props;
   const focused = accessibilityState.selected;
-  const viewRef = useRef(null);
+  const viewRef = useRef<any>(null);
 
   const numberNotification = useSelector(
     (state: RootState) => state.notifications.numberNoti,
@@ -74,39 +74,43 @@ const TabButton = (props: any) => {
 
   useEffect(() => {
     if (focused) {
-      viewRef.current.animate({
-        0: {scale: 0.5, rotate: '0deg'},
-        1: {scale: 1.5, rotate: '360deg'},
+      viewRef.current?.animate({
+        0: {scale: 0.5},
+        1: {scale: 1.5},
       });
     } else {
-      viewRef.current.animate({
+      viewRef.current?.animate({
         0: {scale: 1.5, rotate: '360deg'},
         1: {scale: 1, rotate: '0deg'},
       });
     }
   }, [focused]);
 
-  const showPost = () => {
-    dispatch(setPostShow(true));
+  const handleTabPress = () => {
+    if (item.route === 'Post') {
+      dispatch(setPostShow(true));
+    } else {
+      if (item.route === 'Notifications') dispatch(setNumberNoti());
+      onPress();
+    }
   };
 
   return (
     <TouchableOpacity
-      onPress={item.route === 'Post' ? showPost : onPress}
+      onPress={handleTabPress}
       activeOpacity={1}
       style={styles.container}>
       <Animatable.View ref={viewRef} duration={1000} style={styles.container}>
         <Icon
           type={item.type}
-          name={
-            focused
-              ? item.activeIcon
-              : numberNotification && item.route === 'Notifications'
-              ? item.bellBadge
-              : item.inActiveIcon
-          }
+          name={focused ? item.activeIcon : item.inActiveIcon}
           color={focused ? Colors.primary : Colors.primaryLite}
         />
+        {item.route === 'Notifications' && numberNotification > 0 && (
+          <View style={styles.badgeContainer}>
+            <Text style={styles.badgeText}>{numberNotification}</Text>
+          </View>
+        )}
       </Animatable.View>
     </TouchableOpacity>
   );
@@ -147,5 +151,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: 15,
+    right: 0,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 15,
+    height: 15,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });

@@ -7,7 +7,7 @@ export default function AppLoader() {
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.container]}>
       <LottieView
-        source={require('../../assets/images/cat-loader.json')}
+        source={require('../../assets/images/sub-loader.json')}
         autoPlay
         loop
       />

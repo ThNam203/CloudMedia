@@ -7,39 +7,33 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import Modal from 'react-native-modal';
-import FriendList from '../components/ui/FriendList';
 import Icon, {Icons} from '../components/ui/Icons';
 import InvitationsList from '../components/ui/InvitationsList';
 
-function InvitationsScreen(props: any) {
-  const toggleModal = () => {
-    props.setVisible(!props.isVisible);
+function InvitationsScreen({navigation}: any) {
+  const navigateBack = () => {
+    navigation.goBack();
   };
 
   return (
-    <Modal
-      onBackdropPress={() => props.setVisible(false)}
-      onBackButtonPress={() => props.setVisible(false)}
-      isVisible={props.isVisible}
-      style={{margin: 0}}>
+    <View style={{flex: 1}}>
       <View style={{flex: 1}}>
         <View style={styles.modalContent}>
           <View style={{height: 70}} />
           <View style={{marginHorizontal: 20}}>
-            <InvitationsList />
+            <InvitationsList navigation={navigation} />
           </View>
         </View>
       </View>
       <View style={styles.topView}>
-        <View style={{margin: 20, flexDirection: 'row'}}>
-          <TouchableOpacity onPress={toggleModal} style={{marginTop: -3}}>
+        <View style={{margin: 15, flexDirection: 'row'}}>
+          <TouchableOpacity onPress={navigateBack} style={{marginTop: -3}}>
             <Icon type={Icons.Ionicons} name="arrow-back" size={35} />
           </TouchableOpacity>
           <Text style={styles.title}>Invitations</Text>
         </View>
       </View>
-    </Modal>
+    </View>
   );
 }
 export default InvitationsScreen;
@@ -76,5 +70,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
+    elevation: 5,
   },
 });

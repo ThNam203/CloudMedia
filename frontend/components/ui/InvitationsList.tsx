@@ -3,21 +3,25 @@ import {FlatList, View} from 'react-native';
 import ItemRequestUser from './ItemRequestUser';
 import {getAllFrRequestOfUser} from '../../api/friend_api';
 import {RootState} from '../../reducers/Store';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {getInfoUser} from '../../api/userApi';
 import {replyRequestFr} from '../../api/friend_api';
 import {Toast} from './Toast';
+import {addFriend} from '../../reducers/UserReducer';
 
-const InvitationsList = () => {
+const InvitationsList = (props: any) => {
+  const {navigation} = props;
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
 
+  const dispatch = useDispatch();
+
   const [invitations, setInvitations] = useState<
-    {id: string; name: string; avatar: any; connection: any}[]
+    {idRq: string; _id: string; name: string; avatar: any; connection: any}[]
   >([]);
 
   const deleteInvitation = (id: any) => {
-    const newInvitations = invitations.filter(obj => obj.id !== id);
+    const newInvitations = invitations.filter(obj => obj.idRq !== id);
     setInvitations(newInvitations);
   };
 
@@ -39,8 +43,9 @@ const InvitationsList = () => {
       });
   };
 
-  const handleAccept = async (requestId: any) => {
+  const handleAccept = async (requestId: any, senderId: any) => {
     replyRequest('Accept', requestId);
+    dispatch(addFriend(senderId));
   };
 
   const handleDecline = async (requestId: any) => {
@@ -89,7 +94,8 @@ const InvitationsList = () => {
           return getNameInfo(item.senderId)
             .then((infoUser: any) => {
               return {
-                id: item._id,
+                idRq: item._id,
+                _id: item.senderId,
                 name: infoUser.name,
                 profileImagePath: infoUser.profileImagePath,
                 datebetween: diffInHours + 'h',
@@ -115,13 +121,14 @@ const InvitationsList = () => {
       renderItem={({item}) => (
         <ItemRequestUser
           item={item}
+          navigation={navigation}
           nameRequest="Accept"
           nameRequest2="Decline"
           pressLeft={() => {
-            handleAccept(item.id);
+            handleAccept(item.idRq, item._id);
           }}
           pressRight={() => {
-            handleDecline(item.id);
+            handleDecline(item.idRq);
           }}
         />
       )}

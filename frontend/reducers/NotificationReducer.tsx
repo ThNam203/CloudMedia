@@ -11,8 +11,9 @@ interface Notification {
     name: any;
     profileImagePath: any;
   };
+  link: any;
   isRead: boolean;
-  updatedAt: any;
+  createdAt: any;
 }
 
 interface Notifications {
@@ -38,8 +39,15 @@ const NotificationSlice = createSlice({
         }
       });
     },
+    setNumberNoti: (state: Notifications) => {
+      state.numberNoti = 0;
+    },
+    clearNotifications: (state: Notifications) => {
+      state.arr = [];
+    },
   },
 });
 
-export const {setNotifications} = NotificationSlice.actions;
+export const {setNotifications, setNumberNoti, clearNotifications} =
+  NotificationSlice.actions;
 export default NotificationSlice.reducer;

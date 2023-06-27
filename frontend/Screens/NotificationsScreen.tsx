@@ -2,26 +2,61 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import {View, Text, FlatList, TouchableOpacity, Image} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
+import {getTimeToNow} from '../utils/Utils';
+import {getAStatusPostById} from '../api/statusPostApi';
+import {Toast} from '../components/ui/Toast';
+import {pushStatusPostsSub} from '../reducers/StatusPostReducer';
+import {readNotification} from '../api/notificationApi';
 
 export default function NotificationsScreen({navigation}: any) {
   const NotificationsData = useSelector(
     (state: RootState) => state.notifications.arr,
   );
 
-  const getTimeToNow = (time: any) => {
-    const dateNow = new Date();
-    const date = new Date(time);
-    const diffInMilliseconds = dateNow.getTime() - date.getTime();
-    return Math.round(diffInMilliseconds / 3600000);
+  const uid = useSelector((state: RootState) => state.uid.id);
+  const jwt = useSelector((state: RootState) => state.token.key);
+  const dispatch = useDispatch();
+
+  const navigateToDetail = (id: any) => {
+    getAStatusPostById(jwt, id)
+      .then((res: any) => {
+        if (res.status === 200) {
+          dispatch(pushStatusPostsSub(res.data));
+          return res.data;
+        } else {
+          throw new Error(res.data.errorMessage);
+        }
+      })
+      .then((data: any) => {
+        navigation.push('detailStatus', {idPost: id});
+      })
+      .catch((error: any) => {
+        Toast(error.message);
+      });
   };
 
-  const CTA = ({title}: any) => (
+  useEffect(() => {
+    const readNotifi = async () => {
+      const response: any = await readNotification(uid, jwt);
+      if (response.status !== 204) {
+        console.log(response.status);
+        console.log(response.data.errorMessage);
+      }
+    };
+    readNotifi();
+  }, []);
+
+  const CTA = ({title, item}: any) => (
     <TouchableOpacity
-      onPress={() => {}}
+      onPress={() => {
+        if (item.notificationType === 'Comment') navigateToDetail(item.link);
+        if (item.notificationType === 'FriendRequest')
+          navigation.navigate('invitations');
+      }}
       style={{
         borderRadius: 50,
         borderColor: '#0077B5',
@@ -43,14 +78,28 @@ export default function NotificationsScreen({navigation}: any) {
         flexDirection: 'row',
         alignItems: 'center',
       }}>
-      <Image
-        source={
-          item.sender?.profileImagePath
-            ? {uri: item.sender.profileImagePath}
-            : require('../assets/images/Spiderman.jpg')
-        }
-        style={{height: 70, width: 70, marginRight: 20, borderRadius: 35}}
-      />
+      <View
+        style={{
+          height: 70,
+          width: 70,
+          marginRight: 20,
+          borderRadius: 35,
+          elevation: 5,
+        }}>
+        <Image
+          source={
+            item.sender?.profileImagePath
+              ? {uri: item.sender.profileImagePath}
+              : require('../assets/images/Spiderman.jpg')
+          }
+          style={{
+            flex: 1,
+            borderRadius: 35,
+            height: undefined,
+            width: undefined,
+          }}
+        />
+      </View>
       <View>
         <Text
           style={{
@@ -62,16 +111,16 @@ export default function NotificationsScreen({navigation}: any) {
           {item.content}
         </Text>
         {item.notificationType === 'FriendRequest' ? (
-          <CTA title="View request" />
+          <CTA title="View request" item={item} />
         ) : item.notificationType === 'Comment' ? (
-          <CTA title="See all comment" />
+          <CTA title="See all comment" item={item} />
         ) : item.notificationType === 'Like' ? (
-          <CTA title="See like" />
+          <CTA title="See like" item={item} />
         ) : null}
       </View>
       <View>
         <Text style={{fontSize: 13, marginBottom: 5}}>
-          {getTimeToNow(item.updatedAt)}h
+          {getTimeToNow(item.createdAt)}
         </Text>
         <TouchableOpacity onPress={() => {}}>
           <Icon
@@ -110,11 +159,12 @@ export default function NotificationsScreen({navigation}: any) {
       </View>
     );
   };
+
   return (
     <View
       style={{
         marginTop: 10,
-        paddingHorizontal: 10,
+        paddingHorizontal: 5,
         backgroundColor: 'white',
       }}>
       <FlatList

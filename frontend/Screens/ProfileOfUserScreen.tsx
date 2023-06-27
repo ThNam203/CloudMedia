@@ -1,149 +1,65 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
 import {
+  View,
+  Text,
+  StyleSheet,
   Dimensions,
+  ScrollView,
   Image,
   Pressable,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
 } from 'react-native';
-import ActivitySection from '../components/ui/ActivitySection';
-import UploadPhoto from '../components/ui/UploadPhoto';
-
-import EditProfileScreen from './EditProfileScreen';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../reducers/Store';
-import {postAvatarImg, postBackgrImg, userLogout} from '../api/userApi';
-import {nameStorage, storeData} from '../reducers/AsyncStorage';
-import {setStatus} from '../reducers/LoadingReducer';
-import {updateAvatar, updateBackground} from '../reducers/UserReducer';
+import React, {useEffect, useState} from 'react';
 import Colors from '../constants/Colors';
+import {useDispatch, useSelector} from 'react-redux';
+import ActivitySection from '../components/ui/ActivitySection';
+import {getInfoUser} from '../api/userApi';
 import {Toast} from '../components/ui/Toast';
 import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
-import Icon, {Icons} from '../components/ui/Icons';
+import Header from '../components/ui/Header';
+import {RootState} from '../reducers/Store';
 
 const screenWidth = Dimensions.get('window').width;
 
-function ProfileScreen({navigation}: any) {
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [isModelBackGrVisible, setIsModelBackGrVisible] = useState(false);
+export default function ProfileOfUserScreen(props: any) {
+  const {navigation, route} = props;
+  const {id} = route.params;
 
-  const [editProfile, setEditProfile] = useState(false);
-
-  const user = useSelector((state: RootState) => state.userInfo);
-  const token = useSelector((state: RootState) => state.token.key);
-  const uid = useSelector((state: RootState) => state.uid.id);
-
+  const [user, setUser] = useState<any>({});
   const dispatch = useDispatch();
 
-  const handleLogout = async () => {
-    userLogout(token)
-      .then((response: any) => {
-        if (response.status === 204) {
-          console.log(response);
-          storeData(false, nameStorage.isLogin)
-            .then(() => {
-              navigation.reset({
-                index: 0,
-                routes: [{name: 'login'}],
-              });
-            })
-            .catch(error => {
-              console.error(error);
-            });
+  const myUser = useSelector((state: RootState) => state.userInfo);
+
+  const [isFriend, setIsFriend] = useState(false);
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        const response: any = await getInfoUser(id);
+        if (response.status === 200) {
+          setUser(response.data);
         } else {
-          throw new Error('Logout failed.');
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
-      })
-      .catch(error => {
+      } catch (error: any) {
         Toast(error.message);
-      });
-  };
+      }
+    };
 
-  const postImage = (image: any) => {
-    const dataForm = new FormData();
-    dataForm.append('profile-image', {
-      uri: image.path,
-      type: image.mime,
-      name: image.filename || 'profile-image',
-    });
-    dispatch(setStatus(true));
-    postAvatarImg(dataForm, uid, token)
-      .then((response: any) => {
-        if (response.status === 200) {
-          console.log(response.data);
-          return response.data;
-        } else {
-          console.log(response.status);
-          throw new Error(response.data.errorMessage);
-        }
-      })
-      .then((data: any) => {
-        dispatch(updateAvatar(data.imagePath));
-      })
-      .catch(error => Toast(error.message))
-      .finally(() => {
-        dispatch(setStatus(false));
-      });
-  };
+    for (let idConnection of myUser.connections) {
+      if (idConnection === id) {
+        setIsFriend(true);
+        break;
+      }
+    }
 
-  const postBackgroundImage = (image: any) => {
-    const dataForm = new FormData();
-    dataForm.append('background-image', {
-      uri: image.path,
-      type: image.mime,
-      name: image.filename || 'profile-image',
-    });
-    dispatch(setStatus(true));
-    postBackgrImg(dataForm, uid, token)
-      .then((response: any) => {
-        if (response.status === 200) {
-          console.log(response.data);
-          return response.data;
-        } else {
-          console.log(response.status);
-          throw new Error(response.data.errorMessage);
-        }
-      })
-      .then((data: any) => {
-        dispatch(updateBackground(data.backgroundImagePath));
-      })
-      .catch(error => Toast(error.message))
-      .finally(() => {
-        dispatch(setStatus(false));
-      });
-  };
-
-  // useEffect(() => {
-  //   dispatch(clearStatusPostsSub());
-  // }, []);
-
+    // dispatch(clearStatusPostsSub());
+    getUserInfo();
+  }, [myUser]);
+  // return null;
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <Header navigation={navigation} />
       <View style={styles.container}>
-        <UploadPhoto
-          isVisible={isModalVisible}
-          setVisible={setModalVisible}
-          height={140}
-          width={140}
-          isCirle={true}
-          postImage={postImage}
-        />
-        <UploadPhoto
-          isVisible={isModelBackGrVisible}
-          setVisible={setIsModelBackGrVisible}
-          height={120}
-          width={screenWidth}
-          isCirle={false}
-          postImage={postBackgroundImage}
-        />
-        <EditProfileScreen
-          isVisible={editProfile}
-          setVisible={setEditProfile}
-        />
         <View style={styles.backgroundAvatarContainer}>
           <Image
             source={
@@ -153,24 +69,6 @@ function ProfileScreen({navigation}: any) {
             }
             style={styles.backgroundAvatarImage}
           />
-          <View style={{position: 'absolute', top: 10, right: 5}}>
-            <TouchableOpacity
-              style={{
-                backgroundColor: Colors.white,
-                borderRadius: 50,
-                padding: 5,
-                elevation: 5,
-              }}
-              onPress={() => {
-                setIsModelBackGrVisible(!isModelBackGrVisible);
-              }}>
-              <Icon
-                name="camera"
-                type={Icons.Entypo}
-                style={{width: 25, height: 25}}
-              />
-            </TouchableOpacity>
-          </View>
         </View>
         <View
           style={{
@@ -187,28 +85,7 @@ function ProfileScreen({navigation}: any) {
               }
               style={styles.avatarImage}
             />
-            <View style={styles.buttonAddImageOuter}>
-              <TouchableOpacity
-                style={styles.buttonAddImage}
-                onPress={() => setModalVisible(!isModalVisible)}>
-                <Image
-                  source={require('../assets/images/Add.png')}
-                  style={{width: 25, height: 25, marginTop: 3}}
-                />
-              </TouchableOpacity>
-            </View>
           </View>
-          <TouchableOpacity
-            style={{
-              alignSelf: 'flex-start',
-              margin: 10,
-            }}
-            onPress={() => setEditProfile(!editProfile)}>
-            <Image
-              style={{height: 28, width: 28}}
-              source={require('../assets/images/la_pen.png')}
-            />
-          </TouchableOpacity>
         </View>
         <View>
           <Text style={styles.textName}>{user.name}</Text>
@@ -240,7 +117,7 @@ function ProfileScreen({navigation}: any) {
                 marginTop: 10,
               },
             ]}>
-            {`${user.connections.length} connections`}
+            {`${user.connections?.length} connections`}
           </Text>
           <View
             style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
@@ -254,6 +131,9 @@ function ProfileScreen({navigation}: any) {
                 alignItems: 'center',
               }}>
               <Pressable
+                onPress={() => {
+                  navigation.goBack();
+                }}
                 android_ripple={{color: '#00043d'}}
                 style={{
                   backgroundColor: 'transparent',
@@ -263,7 +143,7 @@ function ProfileScreen({navigation}: any) {
                 }}>
                 <Text
                   style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
-                  Open to
+                  {isFriend ? 'Unfriend' : 'Add friend'}
                 </Text>
               </Pressable>
             </View>
@@ -279,9 +159,6 @@ function ProfileScreen({navigation}: any) {
                 marginHorizontal: 10,
               }}>
               <Pressable
-                onPress={() => {
-                  dispatch(setStatus(true));
-                }}
                 android_ripple={{color: '#0d8fe0ff'}}
                 style={{
                   backgroundColor: 'transparent',
@@ -327,40 +204,14 @@ function ProfileScreen({navigation}: any) {
             style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
           />
           <View>
-            <ActivitySection navigation={navigation} userId={uid} />
+            <ActivitySection navigation={navigation} userId={id} />
           </View>
-        </View>
-        <View
-          style={{
-            overflow: 'hidden',
-            borderRadius: 15,
-            width: 300,
-            alignSelf: 'center',
-            marginBottom: 10,
-          }}>
-          <Pressable
-            onPress={handleLogout}
-            style={styles.btnLogout}
-            android_ripple={{color: '#613FC2', borderless: false}}>
-            <Text
-              style={[
-                styles.fontText,
-                {
-                  fontWeight: '700',
-                  lineHeight: 20,
-                  alignSelf: 'center',
-                  color: '#ffffff',
-                },
-              ]}>
-              Log out
-            </Text>
-          </Pressable>
         </View>
       </View>
     </ScrollView>
   );
 }
-export default ProfileScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

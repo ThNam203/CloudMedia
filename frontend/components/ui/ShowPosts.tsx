@@ -17,10 +17,17 @@ import {deleteAStatusPost, toogleLike} from '../../reducers/StatusPostReducer';
 import MenuStatus from './MenuStatus';
 import {RootState} from '../../reducers/Store';
 import {Toast} from './Toast';
-import {deleteAStatusPostApi} from '../../api/statusPostApi';
+import {
+  deleteAStatusPostApi,
+  toggleLikeStatusApi,
+} from '../../api/statusPostApi';
+import VideoPlayer from 'react-native-video-controls';
+import {setShareLink, setShareShow} from '../../reducers/UtilsReducer';
+import PostShared from './PostShared';
 
 export default function ShowPosts({item, navigation, pressComment}: any) {
   const deviceWidth = Dimensions.get('window').width;
+  const deviceHeight = Dimensions.get('window').height;
   const dispatch = useDispatch();
 
   const [showMore, setShowMore] = useState(false);
@@ -33,18 +40,26 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
     setLengthMore(e.nativeEvent.lines.length >= 3); //to check the text is more than 3 lines or not
   }, []);
 
-  const timeAgo = getTimeToNow(item.updatedAt);
-
-  const [isLike, setIsLike] = useState(false); // check user like this post or not
+  const timeAgo = getTimeToNow(item.createdAt);
+  // check user like this post or not
   // like or unlike
-  const handleLike = () => {
-    console.log('like');
-    dispatch(toogleLike(item));
-    setIsLike((prev: any) => !prev);
+  const handleLike = async () => {
+    try {
+      const response: any = await toggleLikeStatusApi(uid, jwt, item._id);
+      if (response.status === 204) {
+        dispatch(toogleLike(item._id));
+        console.log('success');
+      } else {
+        // throw new Error(response.data.errorMessage);
+        console.log(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
   };
 
   const toggleShowOption = () => {
-    if (item.author === uid) {
+    if (item.author._id === uid) {
       setShowOption((prev: any) => !prev);
     }
   };
@@ -69,6 +84,16 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
     }
   };
 
+  const handleShare = () => {
+    if (item.sharedLink) dispatch(setShareLink(item.sharedLink));
+    else dispatch(setShareLink(item._id));
+    dispatch(setShareShow(true));
+  };
+
+  const navigateToProfile = () => {
+    navigation.navigate('profileOther', {id: item.author._id});
+  };
+
   return (
     <View
       style={{
@@ -83,20 +108,27 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
       ) : null}
 
       <View style={Styles.flexCenter}>
-        <Image
-          source={{uri: item.profileImagePath}}
-          style={{
-            height: 60,
-            width: 60,
-            borderRadius: 100,
-            marginHorizontal: 10,
-          }}
-        />
+        <TouchableOpacity onPress={navigateToProfile}>
+          <Image
+            source={
+              item.author.profileImagePath
+                ? {uri: item.author.profileImagePath}
+                : require('../../assets/images/Spiderman.jpg')
+            }
+            style={{
+              height: 60,
+              width: 60,
+              borderRadius: 100,
+              marginHorizontal: 10,
+            }}
+          />
+        </TouchableOpacity>
         <View>
           <View style={Styles.flexCenter}>
             <Text
+              onPress={navigateToProfile}
               style={{fontSize: 16, color: Colors.black, fontWeight: 'bold'}}>
-              {item.name}
+              {item.author.name}
             </Text>
             <Text style={{fontWeight: 'bold'}}>
               <Icon
@@ -159,37 +191,57 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
           onPress={() =>
             navigation.navigate('imagesPost', {images: item.mediaFiles})
           }>
-          <View style={{height: 300, width: deviceWidth, flexDirection: 'row'}}>
-            <Image
-              source={{uri: item.mediaFiles[0]}}
-              style={{flex: 1, marginHorizontal: 0.75}}
-            />
-            {item.mediaFiles.length > 1 ? (
-              <View
-                style={{
-                  flex: 1,
-                  marginHorizontal: 0.75,
-                  flexDirection: 'column',
-                }}>
-                <Image source={{uri: item.mediaFiles[1]}} style={{flex: 1}} />
-                {item.mediaFiles.length > 2 ? (
-                  <View style={{flex: 1, marginVertical: 1.5}}>
-                    <Image
-                      source={{uri: item.mediaFiles[2]}}
-                      style={{flex: 1}}
-                    />
-                    {item.mediaFiles.length > 3 ? (
-                      <Text style={Styles.textImageMore}>
-                        +{item.mediaFiles.length - 3}
-                      </Text>
-                    ) : null}
-                  </View>
-                ) : null}
-              </View>
-            ) : null}
-          </View>
+          {item.mediaFiles[0].fileType === 'Image' ? (
+            <View
+              style={{height: 300, width: deviceWidth, flexDirection: 'row'}}>
+              <Image
+                source={{uri: item.mediaFiles[0].location}}
+                style={{flex: 1, marginHorizontal: 0.75}}
+              />
+              {item.mediaFiles.length > 1 ? (
+                <View
+                  style={{
+                    flex: 1,
+                    marginHorizontal: 0.75,
+                    flexDirection: 'column',
+                  }}>
+                  <Image
+                    source={{uri: item.mediaFiles[1].location}}
+                    style={{flex: 1}}
+                  />
+                  {item.mediaFiles.length > 2 ? (
+                    <View style={{flex: 1, marginVertical: 1}}>
+                      <Image
+                        source={{uri: item.mediaFiles[2].location}}
+                        style={{flex: 1}}
+                      />
+                      {item.mediaFiles.length > 3 ? (
+                        <Text style={Styles.textImageMore}>
+                          +{item.mediaFiles.length - 3}
+                        </Text>
+                      ) : null}
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
+            </View>
+          ) : (
+            <View style={{height: 230, width: deviceWidth}}>
+              <VideoPlayer
+                source={{uri: item.mediaFiles[0].location}}
+                style={{width: '100%', height: '100%'}}
+                disableBack={true}
+                paused={true}
+                thumbnail={require('../../assets/images/Thumbnail.png')}
+              />
+            </View>
+          )}
         </Pressable>
       ) : null}
+      {item.sharedLink ? (
+        <PostShared sharedLink={item.sharedLink} navigation={navigation} />
+      ) : null}
+
       <Pressable onPress={pressComment}>
         <View
           style={[
@@ -249,11 +301,11 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
             type={Icons.Entypo}
             name="thumbs-up"
             size={19}
-            color={isLike ? Colors.skyBlue : Colors.gray}
+            color={item.isLiked ? Colors.skyBlue : Colors.gray}
           />
           <Text
             style={{
-              color: isLike ? Colors.skyBlue : Colors.gray,
+              color: item.isLiked ? Colors.skyBlue : Colors.gray,
               marginHorizontal: 5,
             }}>
             Like
@@ -270,6 +322,18 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
             color={Colors.gray}
           />
           <Text style={{marginHorizontal: 5}}>Comment</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{alignItems: 'center', flexDirection: 'row'}}
+          onPress={handleShare}>
+          <Icon
+            type={Icons.FontAwesome}
+            name="share"
+            size={19}
+            color={Colors.gray}
+          />
+          <Text style={{marginHorizontal: 5}}>Share</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -28,9 +28,12 @@ import ShowPosts from '../components/ui/ShowPosts';
 import {
   decrementComment,
   imcrementComment,
+  updateAStatusPost,
 } from '../reducers/StatusPostReducer';
+import {useFocusEffect} from '@react-navigation/native';
+import {getAStatusPostById} from '../api/statusPostApi';
 
-interface ImageItem {
+interface MediaItem {
   uri: string;
   type: string;
   name: string;
@@ -43,11 +46,18 @@ export default function DetailStatusScreen({navigation, route}: any) {
   const uid = useSelector((state: RootState) => state.uid.id);
   const token = useSelector((state: RootState) => state.token.key);
 
-  const {item} = route.params;
+  const {idPost} = route.params;
+
+  const item: any = useSelector((state: RootState) => {
+    return (
+      state.statusPost.HomePage.find(item => item._id === idPost) ||
+      state.statusPost.sub.find(item => item._id === idPost)
+    );
+  });
 
   const [comment, setComment] = useState('');
 
-  const [mediaFile, setMediaFile] = useState<ImageItem>();
+  const [mediaFile, setMediaFile] = useState<MediaItem>();
 
   const [isFocused, setIsFocused] = useState(false);
 
@@ -134,9 +144,38 @@ export default function DetailStatusScreen({navigation, route}: any) {
       .catch(error => Toast(error.message));
   };
 
+  const getComments = async () => {
+    try {
+      const response: any = await getAllComments(item._id, token);
+      if (response.status === 200) {
+        setComments(response.data);
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
   const handleKeyboardDismiss = () => {
     setIsFocused(false);
     commentRef.current?.blur();
+  };
+
+  const updateStatus = async () => {
+    try {
+      const response: any = await getAStatusPostById(token, item._id);
+      if (response.status === 200) {
+        const dataStatus: any = response.data;
+        dispatch(updateAStatusPost({dataStatus}));
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
   };
 
   useEffect(() => {
@@ -144,24 +183,20 @@ export default function DetailStatusScreen({navigation, route}: any) {
       'keyboardDidHide',
       handleKeyboardDismiss,
     );
-    const getComments = async () => {
-      try {
-        const response: any = await getAllComments(item._id, token);
-        if (response.status === 200) {
-          setComments(response.data);
-        } else {
-          console.log(response.status);
-          throw new Error(response.data.errorMessage);
-        }
-      } catch (error: any) {
-        Toast(error.message);
-      }
-    };
-    getComments();
     return () => {
       keyboardDidHideListener.remove();
     };
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getComments();
+      updateStatus();
+      return () => {
+        // Cleanup or cancel any pending requests if needed
+      };
+    }, []),
+  );
 
   return (
     <View style={Styles.container}>
@@ -178,9 +213,10 @@ export default function DetailStatusScreen({navigation, route}: any) {
         <View style={{flex: 1, marginVertical: 5, paddingVertical: 10}}>
           {comments.map((comment, index) => (
             <ItemComment
+              statusId={item._id}
               navigation={navigation}
               item={comment}
-              IdAuthorOfStatus={item.author}
+              IdAuthorOfStatus={item.author._id}
               handleDeleteComment={() => {
                 handleDeleteComment(comment._id);
               }}

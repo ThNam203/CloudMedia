@@ -3,26 +3,18 @@ import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
 import React, {useState} from 'react';
 import Icon, {Icons} from '../components/ui/Icons';
 import FriendList from '../components/ui/FriendList';
-import InvitationsScreen from './InvitationsScreen';
 
 function NetworkScreen({navigation}: any) {
-  const [invitationsScreen, setInvitationsScreen] = useState(false);
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('myNetworks')}>
         <View style={styles.manageNetworkView}>
           <Text style={styles.title}>Manage my network</Text>
           <Icon type={Icons.AntDesign} name={'right'} />
         </View>
       </TouchableOpacity>
       <View style={{backgroundColor: '#eeeeee', height: 10}} />
-      <InvitationsScreen
-        isVisible={invitationsScreen}
-        setVisible={setInvitationsScreen}
-      />
-      <TouchableOpacity
-        onPress={() => setInvitationsScreen(!invitationsScreen)}>
+      <TouchableOpacity onPress={() => navigation.navigate('invitations')}>
         <View style={styles.manageNetworkView}>
           <Text style={styles.title}>Invitation</Text>
           <Icon type={Icons.AntDesign} name={'right'} />

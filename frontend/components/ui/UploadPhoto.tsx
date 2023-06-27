@@ -14,10 +14,10 @@ function UploadPhoto(props: any) {
   const takePhotoFromCamera = () => {
     toggleModal();
     ImagePicker.openCamera({
-      height: 140,
-      width: 140,
+      height: props.height,
+      width: props.width,
       cropping: true,
-      cropperCircleOverlay: true,
+      cropperCircleOverlay: props.isCirle,
     })
       .then(image => {
         props.postImage(image);
@@ -29,10 +29,12 @@ function UploadPhoto(props: any) {
   const choosePhotoFromLibrary = () => {
     toggleModal();
     ImagePicker.openPicker({
-      height: 140,
-      width: 140,
+      height: props.height,
+      width: props.width,
+      waitAnimationEnd: false,
+      compressImageQuality: 0.8,
       cropping: true,
-      cropperCircleOverlay: true,
+      cropperCircleOverlay: props.isCirle,
     })
       .then(image => {
         props.postImage(image);

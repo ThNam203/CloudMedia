@@ -12,13 +12,16 @@ import Icon, {Icons} from './Icons';
 import {getTimeToNow} from '../../utils/Utils';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
+import {Toast} from './Toast';
+import {toggleLikeCommentApi} from '../../api/statusCommentApi';
 
 export default function ItemComment(props: any) {
-  const {navigation, item, IdAuthorOfStatus, handleDeleteComment} = props;
-  const [showMore, setShowMore] = useState(false);
+  const {navigation, item, statusId, IdAuthorOfStatus, handleDeleteComment} =
+    props;
   const {author, content, mediaFile, createdAt} = item;
-  const [isLike, setIsLike] = useState(false);
+  const [isLike, setIsLike] = useState(item.isLiked);
   const [likeCount, setLikeCount] = useState(item.likeCount);
+  const [showMore, setShowMore] = useState(false);
   const [lengthMore, setLengthMore] = useState(false);
 
   const onTextLayout = useCallback((e: any) => {
@@ -30,6 +33,7 @@ export default function ItemComment(props: any) {
   const [showOption, setShowOption] = useState(false);
 
   const uid = useSelector((state: RootState) => state.uid.id);
+  const jwt = useSelector((state: RootState) => state.token.key);
 
   const toggleShowOption = () => {
     if (uid === author._id || uid === IdAuthorOfStatus) {
@@ -37,18 +41,32 @@ export default function ItemComment(props: any) {
     }
   };
 
-  const toogleLike = () => {
-    if (isLike) {
-      setLikeCount((prev: any) => prev - 1);
-    } else {
-      setLikeCount((prev: any) => prev + 1);
+  const toogleLike = async () => {
+    try {
+      const response: any = await toggleLikeCommentApi(statusId, item._id, jwt);
+      if (response.status === 204) {
+        if (isLike) {
+          setLikeCount((prev: any) => prev - 1);
+        } else {
+          setLikeCount((prev: any) => prev + 1);
+        }
+        setIsLike((prev: any) => !prev);
+      } else {
+        throw new Error(response.data.errorMessage);
+        // console.log(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
     }
-    setIsLike((prev: any) => !prev);
   };
 
   useEffect(() => {
     setShowOption(false);
   }, [item]);
+
+  const navigateToProfile = () => {
+    navigation.push('profileOther', {id: author._id});
+  };
 
   return (
     <View style={styles.container}>
@@ -61,7 +79,7 @@ export default function ItemComment(props: any) {
           </View>
         </View>
       ) : null}
-      <View style={{marginTop: 7}}>
+      <TouchableOpacity onPress={navigateToProfile} style={{marginTop: 7}}>
         <Image
           source={
             author.profileImagePath
@@ -70,12 +88,14 @@ export default function ItemComment(props: any) {
           }
           style={{width: 50, height: 50, borderRadius: 25}}
         />
-      </View>
+      </TouchableOpacity>
       <View style={styles.mainContent}>
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={styles.textName}>{author.name || 'Lalalie'}</Text>
+              <Text onPress={navigateToProfile} style={styles.textName}>
+                {author.name || 'Lalalie'}
+              </Text>
               {author._id === IdAuthorOfStatus && (
                 <Text style={styles.author}>Author</Text>
               )}
