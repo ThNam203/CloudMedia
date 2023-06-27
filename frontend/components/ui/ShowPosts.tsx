@@ -23,6 +23,7 @@ import {
 } from '../../api/statusPostApi';
 import VideoPlayer from 'react-native-video-controls';
 import {setShareLink, setShareShow} from '../../reducers/UtilsReducer';
+import PostShared from './PostShared';
 
 export default function ShowPosts({item, navigation, pressComment}: any) {
   const deviceWidth = Dimensions.get('window').width;
@@ -91,10 +92,6 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
 
   const navigateToProfile = () => {
     navigation.navigate('profileOther', {id: item.author._id});
-  };
-
-  const navigateToPostShared = () => {
-    navigation.push('detailStatus', {idPost: item.sharedLink});
   };
 
   return (
@@ -242,21 +239,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
         </Pressable>
       ) : null}
       {item.sharedLink ? (
-        <View style={{paddingHorizontal: 16}}>
-          <TouchableOpacity onPress={navigateToPostShared}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Icon
-                type={Icons.Entypo}
-                name="link"
-                size={16}
-                color={Colors.irisBlue}
-              />
-              <Text style={{color: Colors.irisBlue, marginLeft: 5}}>
-                {item.sharedLink}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <PostShared sharedLink={item.sharedLink} navigation={navigation} />
       ) : null}
 
       <Pressable onPress={pressComment}>

@@ -28,8 +28,10 @@ import ShowPosts from '../components/ui/ShowPosts';
 import {
   decrementComment,
   imcrementComment,
+  updateAStatusPost,
 } from '../reducers/StatusPostReducer';
 import {useFocusEffect} from '@react-navigation/native';
+import {getAStatusPostById} from '../api/statusPostApi';
 
 interface MediaItem {
   uri: string;
@@ -161,6 +163,21 @@ export default function DetailStatusScreen({navigation, route}: any) {
     commentRef.current?.blur();
   };
 
+  const updateStatus = async () => {
+    try {
+      const response: any = await getAStatusPostById(token, item._id);
+      if (response.status === 200) {
+        const dataStatus: any = response.data;
+        dispatch(updateAStatusPost({dataStatus}));
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
   useEffect(() => {
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
@@ -174,7 +191,7 @@ export default function DetailStatusScreen({navigation, route}: any) {
   useFocusEffect(
     React.useCallback(() => {
       getComments();
-
+      updateStatus();
       return () => {
         // Cleanup or cancel any pending requests if needed
       };

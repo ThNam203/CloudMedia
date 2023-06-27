@@ -47,12 +47,21 @@ const StatusPostSlice = createSlice({
       const status: any = state.HomePage.find(
         (item: any) => item._id === action.payload._id,
       );
-      if (status) status.description = action.payload.description;
-      else {
+      if (status) {
+        status.description = action.payload.description;
+        status.isLiked = action.payload.isLiked;
+        status.likeCount = action.payload.likeCount;
+        status.commentCount = action.payload.commentCount;
+      } else {
         const statusSub = state.sub.find(
           (item: any) => item._id === action.payload._id,
         );
-        if (statusSub) statusSub.description = action.payload.description;
+        if (statusSub) {
+          statusSub.description = action.payload.description;
+          statusSub.isLiked = action.payload.isLiked;
+          statusSub.likeCount = action.payload.likeCount;
+          statusSub.commentCount = action.payload.commentCount;
+        }
       }
     },
     deleteAStatusPost: (state: StatusPosts, action: PayloadAction<any>) => {
