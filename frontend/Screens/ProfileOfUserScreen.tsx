@@ -168,7 +168,7 @@ export default function ProfileOfUserScreen(props: any) {
                 }}>
                 <Text
                   style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
-                  Add section
+                  Message
                 </Text>
               </Pressable>
             </View>

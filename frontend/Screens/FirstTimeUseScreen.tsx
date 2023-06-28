@@ -40,12 +40,9 @@ function FirstTimeUseScreen({navigation}: any) {
     const checkLogin = async () => {
       dispatch(setStatus(true));
       retrieveData(nameStorage.isLogin)
-        .then((isLogin: any) => {
-          if (isLogin) {
-            // Connect to socket.io
-            // require('../utils/socket');
-
-            return retrieveData(nameStorage.jwtToken).then((jwt: any) => {
+        .then((isLogin: boolean) => {
+          if (isLogin === true) {
+            retrieveData(nameStorage.jwtToken).then((jwt: any) => {
               navigateToMain(jwt);
             });
           }
@@ -58,8 +55,6 @@ function FirstTimeUseScreen({navigation}: any) {
         });
     };
 
-    // Connect to socket.io
-    // require('../utils/socket');
     checkLogin();
   }, []);
 

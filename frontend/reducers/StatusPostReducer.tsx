@@ -62,6 +62,7 @@ const StatusPostSlice = createSlice({
           statusSub.likeCount = action.payload.likeCount;
           statusSub.commentCount = action.payload.commentCount;
         }
+        console.log(statusSub);
       }
     },
     deleteAStatusPost: (state: StatusPosts, action: PayloadAction<any>) => {

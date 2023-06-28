@@ -19,8 +19,8 @@ import Icon, {Icons} from '../../components/ui/Icons';
 import Colors from '../../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Toast} from '../../components/ui/Toast';
-
-const socket = require('../../utils/socket');
+import CallScreen from './CallScreen';
+import {emitEvent, subscribeToEvent} from '../../utils/socket';
 
 class Message {
   public id: string;
@@ -59,6 +59,8 @@ const ChatRoom = ({navigation, route}: any) => {
   const messageRef = useRef<TextInput>(null);
 
   const flatListRef = useRef<FlatList>(null);
+
+  const [callScreen, setCallScreen] = useState(false);
 
   useEffect(() => {
     if (flatListRef.current !== null) {
@@ -126,9 +128,9 @@ const ChatRoom = ({navigation, route}: any) => {
       setChatMessages(messages);
     };
 
-    socket.emit('joinRoom', {chatRoomId});
+    emitEvent('joinRoom', {chatRoomId});
 
-    socket.on('newMessage', (newRawMessage: any) => {
+    subscribeToEvent('newMessage', (newRawMessage: any) => {
       const newMessage = new Message(
         newRawMessage._id,
         newRawMessage.message,
@@ -148,12 +150,13 @@ const ChatRoom = ({navigation, route}: any) => {
       senderId: uid,
     };
 
-    socket.emit('newMessage', newMessage);
+    emitEvent('newMessage', newMessage);
     setMessage('');
   };
 
   return (
     <View style={{flex: 1}}>
+      <CallScreen isVisible={callScreen} setVisible={setCallScreen} />
       <View style={styles.topView}>
         <View style={{margin: 15, flexDirection: 'row', alignItems: 'center'}}>
           <TouchableOpacity
@@ -165,6 +168,21 @@ const ChatRoom = ({navigation, route}: any) => {
           </TouchableOpacity>
           <Image style={styles.roomImage} source={imageSource} />
           <Text style={styles.roomName}>{title}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <View style={{marginHorizontal: 30}}>
+              <TouchableOpacity
+                onPress={() => {
+                  setCallScreen(!callScreen);
+                }}>
+                <Icon type={Icons.Ionicons} name="call" />
+              </TouchableOpacity>
+            </View>
+            <View>
+              <TouchableOpacity>
+                <Icon type={Icons.Ionicons} name="videocam" />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
       <View style={styles.parentView}>

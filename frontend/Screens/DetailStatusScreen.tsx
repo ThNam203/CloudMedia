@@ -168,7 +168,8 @@ export default function DetailStatusScreen({navigation, route}: any) {
       const response: any = await getAStatusPostById(token, item._id);
       if (response.status === 200) {
         const dataStatus: any = response.data;
-        dispatch(updateAStatusPost({dataStatus}));
+        dispatch(updateAStatusPost(dataStatus));
+        // console.log(dataStatus);
       } else {
         console.log(response.status);
         throw new Error(response.data.errorMessage);
