@@ -52,7 +52,7 @@ function SignUpHrScreen(props: any) {
       setPhoneWarning(true);
     }
 
-    if (nameWarning || emailWarning || passwordWarning || passwordWarning) {
+    if (nameWarning || emailWarning || passwordWarning || phoneWarning) {
       return false;
     }
     return true;

@@ -29,11 +29,11 @@ import {
 } from '../reducers/NotificationReducer';
 import {getAllNotifications} from '../api/notificationApi';
 import {Toast} from '../components/ui/Toast';
+import {connectSocket, subscribeToEvent} from '../utils/socket';
 
 const Stack = createNativeStackNavigator();
 
 export default function Routers() {
-  const socket = require('../utils/socket');
   // Get the loading status from the Redux store
   const isLoading = useSelector((state: RootState) => state.loading.status);
   const token = useSelector((state: RootState) => state.token.key);
@@ -42,13 +42,20 @@ export default function Routers() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (Object.keys(socket).length) {
+    const ConnectSocket = async () => {
+      connectSocket(uid);
       console.log('socket connected!');
-      socket.on('newNotification', () => {
+
+      subscribeToEvent('newNotification', (newNotify: any) => {
         console.log('co noti moi');
+        console.log(newNotify);
+        dispatch(setNotifications(newNotify));
       });
+    };
+    if (uid) {
+      ConnectSocket();
     }
-  }, [socket]);
+  }, [uid]);
 
   return (
     <>

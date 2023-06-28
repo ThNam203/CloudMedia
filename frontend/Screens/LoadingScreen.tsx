@@ -97,7 +97,7 @@ export default function LoadingScreen({navigation, route}: any) {
 
   useEffect(() => {
     // connect socket
-    require('../utils/socket');
+    // connectSocket(uid);
 
     dispatch(setToken(jwt));
     dispatch(setIdFromJwt(jwt));

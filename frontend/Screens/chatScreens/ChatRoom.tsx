@@ -20,8 +20,7 @@ import Colors from '../../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Toast} from '../../components/ui/Toast';
 import CallScreen from './CallScreen';
-
-const socket = require('../../utils/socket');
+import {emitEvent, subscribeToEvent} from '../../utils/socket';
 
 class Message {
   public id: string;
@@ -129,9 +128,9 @@ const ChatRoom = ({navigation, route}: any) => {
       setChatMessages(messages);
     };
 
-    socket.emit('joinRoom', {chatRoomId});
+    emitEvent('joinRoom', {chatRoomId});
 
-    socket.on('newMessage', (newRawMessage: any) => {
+    subscribeToEvent('newMessage', (newRawMessage: any) => {
       const newMessage = new Message(
         newRawMessage._id,
         newRawMessage.message,
@@ -151,7 +150,7 @@ const ChatRoom = ({navigation, route}: any) => {
       senderId: uid,
     };
 
-    socket.emit('newMessage', newMessage);
+    emitEvent('newMessage', newMessage);
     setMessage('');
   };
 
