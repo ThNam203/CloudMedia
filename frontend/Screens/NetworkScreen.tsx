@@ -26,7 +26,7 @@ function NetworkScreen({navigation}: any) {
           <Text style={styles.title}>People you may know</Text>
         </View>
         <View style={{marginLeft: 20}}>
-          <FriendList />
+          <FriendList navigation={navigation} />
         </View>
       </View>
     </View>

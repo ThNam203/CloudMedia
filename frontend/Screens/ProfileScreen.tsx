@@ -220,7 +220,7 @@ function ProfileScreen({navigation}: any) {
               styles.textName,
               {fontSize: 18, fontWeight: 'normal', marginTop: 10},
             ]}>
-            Academy of Heros (AOF)
+            {user.workingPlace}
           </Text>
           {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
           <Text
@@ -228,7 +228,7 @@ function ProfileScreen({navigation}: any) {
               styles.textName,
               {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
             ]}>
-            Da Nang, Viet Nam
+            {user.location}
           </Text>
           <Text
             style={[

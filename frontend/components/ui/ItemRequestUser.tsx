@@ -32,36 +32,46 @@ export default function ItemRequestUser({
             ? {uri: profileImagePath}
             : require('../../assets/images/Spiderman.jpg')
         }
-        style={{width: 80, height: 80, borderRadius: 40, marginRight: 10}}
+        style={{width: 60, height: 60, borderRadius: 40, marginRight: 10}}
       />
-      <View>
+      <View style={{flex: 1}}>
         <Text style={{fontSize: 18, fontWeight: 'bold', color: 'black'}}>
           {name}
         </Text>
         {item.datebetween && (
           <Text style={{color: 'gray'}}>{`${item.datebetween}`}</Text>
         )}
-        <View style={{flexDirection: 'row'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
           <View
             style={{
               borderRadius: 10,
               backgroundColor:
-                isFriend == 'false' || nameRequest == 'Accept'
+                isFriend == 'false' ||
+                nameRequest == 'Accept' ||
+                nameRequest == 'Add Friend'
                   ? '#000ed2'
                   : Colors.gray,
               overflow: 'hidden',
-              width: 130,
             }}>
             <Pressable
               disabled={
-                isFriend == 'false' || nameRequest == 'Accept' ? false : true
+                isFriend == 'false' ||
+                nameRequest == 'Accept' ||
+                nameRequest == 'Add Friend'
+                  ? false
+                  : true
               }
               onPress={pressLeft}
               android_ripple={{color: '#0073ff'}}
               style={{
                 backgroundColor: 'transparent',
                 elevation: 2,
-                padding: 10,
+                paddingVertical: 10,
+                paddingHorizontal: 20,
               }}>
               <Text
                 style={{
@@ -78,7 +88,6 @@ export default function ItemRequestUser({
               borderRadius: 10,
               backgroundColor: '#eeeeee',
               overflow: 'hidden',
-              width: 130,
               marginLeft: 10,
             }}>
             <Pressable
@@ -87,7 +96,8 @@ export default function ItemRequestUser({
               style={{
                 backgroundColor: 'transparent',
                 elevation: 2,
-                padding: 10,
+                paddingVertical: 10,
+                paddingHorizontal: 20,
               }}>
               <Text
                 style={{

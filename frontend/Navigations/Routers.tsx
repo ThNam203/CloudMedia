@@ -25,6 +25,7 @@ import PostOfUserSreen from '../Screens/PostOfUserSreen';
 import SharePost from '../components/ui/SharePost';
 import {
   clearNotifications,
+  pushNotification,
   setNotifications,
 } from '../reducers/NotificationReducer';
 import {getAllNotifications} from '../api/notificationApi';
@@ -44,12 +45,9 @@ export default function Routers() {
   useEffect(() => {
     const ConnectSocket = async () => {
       connectSocket(uid);
-      console.log('socket connected!');
 
       subscribeToEvent('newNotification', (newNotify: any) => {
-        console.log('co noti moi');
-        console.log(newNotify);
-        dispatch(setNotifications(newNotify));
+        dispatch(pushNotification(newNotify));
       });
     };
     if (uid) {
