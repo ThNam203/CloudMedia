@@ -40,7 +40,7 @@ const sendNotificationOnSomeoneComment = async (
     })
 
     const io = socketIO.getIO()
-    if (noti) io.in(statusPost.author.toString()).emit('newNotification')
+    if (noti) io.in(statusPost.author.toString()).emit('newNotification', noti)
 }
 
 // exports.getCommentById = asyncCatch(async (req, res, next) => {

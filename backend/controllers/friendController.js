@@ -32,7 +32,7 @@ const sendNotificationOnReply = async (sender, receiver, isAccept) => {
     })
 
     const io = socketIO.getIO()
-    if (noti) io.in(sender._id.toString()).emit('newNotification')
+    if (noti) io.in(sender._id.toString()).emit('newNotification', noti)
 }
 
 const sendNotificationOnRequest = async (senderId, receiverId) => {
@@ -47,7 +47,19 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
     })
 
     const io = socketIO.getIO()
-    if (noti) io.to(senderId.toString()).emit('newNotification')
+    if (noti) io.in(senderId.toString()).emit('newNotification', noti)
+}
+
+const updateFollow = (requestSender, respondent) => {
+    if (requestSender.followings.indexOf(respondent._id) === -1) {
+        requestSender.followings.push(respondent._id)
+        requestSender.followers.push(respondent._id)
+    }
+
+    if (respondent.followings.indexOf(requestSender._id) === -1) {
+        respondent.followings.push(requestSender._id)
+        respondent.followers.push(requestSender._id)
+    }
 }
 
 exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
@@ -126,6 +138,7 @@ exports.replyFriendRequest = asyncCatch(async (req, res, next) => {
 
         createChatRoomOnAccept(respondent, requestSender)
         sendNotificationOnReply(requestSender, respondent, true)
+        updateFollow(requestSender, respondent)
 
         await Promise.all([respondent.save(), requestSender.save()])
     } else if (response === 'Decline')
@@ -140,14 +153,16 @@ exports.unfriend = asyncCatch(async (req, res, next) => {
     const user = await User.findById(userId)
     const unfriendUser = await User.findById(unfriendUserId)
 
-    let idx = user.connections.findIndex(unfriendUserId)
-    user.connections.splice(idx, 1)
+    const firstIdx = user.connections.indexOf(unfriendUserId)
+    const secondIdx = unfriendUser.connections.indexOf(userId)
 
-    idx = unfriendUser.connections.findIndex(userId)
-    unfriendUser.connections.splice(idx, 1)
+    if (firstIdx === -1) throw new AppError('User not found', 404)
+    if (secondIdx === -1) throw new AppError('User unfriended not found', 404)
 
-    unfriendUser.save()
-    user.save()
+    user.connections.splice(firstIdx, 1)
+    unfriendUser.connections.splice(secondIdx, 1)
+
+    await Promise.all(unfriendUser.save(), user.save())
 
     res.status(204).end()
 })

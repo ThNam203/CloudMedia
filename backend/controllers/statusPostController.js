@@ -30,7 +30,10 @@ const getUserIdFromJWT = async (req, next) => {
 
 exports.getStatusPostById = asyncCatch(async (req, res, next) => {
     const { statusPostId } = req.params
-    const statusPost = await StatusPost.findById(statusPostId)
+    const statusPost = await StatusPost.findById(statusPostId).populate(
+        'author',
+        '_id name profileImagePath'
+    )
 
     if (!statusPost)
         return next(

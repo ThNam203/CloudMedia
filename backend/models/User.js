@@ -69,6 +69,12 @@ const userSchema = new mongoose.Schema({
     connections: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     },
+    followers: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    },
+    followings: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    },
     userRole: {
         type: String,
         enum: ['Hiring', 'Open For Work', 'Being Idle'],

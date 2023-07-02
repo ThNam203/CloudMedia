@@ -69,3 +69,55 @@ exports.getAllFriends = asyncCatch(async (req, res, next) => {
 
     res.status(200).json(userWithFriends.connections)
 })
+
+exports.followUserById = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const { userFollowedId } = req.body
+    const user = await User.findById(userId)
+    const userFollowed = await User.findById(userFollowedId)
+
+    if (!user) throw new AppError('User not found', 404)
+    if (!userFollowed) throw new AppError('User followed not found', 404)
+
+    user.followings.push(userFollowedId)
+    userFollowed.followers.push(userId)
+
+    user.markModified('followings')
+    userFollowed.markModified('followers')
+    await Promise.all([user.save(), userFollowed.save()])
+
+    res.status(204).end()
+})
+
+exports.unfollowUserById = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const { userUnfollowedId } = req.body
+    const user = await User.findById(userId)
+    const userUnfollowed = await User.findById(userUnfollowedId)
+
+    if (!user) throw new AppError('User not found', 404)
+    if (!userUnfollowed) throw new AppError('User unfollowed not found', 404)
+
+    const firstIdx = user.followings.indexOf(userUnfollowedId)
+    if (firstIdx === -1)
+        throw new AppError(
+            'Unable to find the unfollowed user in the following list',
+            404
+        )
+
+    const secondIdx = userUnfollowed.followers.indexOf(userId)
+    if (secondIdx === -1)
+        throw new AppError(
+            'Something went wrong while updating the unfollowed user',
+            404
+        )
+
+    user.followings.splice(firstIdx, 1)
+    userUnfollowed.followings.splice(secondIdx, 1)
+    user.markModified('followings')
+    userUnfollowed.markModified('followers')
+
+    await Promise.all([user.save(), userUnfollowed.save()])
+
+    res.status(204).end()
+})

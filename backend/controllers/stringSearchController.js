@@ -97,7 +97,9 @@ async function emailSearch(query, userId, threshold = 0.7) {
 // using fuzzy
 async function nameSearch(query, userId, threshold = 0.2) {
     query = query.toLowerCase()
-    const users = await User.find({}).select('name email _id profileImagePath')
+    const users = await User.find({}).select(
+        'name email _id profileImagePath connections'
+    )
     const result = []
 
     const friendRequests = await FriendRequest.find({

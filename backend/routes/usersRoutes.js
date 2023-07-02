@@ -7,6 +7,9 @@ const s3Controller = require('../controllers/s3Controller')
 
 const router = express.Router({ mergeParams: true })
 
+router.route('/:userId/follow').post(usersController.followUserById)
+router.route('/:userId/unfollow').post(usersController.unfollowUserById)
+
 router
     .route('/u/:userEmail')
     .get(authController.isUser, usersController.getUserByEmail)

@@ -1,7 +1,8 @@
 import { io } from 'socket.io-client';
 
-const baseURL = process.env.NODE_ENV === 'development' ? "http://10.0.140.194:3000" : 'https://workwize.azurewebsites.net';
+// const baseURL = process.env.NODE_ENV === 'development' ? "http://192.168.1.7:3000" : 'https://workwize.azurewebsites.net';
 
+const baseURL = 'http://10.0.140.194:3000'
 let socket = null;
 
 const connectSocket = (userId) => {
