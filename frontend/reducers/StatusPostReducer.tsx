@@ -6,6 +6,7 @@ interface StatusPost {
     _id: any;
     name: any;
     profileImagePath: any;
+    workingPlace: any;
   };
   description: any;
   isLiked: any;
@@ -70,6 +71,10 @@ const StatusPostSlice = createSlice({
         (item: any) => item._id === action.payload,
       );
       state.HomePage.splice(index, 1);
+      const indexSub = state.sub.findIndex(
+        (item: any) => item._id === action.payload,
+      );
+      state.sub.splice(indexSub, 1);
     },
     clearStatusPosts: (state: StatusPosts) => {
       state.HomePage = [];

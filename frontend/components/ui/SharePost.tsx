@@ -47,6 +47,7 @@ export default function SharePost() {
         }
       })
       .then((data: any) => {
+        setDescription('');
         dispatch(setStatus(false));
         Toast('Shared!');
       })

@@ -44,6 +44,7 @@ function EditProfileScreen(props: any) {
       phoneNumber: phoneNumber,
       hometown: hometown,
       workingPlace: workingPlace,
+      headline: headline,
       company: {
         logoUrl:
           'https://static.vecteezy.com/system/resources/previews/010/353/285/original/colourful-google-logo-on-white-background-free-vector.jpg',
@@ -73,6 +74,7 @@ function EditProfileScreen(props: any) {
     setPhoneNumber(user.phoneNumber);
     setHometown(user.hometown);
     setWorkingPlace(user.workingPlace);
+    setHeadline(user.headline);
   }, []);
 
   return (
@@ -116,6 +118,8 @@ function EditProfileScreen(props: any) {
                 fontSize: 16,
               }}
               placeholder="Enter your headline"
+              value={headline}
+              onChangeText={text => setHeadline(text)}
             />
           </View>
 

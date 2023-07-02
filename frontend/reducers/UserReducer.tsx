@@ -18,6 +18,7 @@ export interface UserInfo {
   dateOfBirth: string;
   hometown: string;
   workingPlace: string;
+  headline: string;
   followers: any[];
   followings: any[];
 }
@@ -39,6 +40,7 @@ const initialState: UserInfo = {
   dateOfBirth: '',
   hometown: '',
   workingPlace: '',
+  headline: '',
   followers: [],
   followings: [],
 };
@@ -69,6 +71,7 @@ const UserSlice = createSlice({
       state.dateOfBirth = action.payload.dateOfBirth || '';
       state.hometown = action.payload.hometown || '';
       state.workingPlace = action.payload.workingPlace || '';
+      state.headline = action.payload.headline || '';
       /// spread operator ('...') is fail.
     },
     updateAvatar: (state: UserInfo, action: PayloadAction<string>) => {

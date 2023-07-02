@@ -54,7 +54,7 @@ const Post = ({navigation, item}: any) => {
 
 const ActivitySection = (props: any) => {
   const dispatch = useDispatch();
-  const {navigation, userId} = props;
+  const {navigation, userId, followCount} = props;
   const [posts, setPosts] = useState<any[]>([]);
 
   const jwt = useSelector((state: RootState) => state.token.key);
@@ -116,7 +116,7 @@ const ActivitySection = (props: any) => {
         </View>
       </View>
       <View>
-        <Text style={styles.numFollow}>0 followers</Text>
+        <Text style={styles.numFollow}>{`${followCount} followers`} </Text>
       </View>
       <FlatList
         data={posts.slice(0, 2)}

@@ -24,7 +24,7 @@ export default function ItemRequestUser({
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
+        padding: 10,
       }}>
       <Image
         source={

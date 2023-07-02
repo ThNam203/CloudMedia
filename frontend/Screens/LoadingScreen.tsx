@@ -44,8 +44,6 @@ export default function LoadingScreen({navigation, route}: any) {
             if (res.status === 200) {
               // console.log(res.data);
               dispatch(pushStatusPostsSub(res.data));
-            } else {
-              throw new Error(res.data.errorMessage);
             }
           }
         }
