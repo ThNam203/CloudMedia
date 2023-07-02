@@ -6,16 +6,20 @@ import {
   ScrollView,
   Image,
   Pressable,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Colors from '../constants/Colors';
 import {useDispatch, useSelector} from 'react-redux';
 import ActivitySection from '../components/ui/ActivitySection';
-import {getInfoUser} from '../api/userApi';
+import {followUser, getInfoUser, unfollowUser} from '../api/userApi';
 import {Toast} from '../components/ui/Toast';
 import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
 import Header from '../components/ui/Header';
 import {RootState} from '../reducers/Store';
+import {SearchUsersByEmail} from '../api/Utils';
+import Icon, {Icons} from '../components/ui/Icons';
+import {createRequestByEmail, unfriendApi} from '../api/friend_api';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -24,18 +28,121 @@ export default function ProfileOfUserScreen(props: any) {
   const {id} = route.params;
 
   const [user, setUser] = useState<any>({});
+  const [nameTage1, setNameTage1] = useState('');
+  const [nameTage2, setNameTage2] = useState('Follow');
   const dispatch = useDispatch();
 
-  const myUser = useSelector((state: RootState) => state.userInfo);
+  const uid = useSelector((state: RootState) => state.uid.id);
+  const jwt = useSelector((state: RootState) => state.token.key);
 
-  const [isFriend, setIsFriend] = useState(false);
+  const addFriend = async () => {
+    try {
+      const response: any = await createRequestByEmail(user.email, uid, jwt);
+      if (response.status === 200) {
+        changeNameTag1('pending');
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
+  const removeFriend = async () => {
+    try {
+      const response: any = await unfriendApi(user._id, uid, jwt);
+      if (response.status === 200) {
+        changeNameTag1('false');
+        setNameTage2('Follow');
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+      console.log(error.message);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const response: any = await followUser(user._id, uid, jwt);
+      if (response.status === 204) {
+        setNameTage2('Following✓');
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    try {
+      const response: any = await unfollowUser(user._id, uid, jwt);
+      if (response.status === 204) {
+        setNameTage2('Follow');
+      } else {
+        console.log(response.status);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
+  const handleLeftButton = () => {
+    if (nameTage1 === 'Add Friend') {
+      addFriend();
+    } else if (nameTage1 === 'Unfriend') {
+      Alert.alert('Unfriend', 'Are you sure you want to unfriend this user?', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            removeFriend();
+          },
+        },
+      ]);
+    }
+  };
+
+  const handleRightButton = () => {
+    if (nameTage2 === 'Follow') {
+      handleFollow();
+    } else {
+      handleUnfollow();
+    }
+  };
+
+  const changeNameTag1 = (isFriend: string) => {
+    setNameTage1(
+      isFriend === 'pending'
+        ? 'Pending'
+        : isFriend === 'true'
+        ? 'Unfriend'
+        : 'Add Friend',
+    );
+  };
 
   useEffect(() => {
     const getUserInfo = async () => {
       try {
         const response: any = await getInfoUser(id);
         if (response.status === 200) {
-          setUser(response.data);
+          const data = response.data;
+          setUser(data);
+          data.followers.forEach((item: any) => {
+            if (item === uid) {
+              setNameTage2('Following✓');
+            }
+          });
         } else {
           console.log(response.status);
           throw new Error(response.data.errorMessage);
@@ -45,16 +152,33 @@ export default function ProfileOfUserScreen(props: any) {
       }
     };
 
-    for (let idConnection of myUser.connections) {
-      if (idConnection === id) {
-        setIsFriend(true);
-        break;
-      }
-    }
-
     // dispatch(clearStatusPostsSub());
     getUserInfo();
-  }, [myUser]);
+  }, []);
+
+  useEffect(() => {
+    const checkFriend = async () => {
+      try {
+        if (!user.email) return;
+        const response: any = await SearchUsersByEmail(user.email, uid, jwt);
+        if (response.status === 200) {
+          const data = response.data;
+          data.forEach((item: any) => {
+            if (item.email === user.email) {
+              changeNameTag1(item.isFriend);
+            }
+          });
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
+        }
+      } catch (error: any) {
+        Toast(error.message);
+      }
+    };
+    checkFriend();
+  }, [user.email]);
+
   // return null;
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -97,7 +221,7 @@ export default function ProfileOfUserScreen(props: any) {
               styles.textName,
               {fontSize: 18, fontWeight: 'normal', marginTop: 10},
             ]}>
-            Academy of Heros (AOF)
+            {user.workingPlace}
           </Text>
           {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
           <Text
@@ -105,7 +229,7 @@ export default function ProfileOfUserScreen(props: any) {
               styles.textName,
               {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
             ]}>
-            Da Nang, Viet Nam
+            {user.location}
           </Text>
           <Text
             style={[
@@ -127,13 +251,16 @@ export default function ProfileOfUserScreen(props: any) {
                 width: 150,
                 borderRadius: 30,
                 overflow: 'hidden',
-                backgroundColor: '#0A66C2',
+                backgroundColor:
+                  nameTage1 === 'Add Friend'
+                    ? '#0A66C2'
+                    : nameTage1 === 'Unfriend'
+                    ? Colors.red
+                    : 'gray',
                 alignItems: 'center',
               }}>
               <Pressable
-                onPress={() => {
-                  navigation.goBack();
-                }}
+                onPress={handleLeftButton}
                 android_ripple={{color: '#00043d'}}
                 style={{
                   backgroundColor: 'transparent',
@@ -143,7 +270,7 @@ export default function ProfileOfUserScreen(props: any) {
                 }}>
                 <Text
                   style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
-                  {isFriend ? 'Unfriend' : 'Add friend'}
+                  {nameTage1}
                 </Text>
               </Pressable>
             </View>
@@ -159,6 +286,7 @@ export default function ProfileOfUserScreen(props: any) {
                 marginHorizontal: 10,
               }}>
               <Pressable
+                onPress={handleRightButton}
                 android_ripple={{color: '#0d8fe0ff'}}
                 style={{
                   backgroundColor: 'transparent',
@@ -168,7 +296,7 @@ export default function ProfileOfUserScreen(props: any) {
                 }}>
                 <Text
                   style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
-                  Message
+                  {nameTage2}
                 </Text>
               </Pressable>
             </View>
@@ -193,9 +321,11 @@ export default function ProfileOfUserScreen(props: any) {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Image
-                  source={require('../assets/images/3Dot.png')}
-                  style={{width: 25, height: 25}}
+                <Icon
+                  type={Icons.AntDesign}
+                  name="message1"
+                  size={20}
+                  color="#727272"
                 />
               </Pressable>
             </View>

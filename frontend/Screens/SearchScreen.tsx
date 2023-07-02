@@ -15,6 +15,7 @@ import {RootState} from '../reducers/Store';
 import {SearchUsersByEmail, SearchUsersByName} from '../api/Utils';
 import {createRequestByEmail} from '../api/friend_api';
 import {Toast} from '../components/ui/Toast';
+import {useIsFocused} from '@react-navigation/native';
 
 export default function SearchScreen({navigation}: any) {
   const [text, setText] = useState('');
@@ -23,6 +24,7 @@ export default function SearchScreen({navigation}: any) {
   const uid = useSelector((stata: RootState) => stata.uid.id);
 
   const [listData, setListData] = useState([]);
+  const isFocused = useIsFocused();
 
   const searchRef = useRef<TextInput>(null);
 
@@ -35,7 +37,7 @@ export default function SearchScreen({navigation}: any) {
   }, 100);
 
   const handleAddFr = async (email: any) => {
-    console.log(email);
+    // console.log(email);
     createRequestByEmail(email, uid, token)
       .then((response: any) => {
         if (response.status === 200) {
@@ -66,12 +68,11 @@ export default function SearchScreen({navigation}: any) {
 
   useEffect(() => {
     const filtertext = async () => {
-      if (text === '') return;
       try {
         if (/\S+@\S+\.\S+/.test(text)) {
           const response: any = await SearchUsersByEmail(text, uid, token);
           if (response.status === 200) {
-            console.log(response.data);
+            // console.log(response.data);
             setListData(response.data);
           } else {
             console.log(response.status);
@@ -80,7 +81,7 @@ export default function SearchScreen({navigation}: any) {
         } else {
           const response: any = await SearchUsersByName(text, uid, token);
           if (response.status === 200) {
-            console.log(response.data);
+            // console.log(response.data);
             setListData(response.data);
           } else {
             console.log(response.status);
@@ -92,7 +93,7 @@ export default function SearchScreen({navigation}: any) {
       }
     };
     filtertext();
-  }, [text]);
+  }, [text, isFocused]);
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -132,8 +133,11 @@ export default function SearchScreen({navigation}: any) {
                 ? 'Add Friend'
                 : 'Sent Request'
             }
-            nameRequest2="Cancel"
+            nameRequest2="Show Profile"
             pressLeft={() => handleAddFr(item.email)}
+            pressRight={() =>
+              navigation.navigate('profileOther', {id: item._id})
+            }
           />
         )}
         keyExtractor={(item, index) => 'key' + index}

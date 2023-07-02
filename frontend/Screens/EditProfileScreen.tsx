@@ -13,7 +13,7 @@ import {CheckBox} from '@rneui/themed';
 import Icon, {Icons} from '../components/ui/Icons';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
-import {user_update} from '../api/userApi';
+import {updateUser} from '../api/userApi';
 import {saveUser} from '../reducers/UserReducer';
 import {Toast} from '../components/ui/Toast';
 function EditProfileScreen(props: any) {
@@ -27,6 +27,10 @@ function EditProfileScreen(props: any) {
 
   const [fullName, setFullName] = useState('');
   const [location, setLocation] = useState('');
+  const [headline, setHeadline] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [hometown, setHometown] = useState('');
+  const [workingPlace, setWorkingPlace] = useState('');
 
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
@@ -37,6 +41,9 @@ function EditProfileScreen(props: any) {
       ...user,
       name: fullName,
       location: location,
+      phoneNumber: phoneNumber,
+      hometown: hometown,
+      workingPlace: workingPlace,
       company: {
         logoUrl:
           'https://static.vecteezy.com/system/resources/previews/010/353/285/original/colourful-google-logo-on-white-background-free-vector.jpg',
@@ -44,7 +51,7 @@ function EditProfileScreen(props: any) {
         linkToWebsite: 'google.com',
       },
     };
-    user_update(data, uid, token)
+    updateUser(data, uid, token)
       .then((response: any) => {
         if (response.status === 200) {
           console.log(response.data);
@@ -63,6 +70,9 @@ function EditProfileScreen(props: any) {
   useEffect(() => {
     setFullName(user.name);
     setLocation(user.location);
+    setPhoneNumber(user.phoneNumber);
+    setHometown(user.hometown);
+    setWorkingPlace(user.workingPlace);
   }, []);
 
   return (
@@ -93,34 +103,7 @@ function EditProfileScreen(props: any) {
               onChangeText={text => setFullName(text)}
             />
           </View>
-          <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Last name*
-            </Text>
-            <TextInput
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: 'black',
-                color: 'black',
-                fontSize: 16,
-              }}
-              placeholder="Enter your last name"
-            />
-          </View>
-          <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Additional name
-            </Text>
-            <TextInput
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: 'black',
-                color: 'black',
-                fontSize: 16,
-              }}
-              placeholder="Enter your additional name"
-            />
-          </View>
+
           <View style={{marginHorizontal: 10}}>
             <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
               Headline*
@@ -135,20 +118,24 @@ function EditProfileScreen(props: any) {
               placeholder="Enter your headline"
             />
           </View>
-          <TouchableOpacity>
-            <View
+
+          <View style={{marginHorizontal: 10}}>
+            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
+              Phone number*
+            </Text>
+            <TextInput
               style={{
-                marginHorizontal: 10,
-                marginTop: 30,
-                flexDirection: 'row',
-              }}>
-              <Icon type={Icons.Entypo} name="plus" color="#1664b1" />
-              <Text
-                style={{fontSize: 16, color: '#1664b1', fontWeight: 'bold'}}>
-                Add new position
-              </Text>
-            </View>
-          </TouchableOpacity>
+                borderBottomWidth: 1,
+                borderBottomColor: 'black',
+                color: 'black',
+                fontSize: 16,
+              }}
+              placeholder="Enter your phone number"
+              value={phoneNumber}
+              onChangeText={text => setPhoneNumber(text)}
+            />
+          </View>
+
           <View style={{marginHorizontal: 10}}>
             <Text
               style={{
@@ -172,37 +159,11 @@ function EditProfileScreen(props: any) {
                 fontSize: 16,
               }}
               placeholder="Enter your education"
+              value={workingPlace}
+              onChangeText={text => setWorkingPlace(text)}
             />
           </View>
-          <TouchableOpacity>
-            <View
-              style={{
-                marginHorizontal: 10,
-                marginTop: 30,
-                flexDirection: 'row',
-              }}>
-              <Icon type={Icons.Entypo} name="plus" color="#1664b1" />
-              <Text
-                style={{fontSize: 16, color: '#1664b1', fontWeight: 'bold'}}>
-                Add new education
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <View
-            style={{
-              marginTop: 10,
-              flexDirection: 'row',
-            }}>
-            <CheckBox
-              checked={checked}
-              onPress={toggleCheckbox}
-              iconType="material-community"
-              checkedIcon="checkbox-marked"
-              uncheckedIcon="checkbox-blank-outline"
-              checkedColor="#0f6f3e"
-            />
-            <Text style={{marginTop: 18}}>Show education in my intro</Text>
-          </View>
+
           <View style={{marginHorizontal: 10}}>
             <Text
               style={{
@@ -230,21 +191,9 @@ function EditProfileScreen(props: any) {
               onChangeText={text => setLocation(text)}
             />
           </View>
-          <TouchableOpacity>
-            <View
-              style={{
-                marginHorizontal: 10,
-                marginTop: 30,
-              }}>
-              <Text
-                style={{fontSize: 16, color: '#1664b1', fontWeight: 'bold'}}>
-                Use current location
-              </Text>
-            </View>
-          </TouchableOpacity>
           <View style={{marginHorizontal: 10}}>
             <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              City
+              Home Town*
             </Text>
             <TextInput
               style={{
@@ -253,37 +202,12 @@ function EditProfileScreen(props: any) {
                 color: 'black',
                 fontSize: 16,
               }}
-              placeholder="Enter your city"
+              placeholder="Enter your home town"
+              value={hometown}
+              onChangeText={text => setHometown(text)}
             />
           </View>
-          <View style={{marginHorizontal: 10}}>
-            <Text
-              style={{
-                marginTop: 10,
-                color: 'black',
-                fontSize: 20,
-                fontWeight: 'bold',
-              }}>
-              Contact info
-            </Text>
-          </View>
-          <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 10, color: 'black', fontSize: 16}}>
-              Add or edit your profile URL, email, and more
-            </Text>
-          </View>
-          <TouchableOpacity>
-            <View
-              style={{
-                marginHorizontal: 10,
-                marginTop: 30,
-              }}>
-              <Text
-                style={{fontSize: 16, color: '#1664b1', fontWeight: 'bold'}}>
-                Edit contact info
-              </Text>
-            </View>
-          </TouchableOpacity>
+
           <View style={{height: 100}} />
         </View>
       </ScrollView>

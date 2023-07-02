@@ -39,6 +39,12 @@ const NotificationSlice = createSlice({
         }
       });
     },
+    pushNotification: (state: Notifications, action: PayloadAction<any>) => {
+      state.arr.unshift(action.payload);
+      if (!action.payload.isRead) {
+        state.numberNoti++;
+      }
+    },
     setNumberNoti: (state: Notifications) => {
       state.numberNoti = 0;
     },
@@ -48,6 +54,10 @@ const NotificationSlice = createSlice({
   },
 });
 
-export const {setNotifications, setNumberNoti, clearNotifications} =
-  NotificationSlice.actions;
+export const {
+  setNotifications,
+  pushNotification,
+  setNumberNoti,
+  clearNotifications,
+} = NotificationSlice.actions;
 export default NotificationSlice.reducer;

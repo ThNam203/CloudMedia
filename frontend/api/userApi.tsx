@@ -87,14 +87,48 @@ export const postBackgrImg = async (dataForm: any, userId: any, token: any) => {
   }
 };
 
-export const user_update = async (data: any, userId: any, token: any) => {
+export const updateUser = async (data: any, userId: any, token: any) => {
   try {
     const result = await ApiManager(`/${userId}`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         Authorization: 'Bearer ' + token,
       },
       data: data,
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const followUser = async (data: any, userId: any, token: any) => {
+  try {
+    const result = await ApiManager(`/${userId}/follow`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+      data: {
+        userFollowedId: data,
+      },
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const unfollowUser = async (data: any, userId: any, token: any) => {
+  try {
+    const result = await ApiManager(`/${userId}/unfollow`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+      data: {
+        userUnfollowedId: data,
+      },
     });
     return result;
   } catch (error) {

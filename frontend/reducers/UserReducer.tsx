@@ -15,6 +15,11 @@ export interface UserInfo {
   userRole: string;
   profileImagePath: string;
   backgroundImagePath?: string;
+  dateOfBirth: string;
+  hometown: string;
+  workingPlace: string;
+  followers: any[];
+  followings: any[];
 }
 const initialState: UserInfo = {
   name: '',
@@ -31,6 +36,11 @@ const initialState: UserInfo = {
   userRole: '',
   profileImagePath: '',
   backgroundImagePath: '',
+  dateOfBirth: '',
+  hometown: '',
+  workingPlace: '',
+  followers: [],
+  followings: [],
 };
 
 const UserSlice = createSlice({
@@ -54,6 +64,11 @@ const UserSlice = createSlice({
       state.userRole = action.payload.userRole;
       state.profileImagePath = action.payload.profileImagePath || '';
       state.backgroundImagePath = action.payload.backgroundImagePath || '';
+      state.followers = action.payload.followers || [];
+      state.followings = action.payload.followings || [];
+      state.dateOfBirth = action.payload.dateOfBirth || '';
+      state.hometown = action.payload.hometown || '';
+      state.workingPlace = action.payload.workingPlace || '';
       /// spread operator ('...') is fail.
     },
     updateAvatar: (state: UserInfo, action: PayloadAction<string>) => {

@@ -1,43 +1,76 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, Image, Pressable} from 'react-native';
 import ItemRequestUser from './ItemRequestUser';
+import {createRequestByEmail, getRecommendFr} from '../../api/friend_api';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../reducers/Store';
+import {Toast} from './Toast';
 
-const friendsData = [
-  {
-    id: '1',
-    name: 'John Doe',
-    connection: 'Friend',
-    avatar: require('../../assets/images/Spiderman.jpg'),
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    connection: 'Family',
-    avatar: require('../../assets/images/Spiderman.jpg'),
-  },
-  {
-    id: '3',
-    name: 'Bob Johnson',
-    connection: 'Colleague',
-    avatar: require('../../assets/images/Spiderman.jpg'),
-  },
-];
+const FriendList = ({navigation}: any) => {
+  const [friends, setFriends] = useState<any[]>();
+  const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((stata: RootState) => stata.uid.id);
 
-const FriendList = () => {
-  const [friends, setFriends] = useState(friendsData);
+  const handleAddFr = async (email: any) => {
+    // console.log(email);
+    createRequestByEmail(email, uid, token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          return response.data;
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
+        }
+      })
+      .then(data => {
+        console.log(data);
+        setFriends((prev: any) => {
+          return prev.map((item: any) => {
+            if (item.email === email) {
+              return {
+                ...item,
+                isFriend: 'pending',
+              };
+            }
+            return item;
+          });
+        });
+      })
+      .catch(error => {
+        Toast(error.message);
+      });
+  };
+
+  useEffect(() => {
+    const getRecomendFriends = async () => {
+      try {
+        const response: any = await getRecommendFr(uid, token);
+        if (response.status === 200) {
+          setFriends(response.data);
+        } else {
+          throw new Error(response.data.errorMessage);
+        }
+      } catch (error: any) {
+        Toast(error.message);
+      }
+    };
+    getRecomendFriends();
+  }, []);
 
   return (
     <FlatList
-      data={friends.slice(0, 2)}
+      data={friends?.slice(0, 2)}
       renderItem={({item}) => (
         <ItemRequestUser
           item={item}
-          nameRequest="Add friend"
-          nameRequest2="Cancel"
+          nameRequest={item.isFriend === 'pending' ? 'Pending' : 'Add Friend'}
+          nameRequest2="Show Profile"
+          pressLeft={() => handleAddFr(item.email)}
+          pressRight={() => navigation.navigate('profileOther', {id: item._id})}
         />
       )}
-      keyExtractor={item => item.id}
+      keyExtractor={item => item._id}
       showsVerticalScrollIndicator={false}
       scrollEnabled={false}
     />

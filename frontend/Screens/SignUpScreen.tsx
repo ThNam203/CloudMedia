@@ -80,8 +80,8 @@ function SignUpHrScreen(props: any) {
         }
       })
       .then(data => {
-        console.log(data);
-        console.warn('Signup success!');
+        // console.log(data);
+        Toast('Signup success!');
         props.handleCloseModal(false);
       })
       .catch(error => Toast(error.message))
