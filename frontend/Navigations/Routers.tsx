@@ -14,9 +14,7 @@ import ChatRoom from '../Screens/chatScreens/ChatRoom';
 import LoadingScreen from '../Screens/LoadingScreen';
 import ImagesPostScreen from '../Screens/ImagesPostScreen';
 import DetailStatusScreen from '../Screens/DetailStatusScreen';
-
-import VideoCallScreen from '../Screens/chatScreens/NOTWORKING_VideoCall';
-import TestCallScreen from '../Screens/chatScreens/TestCallScreen';
+import InCommingCallScreen from '../Screens/chatScreens/InCommingCallScreen';
 import EditPostScreen from '../Screens/EditPostScreen';
 import ProfileOfUserScreen from '../Screens/ProfileOfUserScreen';
 import MyNetworksScreen from '../Screens/MyNetworksScreen';
@@ -49,6 +47,10 @@ export default function Routers() {
       subscribeToEvent('newNotification', (newNotify: any) => {
         dispatch(pushNotification(newNotify));
       });
+
+      subscribeToEvent('offerVideoCall', (offer: any) => {
+        navigation.navigate('VideoCallScreen')
+      })
     };
     if (uid) {
       ConnectSocket();
@@ -145,10 +147,8 @@ export default function Routers() {
         {/* Chat screen */}
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="chatRoom" component={ChatRoom} />
-
         <Stack.Screen name="loading" component={LoadingScreen} />
-
-        <Stack.Screen name="videoCall" component={VideoCallScreen} />
+        <Stack.Screen name="incomingCallScreen" component={InCommingCallScreen} />
       </Stack.Navigator>
 
       {/* Show the app loader if isLoading is true */}

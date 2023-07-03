@@ -61,6 +61,7 @@ const userSchema = new mongoose.Schema({
     dateOfBirth: Date,
     hometown: String,
     workingPlace: String,
+    headline: String,
     location: {
         type: String,
         trim: true,
@@ -105,6 +106,7 @@ userSchema.statics.createNewUser = function (req) {
         dateOfBirth: req.body.dateOfBirth,
         hometown: req.body.hometow,
         workingPlace: req.body.workingPlace,
+        headline: req.body.headline,
         company: req.body.company,
         connections: req.body.connections,
         userRole: req.body.userRole,

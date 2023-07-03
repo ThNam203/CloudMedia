@@ -162,7 +162,7 @@ exports.unfriend = asyncCatch(async (req, res, next) => {
     user.connections.splice(firstIdx, 1)
     unfriendUser.connections.splice(secondIdx, 1)
 
-    await Promise.all(unfriendUser.save(), user.save())
+    await Promise.all([unfriendUser.save(), user.save()])
 
     res.status(204).end()
 })
@@ -208,6 +208,8 @@ exports.recommendFriends = asyncCatch(async (req, res, next) => {
             $sample: { size: 20 },
         },
     ])
+
+    console.log(potentialFriends)
 
     res.status(200).json(potentialFriends)
 })

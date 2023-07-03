@@ -19,6 +19,10 @@ const statusPostSchema = new mongoose.Schema(
             },
         ],
         likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        likeCount: {
+            type: Number,
+            default: 0,
+        },
         commentCount: {
             type: Number,
             default: 0,
@@ -30,17 +34,7 @@ const statusPostSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-        toJSON: {
-            virtuals: true,
-        },
-        toObject: {
-            virtuals: true,
-        },
     }
 )
-
-statusPostSchema.virtual('likeCount').get(function () {
-    return this.likedUsers ? this.likedUsers.length : 0
-})
 
 module.exports = mongoose.model('StatusPost', statusPostSchema)

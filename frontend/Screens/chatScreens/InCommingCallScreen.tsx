@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
 import Svg, {Path} from 'react-native-svg';
+import socket from '../../utils/socket';
 
 const CallAnswer = (props: any) => (
   <Svg
@@ -15,7 +16,6 @@ const CallAnswer = (props: any) => (
 );
 
 export default function InCommingCallScreen({ callerName, navigation }: any) {
-  const IncomingCallScreen = () => {
     return (
       <View
         style={{
@@ -46,7 +46,7 @@ export default function InCommingCallScreen({ callerName, navigation }: any) {
           }}>
           <TouchableOpacity
             onPress={() => {
-              setType('WEBRTC_ROOM');
+              socket.emitEvent
             }}
             style={{
               backgroundColor: 'green',
@@ -56,11 +56,9 @@ export default function InCommingCallScreen({ callerName, navigation }: any) {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <CallAnswer height={28} fill={'#fff'} />
+            <CallAnswer height={28} fill={'#fff'}/>
           </TouchableOpacity>
         </View>
       </View>
     );
   };
-    //
-  }

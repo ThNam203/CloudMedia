@@ -1,5 +1,6 @@
 const ChatMessage = require('../models/ChatMessage')
 const ChatRoom = require('../models/ChatRoom')
+const User = require('../models/User')
 const socketIO = require('./socket')
 
 const io = socketIO.getIO()
@@ -14,7 +15,6 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
     socket.join(socket.handshake.auth.userId)
-    console.log(socket.handshake.auth.userId)
 
     socket.on('joinRoom', (data) => {
         const chatRoomId = data
@@ -26,53 +26,41 @@ io.on('connection', (socket) => {
         socket.leave(chatRoomId)
     })
 
-    socket.on('offerVideoCall', (data) => {
-        const { offerDescription, chatRoomId } = data
-        socket.to(chatRoomId).emit('offerVideoCall', {
-            offerDescription,
+    socket.on('offerVideoCall', async (data) => {
+        const { sdp, chatRoomId, callerId } = data
+        const user = await User.findById(callerId)
+        const offer = JSON.stringify({
+            chatRoomId: chatRoomId,
+            sdp: sdp,
+            callerName: user.name,
+            callerImagePath: user.profileImagePath,
+            callerId: callerId,
         })
-    })
 
-    socket.on('answerOfferVideoCall', (data) => {
-        const { answerDescription, chatRoomId } = data
-        socket.to(chatRoomId).emit('answerOfferVideoCall', answerDescription)
-    })
-
-    socket.on('iceCandidate', (data) => {
-        const { iceCandidate, chatRoomId } = data
-        socket.to(chatRoomId).emit('iceCandidate', iceCandidate)
-    })
-
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-
-    socket.on('call', (data) => {
-        const { calleeId, rtcMessage } = data
-
-        socket.to(calleeId).emit('newCall', {
-            callerId: socket.user,
-            rtcMessage: rtcMessage,
+        const chatRoom = await ChatRoom.findById(chatRoomId)
+        chatRoom.members.forEach((memberId) => {
+            if (memberId.toString() !== callerId)
+                io.in(memberId.toString()).emit('offerVideoCall', offer)
         })
+
+        // socket.to(chatRoomId).emit('offerVideoCall', offer)
     })
 
-    socket.on('answerCall', (data) => {
-        const { callerId, rtcMessage } = data
-
-        socket.to(callerId).emit('callAnswered', {
-            callee: socket.user,
-            rtcMessage: rtcMessage,
+    socket.on('answerOfferVideoCall', async (data) => {
+        const { sdp, chatRoomId } = data
+        const chatRoom = await ChatRoom.findById(chatRoomId)
+        chatRoom.members.forEach((memberId) => {
+            io.in(memberId.toString()).emit('answerOfferVideoCall', sdp)
         })
+        // socket.to(chatRoomId).emit('answerOfferVideoCall', sdp)
     })
 
-    socket.on('ICEcandidate', (data) => {
-        const { calleeId, rtcMessage } = data
-
-        socket.to(calleeId).emit('ICEcandidate', {
-            sender: socket.user,
-            rtcMessage: rtcMessage,
+    socket.on('iceCandidate', async (data) => {
+        const chatRoom = await ChatRoom.findById(data.chatRoomId)
+        chatRoom.members.forEach((memberId) => {
+            io.in(memberId.toString()).emit('iceCandidate', data)
         })
+        // socket.to(data.chatRoomId).emit('iceCandidate', data)
     })
 
     socket.on('newMessage', async (data) => {

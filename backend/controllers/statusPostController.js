@@ -6,6 +6,7 @@ const asyncCatch = require('../utils/asyncCatch')
 const User = require('../models/User')
 const StatusPost = require('../models/StatusPost')
 const JWTBlacklist = require('../models/JWTBlacklist')
+const socketIO = require('../socket/socket')
 
 const getUserIdFromJWT = async (req, next) => {
     if (
@@ -32,7 +33,7 @@ exports.getStatusPostById = asyncCatch(async (req, res, next) => {
     const { statusPostId } = req.params
     const statusPost = await StatusPost.findById(statusPostId).populate(
         'author',
-        '_id name profileImagePath'
+        '_id name profileImagePath workingPlace'
     )
 
     if (!statusPost)
@@ -88,6 +89,13 @@ exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
         return next(new AppError('Unable to create new status post', 500))
     }
 
+    const io = socketIO.getIO()
+    User.findById(userId).then((user) => {
+        user.followers.forEach((follower) => {
+            io.in(follower._id.toString()).emit('newStatusPost', newStatusPost)
+        })
+    })
+
     res.status(200).json(newStatusPost)
 })
 
@@ -97,7 +105,7 @@ exports.getAllStatusPostsOfAUser = asyncCatch(async (req, res, next) => {
     if (!author) return next(new AppError('Unable to find this user', 404))
     const statusPostsRaw = await StatusPost.find({
         author: authorId,
-    }).populate('author', '_id name profileImagePath')
+    }).populate('author', '_id name profileImagePath workingPlace')
 
     // userId is the current request user, the author is post's owner
     const userId = await getUserIdFromJWT(req, next)
@@ -140,8 +148,15 @@ exports.toggleLikeStatusPost = asyncCatch(async (req, res, next) => {
     if (!post) return next(new AppError('Unable to find the status post', 500))
 
     const indexOfTheLiked = post.likedUsers.indexOf(userId)
-    if (indexOfTheLiked === -1) post.likedUsers.push(userId)
-    else post.likedUsers.splice(indexOfTheLiked, 1)
+    if (indexOfTheLiked === -1) {
+        post.likedUsers.push(userId)
+        post.likeCount += 1
+    } else {
+        post.likedUsers.splice(indexOfTheLiked, 1)
+        post.likeCount -= 1
+    }
+
+    post.markModified('likedUsers')
     await post.save()
 
     res.status(204).end()
@@ -156,9 +171,35 @@ exports.deleteStatusPostById = asyncCatch(async (req, res, next) => {
             new AppError('Invalid status post id or already removed', 400)
         )
 
-    deletedPost.mediaFiles.forEach((location) =>
-        s3Controller.deleteMediaFile(location)
+    deletedPost.mediaFiles.forEach((mediaFile) =>
+        s3Controller.deleteMediaFile(mediaFile.location)
     )
 
     res.status(204).end()
+})
+
+exports.getNewsFeed = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const { page } = req.query
+    const user = await User.findById(userId)
+
+    const newsFeed = await StatusPost.find({ user: { $in: user.followings } })
+        .sort({ createdAt: -1 }) // Sort by descending createdAt
+        .skip(page * 7)
+        .limit(7)
+        .populate('author', '_id name profileImagePath workingPlace')
+
+    const randomTopPosts = await StatusPost.find({
+        $and: [
+            { author: { $nin: user.followings } },
+            { _id: { $nin: newsFeed.map((feed) => feed._id) } },
+        ],
+    })
+        .sort({ likeCount: -1 })
+        .limit(3)
+        .populate('author', '_id name profileImagePath workingPlace')
+
+    randomTopPosts.forEach((post) => newsFeed.push(post))
+
+    res.status(200).json(newsFeed)
 })

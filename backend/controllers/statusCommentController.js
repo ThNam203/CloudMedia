@@ -86,7 +86,10 @@ exports.createNewComment = asyncCatch(async (req, res, next) => {
     statusPost.save()
 
     sendNotificationOnSomeoneComment(statusPostId, userId)
-    await newComment.populate('author', '_id profileImagePath email')
+    await newComment.populate(
+        'author',
+        '_id profileImagePath email workingPlace'
+    )
     res.status(200).json(newComment)
 })
 
@@ -130,7 +133,7 @@ exports.getAllCommentsOfStatusPost = asyncCatch(async (req, res, next) => {
 
     const comments = await StatusComment.find({
         statusPostId: statusPostId,
-    }).populate('author', '_id name profileImagePath email')
+    }).populate('author', '_id name profileImagePath email workingPlace')
 
     const objectComments = comments.map((comment) => {
         const objectComment = comment.toObject()

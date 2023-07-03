@@ -19,8 +19,9 @@ import Icon, {Icons} from '../../components/ui/Icons';
 import Colors from '../../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Toast} from '../../components/ui/Toast';
-import CallScreen from './CallScreen';
+import CallScreen from './VoiceCallScreen';
 import {emitEvent, subscribeToEvent} from '../../utils/socket';
+import VoiceCallScreen from './VoiceCallScreen';
 
 class Message {
   public id: string;
@@ -156,7 +157,7 @@ const ChatRoom = ({navigation, route}: any) => {
 
   return (
     <View style={{flex: 1}}>
-      <CallScreen isVisible={callScreen} setVisible={setCallScreen} />
+      <VoiceCallScreen isVisible={callScreen} setVisible={setCallScreen} isCaller={true} />
       <View style={styles.topView}>
         <View style={{margin: 15, flexDirection: 'row', alignItems: 'center'}}>
           <TouchableOpacity

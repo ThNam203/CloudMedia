@@ -12,93 +12,15 @@ import {
 const socket = require('../../utils/socket');
 console.debug = () => {};
 
-
-
 const VideoCallScreen = ({route}: any) => {
-  let peerConstraints = {
-    iceServers: [
-      {
-        urls: 'stun:stun.l.google.com:19302',
-      },
-      {
-        urls: 'stun:stun1.l.google.com:19302',
-      },
-      {
-        urls: 'stun:stun2.l.google.com:19302',
-      },
-    ],
-  };
+  
+
   const chatRoomId = 1;
   const {isCaller} = route.params;
-  const [remoteMediaStream, setRemoteMediaStream] = useState<any>(null);
-  const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(
-    null,
-  );
-  const [remoteCandidates, setRemoteCandidates] = useState<RTCIceCandidate[]>(
-    [],
-  );
-  const [negotiationNeeded, setNegotiationNeeded] = useState(false);
-  const peerConnection = useRef(new RTCPeerConnection(peerConstraints));
-  const [isVoiceOnly, setIsVoiceOnly] = useState(false);
 
-  const sendOfferVideoCall = async () => {
-    if (!negotiationNeeded) return;
 
-    let sessionConstraints = {
-      mandatory: {
-        OfferToReceiveAudio: true,
-        OfferToReceiveVideo: true,
-        VoiceActivityDetection: true,
-      },
-    };
-    try {
-      const offerDescription = await peerConnection.current.createOffer(
-        sessionConstraints,
-      );
-      await peerConnection.current.setLocalDescription(offerDescription);
-      socket.emit('offerVideoCall', {offerDescription, chatRoomId});
-    } catch (err) {
-      // Handle Errors
-    }
-  };
 
-  function handleRemoteCandidate(receivedIceCandidate: any) {
-    const iceCandidate = new RTCIceCandidate(receivedIceCandidate);
-    if (peerConnection.current.remoteDescription == null) {
-      return setRemoteCandidates(prevCandidates => [
-        ...prevCandidates,
-        iceCandidate,
-      ]);
-    }
-
-    return peerConnection.current.addIceCandidate(iceCandidate);
-  }
-
-  function processCandidates() {
-    if (remoteCandidates.length < 1) {
-      return;
-    }
-
-    remoteCandidates.map(candidate =>
-      peerConnection.current.addIceCandidate(candidate),
-    );
-    setRemoteCandidates([]);
-  }
-
-  const answerOfferVideoCall = async (receivedOfferDescription: any) => {
-    try {
-      const offerDescription = new RTCSessionDescription(
-        receivedOfferDescription,
-      );
-      await peerConnection.current.setRemoteDescription(offerDescription);
-
-      const answerDescription = await peerConnection.current.createAnswer();
-      await peerConnection.current.setLocalDescription(answerDescription);
-
-      processCandidates();
-      socket.emit('answerOfferVideoCall', {answerDescription, chatRoomId});
-    } catch (err) {}
-  };
+ 
 
   const onAnswerOfferVideoCall = async (receivedAnswerDescription: any) => {
     try {
