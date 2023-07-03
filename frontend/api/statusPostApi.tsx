@@ -28,6 +28,20 @@ export const getAllStatusPostOfUser = async (userId: any, token: any) => {
   }
 };
 
+export const getNewsFeed = async (userId: any, token: any, pageNum: any) => {
+  try {
+    const result = await ApiManager(`/${userId}/news-feed?page=${pageNum}`, {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const createNewPost = async (dataForm: any, userId: any, token: any) => {
   try {
     const result = await ApiManager(`/${userId}/post`, {

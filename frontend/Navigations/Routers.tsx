@@ -31,6 +31,7 @@ import {
 import {getAllNotifications} from '../api/notificationApi';
 import {Toast} from '../components/ui/Toast';
 import {connectSocket, subscribeToEvent} from '../utils/socket';
+import {pushStatusPosts} from '../reducers/StatusPostReducer';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,7 +47,14 @@ export default function Routers() {
     const ConnectSocket = async () => {
       connectSocket(uid);
 
+      subscribeToEvent('newStatusPost', (newPost: any) => {
+        console.log('have new post');
+        console.log(newPost);
+        dispatch(pushStatusPosts(newPost));
+      });
+
       subscribeToEvent('newNotification', (newNotify: any) => {
+        console.log('have new notification');
         dispatch(pushNotification(newNotify));
       });
     };
