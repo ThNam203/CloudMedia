@@ -29,6 +29,9 @@ import {
 import {getAllNotifications} from '../api/notificationApi';
 import {Toast} from '../components/ui/Toast';
 import {connectSocket, subscribeToEvent} from '../utils/socket';
+import {useNavigation} from '@react-navigation/native';
+import {setCallShow, setDataCall} from '../reducers/UtilsReducer';
+import VideoCallScreen from '../Screens/chatScreens/VideoCallScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,8 +52,13 @@ export default function Routers() {
       });
 
       subscribeToEvent('offerVideoCall', (offer: any) => {
-        navigation.navigate('VideoCallScreen')
-      })
+        // set data
+        // view in utilsReducer
+        // dispatch(setDataCall({alo: 'ola'}));
+        dispatch(setDataCall(offer));
+        // show modal
+        dispatch(setCallShow(true));
+      });
     };
     if (uid) {
       ConnectSocket();
@@ -148,7 +156,10 @@ export default function Routers() {
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="chatRoom" component={ChatRoom} />
         <Stack.Screen name="loading" component={LoadingScreen} />
-        <Stack.Screen name="incomingCallScreen" component={InCommingCallScreen} />
+        <Stack.Screen
+          name="incomingCallScreen"
+          component={InCommingCallScreen}
+        />
       </Stack.Navigator>
 
       {/* Show the app loader if isLoading is true */}
@@ -157,6 +168,7 @@ export default function Routers() {
       {/* Post screen */}
       <PostScreen />
       <SharePost />
+      <VideoCallScreen />
     </>
   );
 }
