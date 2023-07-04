@@ -242,7 +242,6 @@ export default function VideoCallScreen() {
       <React.Fragment>
         {props.isCaller === true || acceptedCall ? (
           <View style={{flex: 1}}>
-            (
             {remoteAudioStream && (
               <RTCView
                 streamURL={remoteAudioStream.toURL()}
@@ -296,15 +295,13 @@ export default function VideoCallScreen() {
                     flex: 1,
                     alignItems: 'center',
                   }}>
-                  <View>
-                    <TouchableOpacity onPress={toggleIconMic}>
-                      <Icon
-                        name={iconMic}
-                        color="white"
-                        type={Icons.FontAwesome}
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity onPress={toggleIconMic}>
+                    <Icon
+                      name={iconMic}
+                      color="white"
+                      type={Icons.FontAwesome}
+                    />
+                  </TouchableOpacity>
                 </View>
                 <View style={{flex: 1}}>
                   <TouchableOpacity
@@ -320,18 +317,15 @@ export default function VideoCallScreen() {
                     onPress={() => {
                       dispatch(setCallShow(false));
                     }}>
-                    <View>
-                      <Icon
-                        name="phone-hangup"
-                        color="white"
-                        type={Icons.MaterialCommunityIcons}
-                      />
-                    </View>
+                    <Icon
+                      name="phone-hangup"
+                      color="white"
+                      type={Icons.MaterialCommunityIcons}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
-            )
           </View>
         ) : (
           <View
