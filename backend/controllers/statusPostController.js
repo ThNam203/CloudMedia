@@ -89,10 +89,17 @@ exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
         return next(new AppError('Unable to create new status post', 500))
     }
 
+    // why populated is not the response for res.json is because it was in the old version and i hate to change it
+    // and notify the change to the frontend lmao
+    const populatedPost = await newStatusPost.populate(
+        'author',
+        '_id name profileImagePath'
+    )
+
     const io = socketIO.getIO()
     User.findById(userId).then((user) => {
         user.followers.forEach((follower) => {
-            io.in(follower._id.toString()).emit('newStatusPost', newStatusPost)
+            io.in(follower._id.toString()).emit('newStatusPost', populatedPost)
         })
     })
 
@@ -196,6 +203,7 @@ exports.getNewsFeed = asyncCatch(async (req, res, next) => {
         ],
     })
         .sort({ likeCount: -1 })
+        .skip(page * 3)
         .limit(3)
         .populate('author', '_id name profileImagePath workingPlace')
 

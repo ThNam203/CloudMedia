@@ -19,9 +19,8 @@ import Icon, {Icons} from '../../components/ui/Icons';
 import Colors from '../../constants/Colors';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Toast} from '../../components/ui/Toast';
-import CallScreen from './VoiceCallScreen';
 import {emitEvent, subscribeToEvent} from '../../utils/socket';
-import VoiceCallScreen from './VoiceCallScreen';
+import {setCallShow, setDataCall} from '../../reducers/UtilsReducer';
 
 class Message {
   public id: string;
@@ -54,14 +53,13 @@ const ChatRoom = ({navigation, route}: any) => {
   const jwt = useSelector((state: RootState) => state.token.key);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
+  const dispatch = useDispatch()
 
   const [isFocused, setIsFocused] = useState(false);
   const [mediaFile, setMediaFile] = useState<MediaItem>();
   const messageRef = useRef<TextInput>(null);
 
   const flatListRef = useRef<FlatList>(null);
-
-  const [callScreen, setCallScreen] = useState(false);
 
   useEffect(() => {
     if (flatListRef.current !== null) {
@@ -157,7 +155,6 @@ const ChatRoom = ({navigation, route}: any) => {
 
   return (
     <View style={{flex: 1}}>
-      <VoiceCallScreen isVisible={callScreen} setVisible={setCallScreen} isCaller={true} />
       <View style={styles.topView}>
         <View style={{margin: 15, flexDirection: 'row', alignItems: 'center'}}>
           <TouchableOpacity
@@ -173,7 +170,12 @@ const ChatRoom = ({navigation, route}: any) => {
             <View style={{marginHorizontal: 30}}>
               <TouchableOpacity
                 onPress={() => {
-                  setCallScreen(!callScreen);
+                  dispatch(setDataCall({
+                    isCaller: true,
+                    chatRoomId: chatRoomId
+                  }));
+                  // show modal
+                  dispatch(setCallShow(true));
                 }}>
                 <Icon type={Icons.Ionicons} name="call" />
               </TouchableOpacity>

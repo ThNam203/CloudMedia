@@ -1,119 +1,38 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Svg, {Path} from 'react-native-svg';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Modal from 'react-native-modal';
 import Icon, {Icons} from '../../components/ui/Icons';
-import { MediaStream, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
-import socket from '../../utils/socket'
+import {
+  MediaStream,
+  RTCIceCandidate,
+  RTCPeerConnection,
+  RTCSessionDescription,
+  RTCView,
+  mediaDevices,
+} from 'react-native-webrtc';
 
 function VoiceCallScreen(props: any) {
-  const { chatRoomId } = props
-  const toggleModal = () => {
-    props.setVisible(!props.isVisible);
-  };
 
-  let peerConstraints = {
-    iceServers: [
-      {
-        urls: 'stun:iphone-stun.strato-iphone.de:3478',
-      },
-      {
-        urls: 'stun:openrelay.metered.ca:80',
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:80',
-        username: 'openrelayproject',
-        credential: 'openrelayproject',
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:443',
-        username: 'openrelayproject',
-        credential: 'openrelayproject',
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-        username: 'openrelayproject',
-        credential: 'openrelayproject',
-      },
-    ],
-  };
 
-  const unprocessedRemoteCandidates: RTCIceCandidate[] = []
-  const peerConnection = useRef(new RTCPeerConnection(peerConstraints));
-
-  const sendOfferVideoCall = async () => {
-    let sessionConstraints = {
-      mandatory: {
-        OfferToReceiveAudio: true,
-        VoiceActivityDetection: true,
-      },
-    };
-    try {
-      const offerDescription = await peerConnection.current.createOffer(
-        sessionConstraints,
-      );
-      await peerConnection.current.setLocalDescription(offerDescription);
-      socket.emitEvent('offerVideoCall', {offerDescription, chatRoomId});
-    } catch (err) {
-      // Handle Errors
-    }
-  };
-
-  function handleRemoteCandidate(receivedIceCandidate: any) {
-    const iceCandidate = new RTCIceCandidate(receivedIceCandidate);
-    if (peerConnection.current.remoteDescription == null) 
-      unprocessedRemoteCandidates.push(iceCandidate)
-    else 
-      peerConnection.current.addIceCandidate(iceCandidate);
-  }
-
-  function processCandidates() {
-    if (unprocessedRemoteCandidates.length < 1) {
-      return;
-    }
-
-    unprocessedRemoteCandidates.map(candidate =>
-      peerConnection.current.addIceCandidate(candidate)
-    );
-
-    unprocessedRemoteCandidates.splice(0, unprocessedRemoteCandidates.length)
-  }
-
-  const answerOfferVideoCall = async (receivedOfferDescription: any) => {
-    try {
-      const offerDescription = new RTCSessionDescription(
-        receivedOfferDescription,
-      );
-      await peerConnection.current.setRemoteDescription(offerDescription);
-
-      const answerDescription = await peerConnection.current.createAnswer();
-      await peerConnection.current.setLocalDescription(answerDescription);
-
-      processCandidates();
-      socket.emitEvent('answerOfferVideoCall', {answerDescription, chatRoomId});
-    } catch (err) {}
-  };
-
-  const [acceptedCall, setAcceptedCall] = useState(false)
-  const [iconVideo, setIconVideo] = useState('video');
-  const [iconMic, setIconMic] = useState('microphone');
-
-  const toggleIconVideo = () => {
-    const newIconName = iconVideo === 'video' ? 'video-slash' : 'video';
-    setIconVideo(newIconName);
-  };
-  const toggleIconMic = () => {
-    const newIconMic =
-      iconMic === 'microphone' ? 'microphone-slash' : 'microphone';
-    setIconMic(newIconMic);
-  };
-
-  return (
-    ('isCaller' in props && props.isCaller === true) || acceptedCall ? <Modal
+  return isCaller === true || acceptedCall ? (
+    <Modal
       onBackdropPress={() => props.setVisible(false)}
       onBackButtonPress={() => props.setVisible(false)}
       style={{margin: 0}}
       isVisible={props.isVisible}>
+      {remoteAudioStream && (
+        <RTCView
+          streamURL={remoteAudioStream.toURL()}
+          style={{width: 0, height: 0}}
+        />
+      )}
+      {localAudioStream && (
+        <RTCView
+          streamURL={localAudioStream.toURL()}
+          style={{width: 0, height: 0}}
+        />
+      )}
       <View style={{flex: 1, backgroundColor: 'white'}}>
         <View style={styles.middleView}>
           <Image
@@ -130,7 +49,7 @@ function VoiceCallScreen(props: any) {
             Son truong
           </Text>
           <Text style={{fontSize: 18, marginTop: 10, color: 'black'}}>
-            Calling 
+            Calling
           </Text>
         </View>
         <View style={styles.bottomView}>
@@ -181,7 +100,7 @@ function VoiceCallScreen(props: any) {
         </View>
       </View>
     </Modal>
-  : 
+  ) : (
     <View
       style={{
         flex: 1,
@@ -211,7 +130,7 @@ function VoiceCallScreen(props: any) {
         }}>
         <TouchableOpacity
           onPress={() => {
-            answerOfferVideoCall()
+            answerOfferVideoCall();
           }}
           style={{
             backgroundColor: 'green',
@@ -221,7 +140,7 @@ function VoiceCallScreen(props: any) {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <CallAnswer height={28} fill={'#fff'}/>
+          <CallAnswer height={28} fill={'#fff'} />
         </TouchableOpacity>
       </View>
     </View>
@@ -240,7 +159,6 @@ const CallAnswer = (props: any) => (
   </Svg>
 );
 
-export default VoiceCallScreen;
 const styles = StyleSheet.create({
   textTopView: {
     fontSize: 18,

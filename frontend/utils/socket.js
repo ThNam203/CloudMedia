@@ -27,6 +27,10 @@ const disconnectSocket = () => {
   }
 };
 
+const unsubscribeToEvent = (eventName) => {
+  if (socket) socket.off(eventName);
+};
+
 const subscribeToEvent = (eventName, callback) => {
   if (socket)
     socket.on(eventName, callback);
@@ -37,5 +41,5 @@ const emitEvent = (eventName, data) => {
     socket.emit(eventName, data);
 };
 
-export { connectSocket, disconnectSocket, subscribeToEvent, emitEvent };
-export default { connectSocket, disconnectSocket, subscribeToEvent, emitEvent };
+export { connectSocket, disconnectSocket, subscribeToEvent, unsubscribeToEvent, emitEvent };
+export default { connectSocket, disconnectSocket, subscribeToEvent, unsubscribeToEvent, emitEvent };

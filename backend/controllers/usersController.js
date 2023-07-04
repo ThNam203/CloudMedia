@@ -78,6 +78,8 @@ exports.followUserById = asyncCatch(async (req, res, next) => {
 
     if (!user) throw new AppError('User not found', 404)
     if (!userFollowed) throw new AppError('User followed not found', 404)
+    if (user.followings.includes(userFollowed))
+        throw new AppError('Already followed', 500)
 
     user.followings.push(userFollowedId)
     userFollowed.followers.push(userId)

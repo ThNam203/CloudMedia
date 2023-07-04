@@ -27,35 +27,48 @@ io.on('connection', (socket) => {
     })
 
     socket.on('offerVideoCall', async (data) => {
-        const { sdp, chatRoomId, callerId } = data
+        console.log('offerVideoCall')
+        console.log(data)
+        const { offerDescription, chatRoomId, callerId, isVoiceCall } = data
         const user = await User.findById(callerId)
         const offer = JSON.stringify({
             chatRoomId: chatRoomId,
-            sdp: sdp,
+            offerDescription: offerDescription,
             callerName: user.name,
             callerImagePath: user.profileImagePath,
             callerId: callerId,
+            isVoiceCall: isVoiceCall,
         })
 
         const chatRoom = await ChatRoom.findById(chatRoomId)
         chatRoom.members.forEach((memberId) => {
-            if (memberId.toString() !== callerId)
+            if (memberId.toString() !== callerId) {
+                console.log(memberId)
+                console.log(offer)
                 io.in(memberId.toString()).emit('offerVideoCall', offer)
+            }
         })
 
         // socket.to(chatRoomId).emit('offerVideoCall', offer)
     })
 
     socket.on('answerOfferVideoCall', async (data) => {
-        const { sdp, chatRoomId } = data
+        console.log('answerOfferVideoCall')
+        console.log(data)
+        const { answerDescription, chatRoomId } = data
         const chatRoom = await ChatRoom.findById(chatRoomId)
         chatRoom.members.forEach((memberId) => {
-            io.in(memberId.toString()).emit('answerOfferVideoCall', sdp)
+            io.in(memberId.toString()).emit(
+                'answerOfferVideoCall',
+                answerDescription
+            )
         })
         // socket.to(chatRoomId).emit('answerOfferVideoCall', sdp)
     })
 
     socket.on('iceCandidate', async (data) => {
+        console.log('iceCandidate')
+        console.log(data)
         const chatRoom = await ChatRoom.findById(data.chatRoomId)
         chatRoom.members.forEach((memberId) => {
             io.in(memberId.toString()).emit('iceCandidate', data)

@@ -14,7 +14,6 @@ import ChatRoom from '../Screens/chatScreens/ChatRoom';
 import LoadingScreen from '../Screens/LoadingScreen';
 import ImagesPostScreen from '../Screens/ImagesPostScreen';
 import DetailStatusScreen from '../Screens/DetailStatusScreen';
-import InCommingCallScreen from '../Screens/chatScreens/InCommingCallScreen';
 import EditPostScreen from '../Screens/EditPostScreen';
 import ProfileOfUserScreen from '../Screens/ProfileOfUserScreen';
 import MyNetworksScreen from '../Screens/MyNetworksScreen';
@@ -52,6 +51,8 @@ export default function Routers() {
       });
 
       subscribeToEvent('offerVideoCall', (offer: any) => {
+        console.log('offerVoiceCall')
+        console.log(offer)
         // set data
         // view in utilsReducer
         // dispatch(setDataCall({alo: 'ola'}));
@@ -156,10 +157,6 @@ export default function Routers() {
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="chatRoom" component={ChatRoom} />
         <Stack.Screen name="loading" component={LoadingScreen} />
-        <Stack.Screen
-          name="incomingCallScreen"
-          component={InCommingCallScreen}
-        />
       </Stack.Navigator>
 
       {/* Show the app loader if isLoading is true */}
