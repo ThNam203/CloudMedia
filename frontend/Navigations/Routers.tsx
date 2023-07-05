@@ -31,7 +31,11 @@ import {
 import {getAllNotifications} from '../api/notificationApi';
 import {Toast} from '../components/ui/Toast';
 import {connectSocket, subscribeToEvent} from '../utils/socket';
-import {pushStatusPosts} from '../reducers/StatusPostReducer';
+import {
+  pushStatusPosts,
+  pushStatusPostsSub,
+} from '../reducers/StatusPostReducer';
+import {getAStatusPostById} from '../api/statusPostApi';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +47,22 @@ export default function Routers() {
 
   const dispatch = useDispatch();
 
+  const getPostById = async (id: any) => {
+    try {
+      const response: any = await getAStatusPostById(token, id);
+      if (response.status === 200) {
+        const data = response.data;
+        dispatch(pushStatusPostsSub(data));
+      } else {
+        console.log(response.status);
+        console.log(response.data.errorMessage);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
   useEffect(() => {
     const ConnectSocket = async () => {
       connectSocket(uid);
@@ -51,6 +71,9 @@ export default function Routers() {
         console.log('have new post');
         console.log(newPost);
         dispatch(pushStatusPosts(newPost));
+        if (newPost.sharedLink) {
+          getPostById(newPost.sharedLink);
+        }
       });
 
       subscribeToEvent('newNotification', (newNotify: any) => {

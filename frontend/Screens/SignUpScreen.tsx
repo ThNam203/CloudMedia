@@ -190,23 +190,7 @@ function SignUpHrScreen(props: any) {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.textInput}>
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={{fontSize: 16}}
-          data={listboxData}
-          search={false}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Being Idle"
-          value={userRole}
-          onChange={item => {
-            setUserRole(item.value);
-          }}
-          renderItem={renderItem}
-        />
-      </View>
+
       <View style={styles.textInput}>
         {phoneWarning && (
           <Text style={styles.textWarning}>
@@ -277,14 +261,6 @@ function SignUpHrScreen(props: any) {
             Sign Up
           </Text>
         </Pressable>
-      </View>
-      <View>
-        <CustomFTG
-          textTitle={'or sign up with'}
-          textQuestion1={'Already have an account?'}
-          textQuestion2={'Log in'}
-          handlePressQues2={props.handleToLogin}
-        />
       </View>
     </View>
   );

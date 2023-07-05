@@ -23,9 +23,7 @@ export default function Header({navigation}: any) {
             navigation.navigate('main', {screen: 'Home'});
           }}>
           <Image
-            source={{
-              uri: 'https://downloadwap.com/thumbs2/wallpapers/p2/2019/signs/12/f219249013025356.jpg',
-            }}
+            source={require('../../assets/images/wordpress.png')}
             style={{height: 35, width: 35, borderRadius: 100}}
           />
         </TouchableOpacity>

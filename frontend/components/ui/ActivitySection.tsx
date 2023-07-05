@@ -6,7 +6,10 @@ import {FlatList, StyleSheet, Text, Image, View, Pressable} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {setPostShow} from '../../reducers/UtilsReducer';
 import {Toast} from './Toast';
-import {getAllStatusPostOfUser} from '../../api/statusPostApi';
+import {
+  getAStatusPostById,
+  getAllStatusPostOfUser,
+} from '../../api/statusPostApi';
 import {RootState} from '../../reducers/Store';
 import {getTimeToNow} from '../../utils/Utils';
 import {useFocusEffect} from '@react-navigation/native';
@@ -26,7 +29,9 @@ const Post = ({navigation, item}: any) => {
       <Text style={styles.time}>{getTimeToNow(item.createdAt)}</Text>
       <Text style={styles.user}>
         {item.author.name}{' '}
-        <Text style={{fontWeight: 'normal', color: '#999'}}>posted this</Text>
+        <Text style={{fontWeight: 'normal', color: '#999'}}>
+          {item.sharedLink ? 'shared' : 'posted'}{' '}
+        </Text>
       </Text>
 
       <View style={{flexDirection: 'row'}}>
@@ -59,13 +64,29 @@ const ActivitySection = (props: any) => {
 
   const jwt = useSelector((state: RootState) => state.token.key);
 
+  const getPostById = async (id: any) => {
+    try {
+      const response: any = await getAStatusPostById(jwt, id);
+      if (response.status === 200) {
+        const data = response.data;
+        dispatch(pushStatusPostsSub(data));
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
   const getPosts = async () => {
     try {
       const response: any = await getAllStatusPostOfUser(userId, jwt);
       if (response.status === 200) {
         setPosts(response.data.reverse());
-        for (const postsub of response.data)
+        for (const postsub of response.data) {
           dispatch(pushStatusPostsSub(postsub));
+          if (postsub.sharedLink) {
+            getPostById(postsub.sharedLink);
+          }
+        }
       } else throw new Error(response.data.errorMessage);
     } catch (error: any) {
       Toast(error.message);

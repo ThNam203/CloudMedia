@@ -23,7 +23,7 @@ export default function HomeScreen({navigation}: any) {
     (state: RootState) => state.statusPost.HomePage,
   );
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -34,6 +34,7 @@ export default function HomeScreen({navigation}: any) {
       const response: any = await getNewsFeed(uid, token, currentPage);
       if (response.status === 200) {
         const data = response.data;
+        // console.log(currentPage);
         for (const post of data) {
           // console.log(post);
           dispatch(pushStatusPosts(post));
