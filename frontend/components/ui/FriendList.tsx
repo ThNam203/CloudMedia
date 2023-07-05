@@ -64,6 +64,7 @@ const FriendList = ({navigation}: any) => {
       renderItem={({item}) => (
         <ItemRequestUser
           item={item}
+          navigation={navigation}
           nameRequest={item.isFriend === 'pending' ? 'Pending' : 'Add Friend'}
           nameRequest2="Show Profile"
           pressLeft={() => handleAddFr(item.email)}

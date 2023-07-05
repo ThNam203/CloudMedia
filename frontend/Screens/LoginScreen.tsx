@@ -119,14 +119,6 @@ function LoginScreen(props: any) {
           </Text>
         </Pressable>
       </View>
-      <View>
-        <CustomFTG
-          textTitle={'or sign in with'}
-          textQuestion1={'Don’t have an account?'}
-          textQuestion2={'Sign up'}
-          handlePressQues2={props.handleToSignUp}
-        />
-      </View>
     </View>
   );
 }

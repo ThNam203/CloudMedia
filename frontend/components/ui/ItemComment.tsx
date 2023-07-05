@@ -121,7 +121,7 @@ export default function ItemComment(props: any) {
             numberOfLines={1}
             ellipsizeMode="tail">
             {/* {item.title} */}
-            UIT Student
+            {author.workingPlace || 'In the middle of nowhere'}
           </Text>
           {/* time ago */}
 

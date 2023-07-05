@@ -72,12 +72,12 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   const handleDelete = async () => {
     try {
       const response: any = await deleteAStatusPostApi(uid, jwt, item._id);
+      toggleShowOption();
       if (response.status === 204) {
         dispatch(deleteAStatusPost(item._id));
         Toast('Delete Success');
       } else {
         Toast('Delete Fail');
-        throw new Error(response.data.errorMessage);
       }
     } catch (error: any) {
       Toast(error);
@@ -141,7 +141,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
           </View>
           <Text style={{width: 180}} numberOfLines={1} ellipsizeMode="tail">
             {/* {item.title} */}
-            UIT Student
+            {item.author.workingPlace ? item.author.workingPlace : 'Noob'}
           </Text>
           {/* time ago */}
           <Text style={{fontSize: 11}}>{timeAgo}</Text>

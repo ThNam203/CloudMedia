@@ -113,7 +113,7 @@ function FirstTimeUseScreen({navigation}: any) {
             activeOpacity={1}
             onPressOut={closeModalHr}
           />
-          <View style={{flex: 13}}>
+          <View style={{flex: 2}}>
             <ScrollView contentContainerStyle={{flexGrow: 1}}>
               <SignUpHrScreen
                 handleCloseModal={setModalHrVisible}
@@ -135,11 +135,11 @@ function FirstTimeUseScreen({navigation}: any) {
           }}>
           {isLoading ? <AppLoader /> : null}
           <TouchableOpacity
-            style={{flex: 4}}
+            style={{flex: 1}}
             activeOpacity={1}
             onPressOut={closeModalLogin}
           />
-          <View style={{flex: 7}}>
+          <View style={{flex: 1}}>
             <LoginScreen
               handleToSignUp={() => {
                 closeModalLogin();

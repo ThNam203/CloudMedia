@@ -38,6 +38,7 @@ function ProfileScreen({navigation}: any) {
   const uid = useSelector((state: RootState) => state.uid.id);
 
   const dispatch = useDispatch();
+  const [followCount, setFollowCount] = useState(user.followers.length);
 
   const handleLogout = async () => {
     userLogout(token)
@@ -213,7 +214,7 @@ function ProfileScreen({navigation}: any) {
         <View>
           <Text style={styles.textName}>{user.name}</Text>
           <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
-            Attended Multiverse of Madness
+            {user.headline}
           </Text>
           <Text
             style={[
@@ -242,92 +243,16 @@ function ProfileScreen({navigation}: any) {
             ]}>
             {`${user.connections.length} connections`}
           </Text>
+
           <View
-            style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
-            <View
-              style={{
-                height: 35,
-                width: 150,
-                borderRadius: 30,
-                overflow: 'hidden',
-                backgroundColor: '#0A66C2',
-                alignItems: 'center',
-              }}>
-              <Pressable
-                android_ripple={{color: '#00043d'}}
-                style={{
-                  backgroundColor: 'transparent',
-                  width: 150,
-                  height: 35,
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
-                  Open to
-                </Text>
-              </Pressable>
-            </View>
-            <View
-              style={{
-                height: 35,
-                width: 150,
-                borderRadius: 30,
-                borderWidth: 1,
-                borderColor: '#0A66C2',
-                overflow: 'hidden',
-                backgroundColor: 'white',
-                marginHorizontal: 10,
-              }}>
-              <Pressable
-                onPress={() => {
-                  dispatch(setStatus(true));
-                }}
-                android_ripple={{color: '#0d8fe0ff'}}
-                style={{
-                  backgroundColor: 'transparent',
-                  width: 150,
-                  height: 35,
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
-                  Add section
-                </Text>
-              </Pressable>
-            </View>
-            <View
-              style={{
-                height: 35,
-                width: 35,
-                borderRadius: 17.5,
-                borderWidth: 1,
-                borderColor: '#727272',
-                overflow: 'hidden',
-                backgroundColor: 'white',
-                marginHorizontal: 10,
-              }}>
-              <Pressable
-                onPress={() => {}}
-                android_ripple={{color: '#0d8fe0ff'}}
-                style={{
-                  backgroundColor: 'transparent',
-                  width: 35,
-                  height: 35,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Image
-                  source={require('../assets/images/3Dot.png')}
-                  style={{width: 25, height: 25}}
-                />
-              </Pressable>
-            </View>
-          </View>
-          <View
-            style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
+            style={{backgroundColor: '#E9E5DF', height: 5, marginTop: 10}}
           />
           <View>
-            <ActivitySection navigation={navigation} userId={uid} />
+            <ActivitySection
+              navigation={navigation}
+              userId={uid}
+              followCount={followCount}
+            />
           </View>
         </View>
         <View

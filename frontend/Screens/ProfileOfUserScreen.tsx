@@ -30,6 +30,7 @@ export default function ProfileOfUserScreen(props: any) {
   const [user, setUser] = useState<any>({});
   const [nameTage1, setNameTage1] = useState('');
   const [nameTage2, setNameTage2] = useState('Follow');
+  const [followCount, setFollowCount] = useState(0);
   const dispatch = useDispatch();
 
   const uid = useSelector((state: RootState) => state.uid.id);
@@ -52,7 +53,7 @@ export default function ProfileOfUserScreen(props: any) {
   const removeFriend = async () => {
     try {
       const response: any = await unfriendApi(user._id, uid, jwt);
-      if (response.status === 200) {
+      if (response.status === 204) {
         changeNameTag1('false');
         setNameTage2('Follow');
       } else {
@@ -116,8 +117,10 @@ export default function ProfileOfUserScreen(props: any) {
   const handleRightButton = () => {
     if (nameTage2 === 'Follow') {
       handleFollow();
+      setFollowCount(followCount + 1);
     } else {
       handleUnfollow();
+      setFollowCount(followCount - 1);
     }
   };
 
@@ -138,6 +141,7 @@ export default function ProfileOfUserScreen(props: any) {
         if (response.status === 200) {
           const data = response.data;
           setUser(data);
+          setFollowCount(data.followers.length);
           data.followers.forEach((item: any) => {
             if (item === uid) {
               setNameTage2('Following✓');
@@ -214,7 +218,7 @@ export default function ProfileOfUserScreen(props: any) {
         <View>
           <Text style={styles.textName}>{user.name}</Text>
           <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
-            Attended Multiverse of Madness
+            {user.headline}
           </Text>
           <Text
             style={[
@@ -334,7 +338,11 @@ export default function ProfileOfUserScreen(props: any) {
             style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
           />
           <View>
-            <ActivitySection navigation={navigation} userId={id} />
+            <ActivitySection
+              navigation={navigation}
+              userId={id}
+              followCount={followCount}
+            />
           </View>
         </View>
       </View>

@@ -31,8 +31,6 @@ export default function LoadingScreen({navigation, route}: any) {
     try {
       const json = jwt_decode(jwt) as {id: string};
       const idUser = json.id;
-      dispatch(clearStatusPosts());
-
       const response: any = await getAllStatusPostOfUser(idUser, jwt);
       if (response.status === 200) {
         const data = response.data;
@@ -44,8 +42,6 @@ export default function LoadingScreen({navigation, route}: any) {
             if (res.status === 200) {
               // console.log(res.data);
               dispatch(pushStatusPostsSub(res.data));
-            } else {
-              throw new Error(res.data.errorMessage);
             }
           }
         }
@@ -101,13 +97,14 @@ export default function LoadingScreen({navigation, route}: any) {
 
     dispatch(setToken(jwt));
     dispatch(setIdFromJwt(jwt));
+    dispatch(clearStatusPosts());
     // get some data
     const loadData = async () => {
       try {
         await Promise.all([
           saveInfo(jwt),
           saveNotification(jwt),
-          saveAllStatusPost(jwt),
+          // saveAllStatusPost(jwt),
         ]);
 
         setTimeout(() => {
