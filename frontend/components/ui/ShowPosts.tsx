@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Icon, {Icons} from '../../components/ui/Icons';
 import Colors from '../../constants/Colors';
 import {getTimeToNow} from '../../utils/Utils';
@@ -25,13 +25,19 @@ import VideoPlayer from 'react-native-video-controls';
 import {setShareLink, setShareShow} from '../../reducers/UtilsReducer';
 import PostShared from './PostShared';
 
-export default function ShowPosts({item, navigation, pressComment}: any) {
+export default function ShowPosts({
+  item,
+  navigation,
+  pressComment,
+  pressDelete,
+}: any) {
   const deviceWidth = Dimensions.get('window').width;
   const deviceHeight = Dimensions.get('window').height;
   const dispatch = useDispatch();
 
   const [showMore, setShowMore] = useState(false);
   const [showOption, setShowOption] = useState(false);
+  const [paused, setPaused] = useState(false);
   const uid = useSelector((state: RootState) => state.uid.id);
   const jwt = useSelector((state: RootState) => state.token.key);
 
@@ -69,21 +75,6 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
     toggleShowOption();
   };
 
-  const handleDelete = async () => {
-    try {
-      const response: any = await deleteAStatusPostApi(uid, jwt, item._id);
-      toggleShowOption();
-      if (response.status === 204) {
-        dispatch(deleteAStatusPost(item._id));
-        Toast('Delete Success');
-      } else {
-        Toast('Delete Fail');
-      }
-    } catch (error: any) {
-      Toast(error);
-    }
-  };
-
   const handleShare = () => {
     if (item.sharedLink) dispatch(setShareLink(item.sharedLink));
     else dispatch(setShareLink(item._id));
@@ -91,8 +82,15 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
   };
 
   const navigateToProfile = () => {
-    navigation.navigate('profileOther', {id: item.author._id});
+    if (item.author._id !== uid)
+      navigation.navigate('profileOther', {id: item.author._id});
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setPaused(true);
+    }, 1500);
+  }, []);
 
   return (
     <View
@@ -103,7 +101,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
       }}>
       {showOption ? (
         <View style={{position: 'absolute', top: 30, right: 30, zIndex: 1}}>
-          <MenuStatus handleEdit={handleEdit} handleDelete={handleDelete} />
+          <MenuStatus handleEdit={handleEdit} handleDelete={pressDelete} />
         </View>
       ) : null}
 
@@ -231,7 +229,7 @@ export default function ShowPosts({item, navigation, pressComment}: any) {
                 source={{uri: item.mediaFiles[0].location}}
                 style={{width: '100%', height: '100%'}}
                 disableBack={true}
-                paused={true}
+                paused={paused}
                 thumbnail={require('../../assets/images/Thumbnail.png')}
               />
             </View>

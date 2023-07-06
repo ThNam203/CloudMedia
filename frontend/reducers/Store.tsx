@@ -6,6 +6,7 @@ import UserReducer from './UserReducer';
 import UtilsReducer from './UtilsReducer';
 import NotificationReducer from './NotificationReducer';
 import StatusReducer from './StatusPostReducer';
+import StoryReducer from './StoryReducer';
 
 export const Store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const Store = configureStore({
     Utils: UtilsReducer,
     notifications: NotificationReducer,
     statusPost: StatusReducer,
+    story: StoryReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

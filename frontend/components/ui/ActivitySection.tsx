@@ -63,6 +63,12 @@ const ActivitySection = (props: any) => {
   const [posts, setPosts] = useState<any[]>([]);
 
   const jwt = useSelector((state: RootState) => state.token.key);
+  const subStory = useSelector((state: RootState) => state.story.Sub);
+
+  const viewStories = () => {
+    if (subStory.length > 0) navigation.navigate('story', {index: 0, type: 1});
+    else Toast('No story to view');
+  };
 
   const getPostById = async (id: any) => {
     try {
@@ -122,16 +128,16 @@ const ActivitySection = (props: any) => {
             borderColor: '#0565a0ff',
           }}>
           <Pressable
-            onPress={() => dispatch(setPostShow(true))}
+            onPress={viewStories}
             android_ripple={{color: '#7fc1ebff'}}
             style={{
               backgroundColor: 'transparent',
-              width: 150,
+              width: 100,
               height: 35,
               justifyContent: 'center',
             }}>
             <Text style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
-              Start a post
+              Stories
             </Text>
           </Pressable>
         </View>

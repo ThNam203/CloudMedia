@@ -27,11 +27,12 @@ import ItemComment from '../components/ui/ItemComment';
 import ShowPosts from '../components/ui/ShowPosts';
 import {
   decrementComment,
+  deleteAStatusPost,
   imcrementComment,
   updateAStatusPost,
 } from '../reducers/StatusPostReducer';
 import {useFocusEffect} from '@react-navigation/native';
-import {getAStatusPostById} from '../api/statusPostApi';
+import {deleteAStatusPostApi, getAStatusPostById} from '../api/statusPostApi';
 
 interface MediaItem {
   uri: string;
@@ -66,6 +67,21 @@ export default function DetailStatusScreen({navigation, route}: any) {
   const commentRef = useRef<TextInput>(null);
 
   const dispatch = useDispatch();
+
+  const handleDelete = async (idPost: any) => {
+    try {
+      const response: any = await deleteAStatusPostApi(uid, token, idPost);
+      if (response.status === 204) {
+        navigation.goBack();
+        dispatch(deleteAStatusPost(idPost));
+        Toast('Delete Success');
+      } else {
+        Toast('Delete Fail');
+      }
+    } catch (error: any) {
+      Toast(error);
+    }
+  };
 
   const handleDeleteComment = async (id: string) => {
     try {
@@ -169,7 +185,6 @@ export default function DetailStatusScreen({navigation, route}: any) {
       if (response.status === 200) {
         const dataStatus: any = response.data;
         dispatch(updateAStatusPost(dataStatus));
-        // console.log(dataStatus);
       } else {
         console.log(response.status);
         throw new Error(response.data.errorMessage);
@@ -209,6 +224,9 @@ export default function DetailStatusScreen({navigation, route}: any) {
           navigation={navigation}
           pressComment={() => {
             commentRef.current?.focus();
+          }}
+          pressDelete={() => {
+            handleDelete(item._id);
           }}
         />
         <View style={{flex: 1, marginVertical: 5, paddingVertical: 10}}>

@@ -11,6 +11,8 @@ import {getAStatusPostById} from '../api/statusPostApi';
 import {Toast} from '../components/ui/Toast';
 import {pushStatusPostsSub} from '../reducers/StatusPostReducer';
 import {readNotification} from '../api/notificationApi';
+import {clearStorySub, pushStorySub} from '../reducers/StoryReducer';
+import {getStoryById} from '../api/storyApi';
 
 export default function NotificationsScreen({navigation}: any) {
   const NotificationsData = useSelector(
@@ -50,12 +52,34 @@ export default function NotificationsScreen({navigation}: any) {
     readNotifi();
   }, []);
 
+  const getAStoryById = async (link: any) => {
+    try {
+      const response: any = await getStoryById(link, jwt);
+      if (response.status === 200) {
+        const data = response.data;
+        await dispatch(pushStorySub(data));
+        navigation.navigate('story', {index: 0, type: 1});
+      } else {
+        console.log(response.status);
+        console.log(response.data.errorMessage);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
   const CTA = ({title, item}: any) => (
     <TouchableOpacity
       onPress={() => {
         if (item.notificationType === 'Comment') navigateToDetail(item.link);
         if (item.notificationType === 'FriendRequest')
           navigation.navigate('invitations');
+        if (item.notificationType === 'NewStory') {
+          console.log(item.link);
+          dispatch(clearStorySub());
+          getAStoryById(item.link);
+        }
       }}
       style={{
         borderRadius: 50,
@@ -116,6 +140,8 @@ export default function NotificationsScreen({navigation}: any) {
           <CTA title="See all comment" item={item} />
         ) : item.notificationType === 'Like' ? (
           <CTA title="See like" item={item} />
+        ) : item.notificationType === 'NewStory' ? (
+          <CTA title="See story" item={item} />
         ) : null}
       </View>
       <View>
@@ -167,12 +193,32 @@ export default function NotificationsScreen({navigation}: any) {
         paddingHorizontal: 5,
         backgroundColor: 'white',
       }}>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={NotificationsData}
-        renderItem={NotificationItem}
-        ListFooterComponent={() => <ShowAllFooter />}
-      />
+      {NotificationsData.length === 0 ? (
+        <View
+          style={{
+            backgroundColor: 'transparent',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <Image
+            style={{
+              width: 400,
+              height: 400,
+              marginTop: 500,
+              alignSelf: 'center',
+              backgroundColor: 'transparent',
+            }}
+            source={require('../assets/images/NoNotification-removebg-preview.png')}
+          />
+        </View>
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={NotificationsData}
+          renderItem={NotificationItem}
+          ListFooterComponent={() => <ShowAllFooter />}
+        />
+      )}
     </View>
   );
 }

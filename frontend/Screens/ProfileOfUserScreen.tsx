@@ -20,6 +20,8 @@ import {RootState} from '../reducers/Store';
 import {SearchUsersByEmail} from '../api/Utils';
 import Icon, {Icons} from '../components/ui/Icons';
 import {createRequestByEmail, unfriendApi} from '../api/friend_api';
+import {clearStorySub, pushStorySub} from '../reducers/StoryReducer';
+import {getAllStory} from '../api/storyApi';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -156,8 +158,21 @@ export default function ProfileOfUserScreen(props: any) {
       }
     };
 
-    // dispatch(clearStatusPostsSub());
+    const getStory = async () => {
+      const response: any = await getAllStory(id, jwt);
+      if (response.status === 200) {
+        const data = response.data;
+        for (const story of data) {
+          dispatch(pushStorySub(story));
+        }
+      } else {
+        console.log(response.status);
+      }
+    };
+    dispatch(clearStorySub());
     getUserInfo();
+    getStory();
+    // dispatch(clearStatusPostsSub());
   }, []);
 
   useEffect(() => {

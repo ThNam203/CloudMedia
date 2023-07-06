@@ -8,6 +8,7 @@ import {getInfoUser} from '../../api/userApi';
 import {replyRequestFr} from '../../api/friend_api';
 import {Toast} from './Toast';
 import {addFriend} from '../../reducers/UserReducer';
+import {Text} from 'react-native-animatable';
 
 const InvitationsList = (props: any) => {
   const {navigation} = props;
@@ -115,27 +116,37 @@ const InvitationsList = (props: any) => {
       });
   }, [token, uid]);
 
-  return (
-    <FlatList
-      data={invitations}
-      renderItem={({item}) => (
-        <ItemRequestUser
-          item={item}
-          navigation={navigation}
-          nameRequest="Accept"
-          nameRequest2="Decline"
-          pressLeft={() => {
-            handleAccept(item.idRq, item._id);
-          }}
-          pressRight={() => {
-            handleDecline(item.idRq);
-          }}
-        />
-      )}
-      keyExtractor={(item, index) => 'key' + index}
-      showsVerticalScrollIndicator={false}
-    />
-  );
+  if (invitations.length === 0) {
+    return (
+      <View>
+        <Text style={{fontSize: 25, alignSelf: 'center', color: 'gray'}}>
+          No invitations
+        </Text>
+      </View>
+    );
+  } else {
+    return (
+      <FlatList
+        data={invitations}
+        renderItem={({item}) => (
+          <ItemRequestUser
+            item={item}
+            navigation={navigation}
+            nameRequest="Accept"
+            nameRequest2="Decline"
+            pressLeft={() => {
+              handleAccept(item.idRq, item._id);
+            }}
+            pressRight={() => {
+              handleDecline(item.idRq);
+            }}
+          />
+        )}
+        keyExtractor={(item, index) => 'key' + index}
+        showsVerticalScrollIndicator={false}
+      />
+    );
+  }
 };
 
 export default InvitationsList;

@@ -5,13 +5,13 @@ import {
   useWindowDimensions,
   StyleSheet,
   SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useRef} from 'react';
 import {Image} from 'react-native';
 import Colors from '../constants/Colors';
 import {ScrollView} from 'react-native-gesture-handler';
 import Icon, {Icons} from '../components/ui/Icons';
-import {TouchableOpacity} from '@gorhom/bottom-sheet';
 
 export default function ImagesPostScreen({navigation: {goBack}, route}: any) {
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -41,7 +41,8 @@ export default function ImagesPostScreen({navigation: {goBack}, route}: any) {
             [{nativeEvent: {contentOffset: {x: scrollX}}}],
             {useNativeDriver: false},
           )}
-          scrollEventThrottle={16}>
+          scrollEventThrottle={16}
+          contentOffset={{x: windowWitdh * 0, y: 0}}>
           {images.map((image: any, imageIndex: any) => {
             return (
               <Animated.View style={{width: windowWitdh}} key={imageIndex}>

@@ -6489,6 +6489,11 @@ react-native-codegen@^0.71.5:
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
 
+react-native-create-thumbnail@^1.6.4:
+  version "1.6.4"
+  resolved "https://registry.npmjs.org/react-native-create-thumbnail/-/react-native-create-thumbnail-1.6.4.tgz"
+  integrity sha512-JWuKXswDXtqUPfuqh6rjCVMvTSSG3kUtwvSK/YdaNU0i+nZKxeqHmt/CO2+TyI/WSUFynGVmWT1xOHhCZAFsRQ==
+
 react-native-date-picker@^4.2.13:
   version "4.2.13"
   resolved "https://registry.npmjs.org/react-native-date-picker/-/react-native-date-picker-4.2.13.tgz"
@@ -6623,7 +6628,7 @@ react-native-webrtc@^111.0.0:
     event-target-shim "6.0.2"
     tar "6.1.11"
 
-react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", "react-native@>= 0.64.3", react-native@>=0.40.0, react-native@>=0.46, react-native@>=0.46.0, react-native@>=0.59, react-native@>=0.60.0, react-native@>=0.65.0, react-native@0.71.5:
+react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", "react-native@>= 0.64.3", react-native@>=0.40.0, react-native@>=0.46, react-native@>=0.46.0, react-native@>=0.59, react-native@>=0.59.0, react-native@>=0.60.0, react-native@>=0.65.0, react-native@0.71.5:
   version "0.71.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.71.5.tgz"
   integrity sha512-fMptnHXoIPotg7gPYAvjMRnfC6gUSkTJzgaIDQJTY/f5F+g6qph5J1xT9LCuWuNguyQ9dh8b0MZTK5ROvTTV9w==
