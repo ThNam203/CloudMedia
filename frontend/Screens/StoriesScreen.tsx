@@ -9,41 +9,91 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  Pressable,
+  Alert,
 } from 'react-native';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Colors from '../constants/Colors';
-import VideoPlayer from 'react-native-video';
+import VideoPlayer from 'react-native-video-controls';
 import Icon, {Icons} from '../components/ui/Icons';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {getTimeToNow} from '../utils/Utils';
+import {deleteStoryApi, likeStory} from '../api/storyApi';
+import {deleteStory, toggleLikeStory} from '../reducers/StoryReducer';
 
 export default function StoriesScreen({navigation: {goBack}, route}: any) {
+  const {index, type} = route.params;
   let {width: windowWidth, height: windowHeight} = useWindowDimensions();
   windowHeight = windowHeight - 150;
 
+  const stories =
+    type === 0
+      ? useSelector((state: RootState) => state.story.Main)
+      : useSelector((state: RootState) => state.story.Sub);
+  const token = useSelector((state: RootState) => state.token.key);
+  const uid = useSelector((state: RootState) => state.uid.id);
+
   const flatListRef = useRef<FlatList<any>>(null);
 
-  const stories = [
-    {
-      id: '1',
-      name: 'John Doe kjasd kasjh dkjashd jklash klajshd',
-      image: 'https://picsum.photos/200/300',
-      uri: 'https://vjs.zencdn.net/v/oceans.mp4',
-      seen: false,
-    },
-    {
-      id: '2',
-      name: 'Jane Doe',
-      image: 'https://picsum.photos/200/300',
-      uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      seen: true,
-    },
-  ];
+  const dispatch = useDispatch();
+
+  // get index of item in flatlist
+  const [currentIndex, setCurrentIndex] = useState(index);
+  useEffect(() => {
+    console.log('index:', currentIndex);
+  }, [currentIndex]);
 
   useEffect(() => {
-    // Scroll to the second item in the FlatList
+    // Scroll to the second item in the FlatList]
     if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({animated: false, index: 0});
+      flatListRef.current.scrollToIndex({animated: false, index: index});
     }
   }, []);
+
+  const toggleLike = async (item: any) => {
+    const response: any = await likeStory(item.author._id, item._id, token);
+    if (response.status === 204) {
+      dispatch(toggleLikeStory(item._id));
+    } else {
+      console.log(response.data);
+    }
+  };
+
+  const handleDelete = async (item: any) => {
+    const response: any = await deleteStoryApi(
+      item.author._id,
+      item._id,
+      token,
+    );
+    if (response.status === 204) {
+      dispatch(deleteStory(item._id));
+    } else {
+      console.log(response.data);
+    }
+  };
+
+  const deleteAStory = async (item: any) => {
+    Alert.alert(
+      'Delete Story',
+      'Are you sure you want to delete this story?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => {
+            handleDelete(item);
+          },
+          style: 'destructive',
+        },
+      ],
+      {cancelable: true},
+    );
+  };
 
   const getItemLayout = (data: any, index: number) => ({
     length: windowWidth,
@@ -51,20 +101,7 @@ export default function StoriesScreen({navigation: {goBack}, route}: any) {
     index,
   });
 
-  const Video = ({source}: any) => {
-    return (
-      <View style={{width: windowWidth}}>
-        <VideoPlayer
-          source={{uri: source}}
-          style={{flex: 1, width: '99%'}}
-          resizeMode="contain"
-          repeat={true}
-        />
-      </View>
-    );
-  };
-
-  const Story = ({item}: any) => {
+  const Story = ({item, index}: any) => {
     return (
       <View
         style={{
@@ -72,34 +109,64 @@ export default function StoriesScreen({navigation: {goBack}, route}: any) {
           justifyContent: 'center',
           alignContent: 'center',
         }}>
-        <Image
-          source={{uri: item.image}}
-          style={{flex: 1, width: '99%'}}
-          resizeMode="contain"
-        />
+        {item.mediaFiles[0].fileType === 'Image' ? (
+          <Image
+            source={{uri: item.mediaFiles[0].location}}
+            style={{flex: 1, width: '99%'}}
+            resizeMode="contain"
+          />
+        ) : (
+          <VideoPlayer
+            source={{uri: item.mediaFiles[0].location}}
+            style={{flex: 1, width: '99%'}}
+            resizeMode="contain"
+            repeat={true}
+            paused={index !== currentIndex ? true : false}
+            tapAnywhereToPause={true}
+            disableFullscreen={true}
+            disablePlayPause={true}
+            disableSeekbar={true}
+            disableVolume={true}
+            disableTimer={true}
+            disableBack={true}
+          />
+        )}
         <View style={styles.header}>
           <View style={styles.row}>
             <TouchableOpacity style={styles.row}>
-              <Image source={{uri: item.image}} style={styles.avatar} />
+              <Image
+                source={
+                  item.author.profileImagePath
+                    ? {uri: item.author.profileImagePath}
+                    : require('../assets/images/Spiderman.jpg')
+                }
+                style={styles.avatar}
+              />
               <Text style={styles.name}>
-                {item.name.length < 18
-                  ? `${item.name}`
-                  : `${item.name.substring(0, 15)}...`}
+                {item.author.name.length < 18
+                  ? `${item.author.name}`
+                  : `${item.author.name.substring(0, 15)}...`}
               </Text>
             </TouchableOpacity>
             <Text style={{color: Colors.white, fontSize: 16, marginLeft: 5}}>
-              {item.seen ? 'seen' : 'not seen'}
+              {getTimeToNow(item.createdAt)}
             </Text>
           </View>
           <View style={styles.row}>
-            <TouchableOpacity onPress={() => {}} style={{padding: 5}}>
-              <Icon
-                type={Icons.Feather}
-                name="delete"
-                color={Colors.white}
-                size={25}
-              />
-            </TouchableOpacity>
+            {uid === item.author._id && (
+              <TouchableOpacity
+                onPress={() => {
+                  deleteAStory(item);
+                }}
+                style={{padding: 5}}>
+                <Icon
+                  type={Icons.Feather}
+                  name="delete"
+                  color={Colors.white}
+                  size={25}
+                />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity onPress={() => goBack()} style={{padding: 5}}>
               <Icon
                 type={Icons.AntDesign}
@@ -111,13 +178,14 @@ export default function StoriesScreen({navigation: {goBack}, route}: any) {
           </View>
         </View>
         <View style={styles.bottom}>
-          <TouchableOpacity style={{padding: 5}}>
+          <TouchableOpacity
+            style={{padding: 5}}
+            onPress={() => toggleLike(item)}>
             <Icon
               type={Icons.FontAwesome}
               name="heart"
-              color={Colors.white}
+              color={item.isLiked ? Colors.red : Colors.white}
               size={30}
-              onPress={() => goBack()}
             />
           </TouchableOpacity>
         </View>
@@ -135,8 +203,15 @@ export default function StoriesScreen({navigation: {goBack}, route}: any) {
           showsHorizontalScrollIndicator={false}
           data={stories}
           keyExtractor={(item, index) => 'key ' + index}
-          renderItem={({item}) => <Story item={item} />}
+          renderItem={({item, index}) => <Story item={item} index={index} />}
           getItemLayout={getItemLayout} // Add getItemLayout prop
+          onScroll={event => {
+            const {contentOffset, layoutMeasurement} = event.nativeEvent;
+            const index = Math.floor(
+              contentOffset.x / (layoutMeasurement.width - 1),
+            );
+            setCurrentIndex(index);
+          }}
         />
       </View>
     </SafeAreaView>

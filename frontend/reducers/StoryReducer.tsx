@@ -45,20 +45,40 @@ const StorySlice = createSlice({
         (item: any) => item._id === action.payload,
       );
       if (index !== -1) state.Main.splice(index, 1);
+
+      const indexSub = state.Sub.findIndex(
+        (item: any) => item._id === action.payload,
+      );
+      if (indexSub !== -1) state.Sub.splice(indexSub, 1);
     },
-    toggleLike: (state: Stories, action: PayloadAction<any>) => {
+    toggleLikeStory: (state: Stories, action: PayloadAction<any>) => {
       const index = state.Main.findIndex(
         (item: any) => item._id === action.payload,
       );
       if (index !== -1) state.Main[index].isLiked = !state.Main[index].isLiked;
+
+      const indexSub = state.Sub.findIndex(
+        (item: any) => item._id === action.payload,
+      );
+      if (indexSub !== -1)
+        state.Sub[indexSub].isLiked = !state.Sub[indexSub].isLiked;
     },
     clearStory: (state: Stories) => {
       state.Main = [];
       state.Sub = [];
     },
+    clearStorySub: (state: Stories) => {
+      state.Sub = [];
+    },
   },
 });
 
-export const {pushStory, pushStorySub, deleteStory, toggleLike, clearStory} =
-  StorySlice.actions;
+export const {
+  pushStory,
+  pushStorySub,
+  deleteStory,
+  toggleLikeStory,
+  clearStory,
+  clearStorySub,
+} = StorySlice.actions;
 export default StorySlice.reducer;

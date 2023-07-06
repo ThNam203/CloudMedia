@@ -13,10 +13,12 @@ import {RootState} from '../reducers/Store';
 import {Toast} from '../components/ui/Toast';
 import LottieView from 'lottie-react-native';
 import {
+  deleteAStatusPost,
   pushStatusPosts,
   pushStatusPostsSub,
 } from '../reducers/StatusPostReducer';
 import {
+  deleteAStatusPostApi,
   getAStatusPostById,
   getAllStatusPostOfUser,
   getNewsFeed,
@@ -79,6 +81,20 @@ export default function HomeScreen({navigation}: any) {
     setCurrentPage(currentPage + 1);
   };
 
+  const handleDelete = async (idPost: any) => {
+    try {
+      const response: any = await deleteAStatusPostApi(uid, token, idPost);
+      if (response.status === 204) {
+        dispatch(deleteAStatusPost(idPost));
+        Toast('Delete Success');
+      } else {
+        Toast('Delete Fail');
+      }
+    } catch (error: any) {
+      Toast(error);
+    }
+  };
+
   useEffect(() => {
     saveAllStatusPost();
   }, [currentPage]);
@@ -102,6 +118,9 @@ export default function HomeScreen({navigation}: any) {
               navigation={navigation}
               pressComment={() => {
                 navigation.navigate('detailStatus', {idPost: item._id});
+              }}
+              pressDelete={() => {
+                handleDelete(item._id);
               }}
             />
           );

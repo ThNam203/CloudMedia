@@ -15,7 +15,6 @@ import {
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 const {width, height} = Dimensions.get('window');
 
-import {stories} from '../../utils/fakeapi';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
 
@@ -207,21 +206,29 @@ const CreateStoryComponent = (props: any) => {
 };
 
 const Story = (props: any) => {
-  const {content, id, navigation} = props;
-  const viewProfile = () => {};
+  const {content, index, navigation} = props;
+  const uid = useSelector((state: RootState) => state.uid.id);
+  const viewProfile = () => {
+    if (content.author._id !== uid)
+      navigation.navigate('profileOther', {id: content.author._id});
+  };
   const viewStory = () => {
-    navigation.navigate('story');
+    navigation.navigate('story', {index, type: 0});
   };
   return (
     <TouchableOpacity onPress={viewStory}>
       <Image
-        source={{uri: `https://picsum.photos/id/${id * 10}/500/500`}}
+        source={{uri: content.mediaFiles[1].location}}
         style={styles.imageStory}
         resizeMode="cover"
       />
       <TouchableOpacity style={styles.avatarContainer} onPress={viewProfile}>
         <Image
-          source={{uri: `https://i.pravatar.cc/150?img=${id}`}}
+          source={
+            content.author.profileImagePath
+              ? {uri: content.author.profileImagePath}
+              : require('../../assets/images/Spiderman.jpg')
+          }
           style={styles.avatar}
           resizeMode="cover"
         />
@@ -235,6 +242,7 @@ const StoriesList = ({navigation}: any) => {
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
   const user = useSelector((state: RootState) => state.userInfo);
+  const stories = useSelector((state: RootState) => state.story.Main);
 
   const scrollStories = createRef<FlatList>();
   const x = useRef(new Animated.Value(0)).current;
@@ -269,14 +277,14 @@ const StoriesList = ({navigation}: any) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{paddingLeft: 112}}
-          keyExtractor={(item: any) => String(item?.id)}
+          keyExtractor={(item, index) => index.toString()}
           scrollEventThrottle={16}
           onScroll={Animated.event([{nativeEvent: {contentOffset: {x}}}], {
             useNativeDriver: false,
           })}
           onScrollEndDrag={onScrollEndDrag}
           renderItem={({item, index}) => (
-            <Story content={item} id={index} navigation={navigation} />
+            <Story content={item} index={index} navigation={navigation} />
           )}
         />
         <CreateStoryComponent
@@ -293,6 +301,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     borderRadius: 10,
+    height: 200,
   },
   titleContainer: {
     backgroundColor: 'white',

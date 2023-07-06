@@ -22,7 +22,7 @@ import {
 import {Toast} from '../components/ui/Toast';
 import {RootState} from '../reducers/Store';
 import {clearStory, pushStory} from '../reducers/StoryReducer';
-import {getAllStory} from '../api/storyApi';
+import {getAllStory, getStoryFeed} from '../api/storyApi';
 
 export default function LoadingScreen({navigation, route}: any) {
   const {jwt} = route.params;
@@ -61,10 +61,9 @@ export default function LoadingScreen({navigation, route}: any) {
     try {
       const json = jwt_decode(jwt) as {id: string};
       const idUser = json.id;
-      const response: any = await getAllStory(idUser, jwt);
+      const response: any = await getStoryFeed(idUser, jwt);
       if (response.status === 200) {
         const data = response.data;
-        console.log(data);
         for (const story of data) {
           dispatch(pushStory(story));
         }

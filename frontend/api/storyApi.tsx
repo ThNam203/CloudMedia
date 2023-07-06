@@ -28,6 +28,20 @@ export const getAllStory = async (userId: any, token: any) => {
   }
 };
 
+export const getStoryFeed = async (userId: any, token: any) => {
+  try {
+    const result = await ApiManager(`/${userId}/story-feed`, {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const createStory = async (data: any, userId: any, token: any) => {
   try {
     const result = await ApiManager(`/${userId}/story`, {
@@ -58,9 +72,13 @@ export const likeStory = async (authorId: any, storyId: any, token: any) => {
   }
 };
 
-export const deleteStory = async (userId: any, storyId: any, token: any) => {
+export const deleteStoryApi = async (
+  authorId: any,
+  storyId: any,
+  token: any,
+) => {
   try {
-    const result = await ApiManager(`/${userId}/story`, {
+    const result = await ApiManager(`/${authorId}/story/${storyId}`, {
       method: 'DELETE',
       headers: {
         Authorization: 'Bearer ' + token,

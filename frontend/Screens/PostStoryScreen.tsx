@@ -10,6 +10,7 @@ import {
 import React, {useEffect, useState} from 'react';
 import {Toast} from '../components/ui/Toast';
 import ImagePicker from 'react-native-image-crop-picker';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import Icon, {Icons} from '../components/ui/Icons';
 import VideoPlayer from 'react-native-video';
 import Colors from '../constants/Colors';
@@ -43,13 +44,13 @@ export default function PostStoryScreen({navigation}: any) {
       maxFiles: 10,
     })
       .then(images => {
-        const selectedImages = {
+        const selectedMedia = {
           uri: images.path,
           type: images.mime,
           name: images.path.split('/').pop() || images.path,
         };
-        console.log(selectedImages);
-        setMediaFiles(selectedImages);
+        console.log(selectedMedia);
+        setMediaFiles(selectedMedia);
         // image/jpeg
         // video/mp4
       })
@@ -74,17 +75,24 @@ export default function PostStoryScreen({navigation}: any) {
     ]);
   };
 
-  const shareStory = () => {
+  const shareStory = async () => {
     navigateBack();
     dispatch(setStatus(true));
     const data = new FormData();
     data.append('media-files', mediaFiles);
-    // data.append('media-files', {
-    //   name: 'e9bd202c-28ce-4880-8e1a-0b389dbb357e.jpg',
-    //   type: 'image/jpeg',
-    //   uri: 'file:///storage/emulated/0/Android/data/com.uit.workwise/files/Pictures/e9bd202c-28ce-4880-8e1a-0b389dbb357e.jpg',
-    // });
-
+    if (mediaFiles?.type === 'video/mp4') {
+      const thumbnail = await createThumbnail({
+        url: mediaFiles.uri,
+        timeStamp: 1000,
+      });
+      data.append('media-files', {
+        uri: thumbnail.path,
+        type: thumbnail.mime,
+        name: thumbnail.path.split('/').pop() || thumbnail.path,
+      });
+    } else {
+      data.append('media-files', mediaFiles);
+    }
     createStory(data, uid, token)
       .then((response: any) => {
         if (response.status === 200) {

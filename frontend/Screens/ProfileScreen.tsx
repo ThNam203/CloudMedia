@@ -24,6 +24,9 @@ import Colors from '../constants/Colors';
 import {Toast} from '../components/ui/Toast';
 import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
 import Icon, {Icons} from '../components/ui/Icons';
+import {clearStorySub, pushStorySub} from '../reducers/StoryReducer';
+import {getAllStory} from '../api/storyApi';
+import {useIsFocused} from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -39,6 +42,7 @@ function ProfileScreen({navigation}: any) {
 
   const dispatch = useDispatch();
   const [followCount, setFollowCount] = useState(user.followers.length);
+  const isFocused = useIsFocused();
 
   const handleLogout = async () => {
     userLogout(token)
@@ -118,9 +122,23 @@ function ProfileScreen({navigation}: any) {
       });
   };
 
-  // useEffect(() => {
-  //   dispatch(clearStatusPostsSub());
-  // }, []);
+  useEffect(() => {
+    const getStory = async () => {
+      const response: any = await getAllStory(uid, token);
+      if (response.status === 200) {
+        const data = response.data;
+        for (const story of data) {
+          dispatch(pushStorySub(story));
+        }
+      } else {
+        console.log(response.status);
+      }
+    };
+    if (isFocused) {
+      dispatch(clearStorySub());
+      getStory();
+    }
+  }, [isFocused]);
 
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
