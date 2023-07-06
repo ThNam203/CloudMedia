@@ -53,7 +53,21 @@ export default function MyNetworksScreen({navigation}: any) {
   if (connections.length === 0) {
     return (
       <View>
-        <Text style={{fontSize: 25, alignSelf: 'center', color: 'gray'}}>
+        <View style={styles.topView}>
+          <View style={{margin: 10, flexDirection: 'row'}}>
+            <TouchableOpacity onPress={navigateBack} style={{marginTop: -3}}>
+              <Icon type={Icons.Ionicons} name="arrow-back" size={35} />
+            </TouchableOpacity>
+            <Text style={styles.title}>My Network</Text>
+          </View>
+        </View>
+        <Text
+          style={{
+            marginTop: 50,
+            fontSize: 25,
+            alignSelf: 'center',
+            color: 'gray',
+          }}>
           You have no connections
         </Text>
       </View>
@@ -81,7 +95,7 @@ export default function MyNetworksScreen({navigation}: any) {
           </ScrollView>
         </View>
         <View style={styles.topView}>
-          <View style={{margin: 20, flexDirection: 'row'}}>
+          <View style={{margin: 10, flexDirection: 'row'}}>
             <TouchableOpacity onPress={navigateBack} style={{marginTop: -3}}>
               <Icon type={Icons.Ionicons} name="arrow-back" size={35} />
             </TouchableOpacity>

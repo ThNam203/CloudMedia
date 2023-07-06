@@ -21,6 +21,8 @@ import {
 } from '../reducers/StatusPostReducer';
 import {Toast} from '../components/ui/Toast';
 import {RootState} from '../reducers/Store';
+import {clearStory, pushStory} from '../reducers/StoryReducer';
+import {getAllStory} from '../api/storyApi';
 
 export default function LoadingScreen({navigation, route}: any) {
   const {jwt} = route.params;
@@ -47,6 +49,26 @@ export default function LoadingScreen({navigation, route}: any) {
         }
       } else {
         console.log(response.status);
+        console.log(response.data.errorMessage);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
+  const saveAllStory = async (jwt: any) => {
+    try {
+      const json = jwt_decode(jwt) as {id: string};
+      const idUser = json.id;
+      const response: any = await getAllStory(idUser, jwt);
+      if (response.status === 200) {
+        const data = response.data;
+        console.log(data);
+        for (const story of data) {
+          dispatch(pushStory(story));
+        }
+      } else {
         console.log(response.data.errorMessage);
         throw new Error(response.data.errorMessage);
       }
@@ -98,12 +120,14 @@ export default function LoadingScreen({navigation, route}: any) {
     dispatch(setToken(jwt));
     dispatch(setIdFromJwt(jwt));
     dispatch(clearStatusPosts());
+    dispatch(clearStory());
     // get some data
     const loadData = async () => {
       try {
         await Promise.all([
           saveInfo(jwt),
           saveNotification(jwt),
+          saveAllStory(jwt),
           // saveAllStatusPost(jwt),
         ]);
 

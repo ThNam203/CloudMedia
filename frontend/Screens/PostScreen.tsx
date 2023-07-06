@@ -67,8 +67,8 @@ function PostScreen() {
           console.log(response.data);
           return response.data;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .then((data: any) => {

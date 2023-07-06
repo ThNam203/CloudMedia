@@ -14,7 +14,7 @@ export const getStoryById = async (storyId: any, token: any) => {
   }
 };
 
-export const getAllStoryBy = async (userId: any, token: any) => {
+export const getAllStory = async (userId: any, token: any) => {
   try {
     const result = await ApiManager(`/${userId}/story`, {
       method: 'GET',
@@ -34,6 +34,7 @@ export const createStory = async (data: any, userId: any, token: any) => {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + token,
+        'Content-Type': 'multipart/form-data',
       },
       data: data,
     });

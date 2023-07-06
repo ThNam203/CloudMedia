@@ -78,22 +78,21 @@ export default function PostStoryScreen({navigation}: any) {
     navigateBack();
     dispatch(setStatus(true));
     const data = new FormData();
-    data.append('mediaFiles', mediaFiles);
-    data.append('mediaFiles', {
-      name: 'd538a596-d788-4557-8a96-08394a897ce4.jpg',
-      type: 'image/jpeg',
-      uri: 'file:///storage/emulated/0/Android/data/com.uit.workwise/files/Pictures/d538a596-d788-4557-8a96-08394a897ce4.jpg',
-    });
+    data.append('media-files', mediaFiles);
+    // data.append('media-files', {
+    //   name: 'e9bd202c-28ce-4880-8e1a-0b389dbb357e.jpg',
+    //   type: 'image/jpeg',
+    //   uri: 'file:///storage/emulated/0/Android/data/com.uit.workwise/files/Pictures/e9bd202c-28ce-4880-8e1a-0b389dbb357e.jpg',
+    // });
 
     createStory(data, uid, token)
       .then((response: any) => {
-        console.log(response.response);
         if (response.status === 200) {
           console.log(response.data);
           return response.data;
         } else {
-          console.log(response.response.status);
-          throw new Error(response.response.data.errorMessage);
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
       })
       .then((data: any) => {
