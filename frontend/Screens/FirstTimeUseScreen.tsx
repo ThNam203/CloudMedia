@@ -65,15 +65,13 @@ function FirstTimeUseScreen({navigation}: any) {
         style={styles.image}
         source={require('../assets/images/xiao.png')}>
         <View style={[styles.viewSurround, {marginTop: 100}]}>
-          <Text style={styles.title}>
-            Everything about a job becomes easier
-          </Text>
+          <Text style={styles.title}>Social media is not a media</Text>
         </View>
 
         <View style={[styles.viewSurround, {marginTop: 30}]}>
           <Text style={styles.textOut}>
-            {'              '}Employment process become faster than ever and
-            getting a job is never easier than now
+            {'              '}The key is to listen, engage, and build
+            relationships
           </Text>
         </View>
         <View style={[styles.buttonContainer, {marginTop: 250}]}>
