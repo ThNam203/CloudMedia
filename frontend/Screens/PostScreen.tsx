@@ -24,7 +24,6 @@ import {Toast} from '../components/ui/Toast';
 import {setStatus} from '../reducers/LoadingReducer';
 import VideoPlayer from 'react-native-video-controls';
 
-
 interface ImageItem {
   uri: string;
   type: string;
@@ -73,10 +72,12 @@ function PostScreen() {
         }
       })
       .then((data: any) => {
-        dispatch(setStatus(false));
         Toast('Post successfully!');
       })
-      .catch(error => console.error(error));
+      .catch((error: any) => Toast(error.message))
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
   };
 
   const takePhotoFromCamera = () => {

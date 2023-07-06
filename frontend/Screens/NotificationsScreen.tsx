@@ -116,6 +116,8 @@ export default function NotificationsScreen({navigation}: any) {
           <CTA title="See all comment" item={item} />
         ) : item.notificationType === 'Like' ? (
           <CTA title="See like" item={item} />
+        ) : item.notificationType === 'hoho' ? (
+          <CTA title="See post" item={item} />
         ) : null}
       </View>
       <View>
@@ -167,12 +169,20 @@ export default function NotificationsScreen({navigation}: any) {
         paddingHorizontal: 5,
         backgroundColor: 'white',
       }}>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={NotificationsData}
-        renderItem={NotificationItem}
-        ListFooterComponent={() => <ShowAllFooter />}
-      />
+      {NotificationsData.length === 0 ? (
+        <View>
+          <Text style={{fontSize: 25, alignSelf: 'center', color: 'gray'}}>
+            No notifications
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={NotificationsData}
+          renderItem={NotificationItem}
+          ListFooterComponent={() => <ShowAllFooter />}
+        />
+      )}
     </View>
   );
 }

@@ -1,4 +1,11 @@
-import {View, FlatList, StyleSheet, ActivityIndicator} from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  SectionList,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ShowPosts from '../components/ui/ShowPosts';
 import {useDispatch, useSelector} from 'react-redux';
@@ -14,6 +21,8 @@ import {
   getAllStatusPostOfUser,
   getNewsFeed,
 } from '../api/statusPostApi';
+import {Image} from 'react-native-animatable';
+import StoriesList from '../components/ui/StoriesList';
 
 export default function HomeScreen({navigation}: any) {
   const token = useSelector((state: RootState) => state.token.key);
@@ -74,26 +83,40 @@ export default function HomeScreen({navigation}: any) {
     saveAllStatusPost();
   }, [currentPage]);
 
+  const sections = [
+    {title: 'Stories', data: [{}]},
+    {title: 'Posts', data: StatusData},
+  ];
+
   return (
-    <View>
-      <FlatList
-        data={StatusData}
-        showsVerticalScrollIndicator={false}
-        renderItem={({item}) => (
-          <ShowPosts
-            item={item}
-            navigation={navigation}
-            pressComment={() => {
-              navigation.navigate('detailStatus', {idPost: item._id});
-            }}
-          />
-        )}
-        keyExtractor={(item, index) => 'key ' + index}
-        ListFooterComponent={renderLoader}
-        onEndReached={loadMoreItem}
-        onEndReachedThreshold={0}
-      />
-    </View>
+    <SectionList
+      sections={sections}
+      keyExtractor={(item, index) => 'key ' + index}
+      renderItem={({item, section}: any) => {
+        if (section.title === 'Stories') {
+          return <StoriesList navigation={navigation} />;
+        } else {
+          return (
+            <ShowPosts
+              item={item}
+              navigation={navigation}
+              pressComment={() => {
+                navigation.navigate('detailStatus', {idPost: item._id});
+              }}
+            />
+          );
+        }
+      }}
+      renderSectionFooter={({section}) => {
+        if (section.title === 'Posts') {
+          return renderLoader();
+        } else {
+          return null;
+        }
+      }}
+      onEndReached={loadMoreItem}
+      onEndReachedThreshold={0}
+    />
   );
 }
 

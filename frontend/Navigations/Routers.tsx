@@ -36,6 +36,8 @@ import {
   pushStatusPostsSub,
 } from '../reducers/StatusPostReducer';
 import {getAStatusPostById} from '../api/statusPostApi';
+import PostStoryScreen from '../Screens/PostStoryScreen';
+import StoriesScreen from '../Screens/StoriesScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -92,10 +94,8 @@ export default function Routers() {
       <Stack.Navigator screenOptions={{headerShown: false}}>
         {/* Login screen */}
         <Stack.Screen name="login" component={FirstTimeUseScreen} />
-
         {/* Main screen with bottom tabs */}
         <Stack.Screen name="main" component={BottomTabs} />
-
         {/* Detail status screen */}
         <Stack.Screen
           name="detailStatus"
@@ -104,7 +104,6 @@ export default function Routers() {
             animation: 'slide_from_right',
           }}
         />
-
         {/* Images post screen */}
         <Stack.Screen
           name="imagesPost"
@@ -115,7 +114,6 @@ export default function Routers() {
             animation: 'none',
           }}
         />
-
         {/* Edit post screen */}
         <Stack.Screen
           name="editPost"
@@ -124,7 +122,6 @@ export default function Routers() {
             animation: 'none',
           }}
         />
-
         {/* My networks screen */}
         <Stack.Screen
           name="myNetworks"
@@ -133,7 +130,6 @@ export default function Routers() {
             animation: 'slide_from_right',
           }}
         />
-
         {/* Invitations screen */}
         <Stack.Screen
           name="invitations"
@@ -142,10 +138,8 @@ export default function Routers() {
             animation: 'slide_from_right',
           }}
         />
-
         {/* Profile screen */}
         <Stack.Screen name="profile" component={ProfileScreen} />
-
         {/* Profile of user screen */}
         <Stack.Screen
           name="profileOther"
@@ -154,7 +148,6 @@ export default function Routers() {
             animation: 'slide_from_right',
           }}
         />
-
         {/* Post of user screen */}
         <Stack.Screen
           name="postOfUser"
@@ -163,7 +156,6 @@ export default function Routers() {
             animation: 'slide_from_right',
           }}
         />
-
         {/* Search screen */}
         <Stack.Screen
           name="search"
@@ -172,13 +164,26 @@ export default function Routers() {
             animation: 'none',
           }}
         />
-
+        <Stack.Screen
+          name="postStory"
+          component={PostStoryScreen}
+          options={{
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="story"
+          component={StoriesScreen}
+          options={{
+            // presentation: 'modal',
+            animationTypeForReplace: 'push',
+            animation: 'none',
+          }}
+        />
         {/* Chat screen */}
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="chatRoom" component={ChatRoom} />
-
         <Stack.Screen name="loading" component={LoadingScreen} />
-
         <Stack.Screen name="videoCall" component={VideoCallScreen} />
       </Stack.Navigator>
 

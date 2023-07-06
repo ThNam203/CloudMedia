@@ -169,7 +169,6 @@ export default function DetailStatusScreen({navigation, route}: any) {
       if (response.status === 200) {
         const dataStatus: any = response.data;
         dispatch(updateAStatusPost(dataStatus));
-        // console.log(dataStatus);
       } else {
         console.log(response.status);
         throw new Error(response.data.errorMessage);

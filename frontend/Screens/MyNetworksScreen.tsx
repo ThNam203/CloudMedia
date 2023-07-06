@@ -50,33 +50,47 @@ export default function MyNetworksScreen({navigation}: any) {
     getInfoConnection();
   }, []);
 
-  return (
-    <View style={{flex: 1}}>
-      <View style={{flex: 1}}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{flexGrow: 1}}>
-          <View style={styles.modalContent}>
-            <View style={{height: 70}} />
-            <View style={{marginHorizontal: 20}}></View>
-            <View style={styles.connectionsContainer}>
-              {connections.map((item, index) => (
-                <ShowNetwork item={item} navigation={navigation} key={index} />
-              ))}
-            </View>
-          </View>
-        </ScrollView>
+  if (connections.length === 0) {
+    return (
+      <View>
+        <Text style={{fontSize: 25, alignSelf: 'center', color: 'gray'}}>
+          You have no connections
+        </Text>
       </View>
-      <View style={styles.topView}>
-        <View style={{margin: 20, flexDirection: 'row'}}>
-          <TouchableOpacity onPress={navigateBack} style={{marginTop: -3}}>
-            <Icon type={Icons.Ionicons} name="arrow-back" size={35} />
-          </TouchableOpacity>
-          <Text style={styles.title}>My Network</Text>
+    );
+  } else {
+    return (
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{flexGrow: 1}}>
+            <View style={styles.modalContent}>
+              <View style={{height: 70}} />
+              <View style={{marginHorizontal: 20}}></View>
+              <View style={styles.connectionsContainer}>
+                {connections.map((item, index) => (
+                  <ShowNetwork
+                    item={item}
+                    navigation={navigation}
+                    key={index}
+                  />
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+        <View style={styles.topView}>
+          <View style={{margin: 20, flexDirection: 'row'}}>
+            <TouchableOpacity onPress={navigateBack} style={{marginTop: -3}}>
+              <Icon type={Icons.Ionicons} name="arrow-back" size={35} />
+            </TouchableOpacity>
+            <Text style={styles.title}>My Network</Text>
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
