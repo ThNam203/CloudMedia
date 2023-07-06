@@ -139,6 +139,10 @@ const ChatRoom = ({navigation, route}: any) => {
     });
 
     getAllMessages();
+
+    return () => {
+      emitEvent('leaveRoom', {chatRoomId})
+    }
   }, []);
 
   const handleNewMessage = () => {
@@ -217,7 +221,12 @@ const ChatRoom = ({navigation, route}: any) => {
             contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}
           />
         ) : (
-          <Text>"Currently no message"</Text>
+          <Text style={{
+            color: 'black',
+            fontSize: 24,
+            alignSelf: 'center',
+            marginTop: 300  
+          }}>No message yet!</Text>
         )}
       </View>
 

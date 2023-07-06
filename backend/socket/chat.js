@@ -18,12 +18,12 @@ io.on('connection', (socket) => {
     socket.join(socket.handshake.auth.userId)
 
     socket.on('joinRoom', (data) => {
-        const chatRoomId = data
+        const { chatRoomId } = data
         socket.join(chatRoomId)
     })
 
     socket.on('leaveRoom', (data) => {
-        const chatRoomId = data
+        const { chatRoomId } = data
         socket.leave(chatRoomId)
     })
 
@@ -91,7 +91,7 @@ io.on('connection', (socket) => {
             return socket.emit('messageError', 'Unable to send new message')
 
         chatRoom.lastMessage = message
-        chatRoom.lastMessageTime = Date.now
+        chatRoom.lastMessageTime = Date.now()
         await chatRoom.save()
 
         io.in(chatRoomId).emit('newMessage', newChatMessage)

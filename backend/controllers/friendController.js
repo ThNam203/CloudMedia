@@ -9,6 +9,14 @@ const asyncCatch = require('../utils/asyncCatch')
 const socketIO = require('../socket/socket')
 
 const createChatRoomOnAccept = async (firstUser, secondUser) => {
+    const isExisted = await ChatRoom.find({
+        members: {
+            $all: [firstUser._id, secondUser._id],
+        },
+    })
+
+    if (isExisted) return
+
     const newChatRoom = await ChatRoom.create({
         members: [firstUser._id, secondUser._id],
     })
@@ -208,8 +216,6 @@ exports.recommendFriends = asyncCatch(async (req, res, next) => {
             $sample: { size: 20 },
         },
     ])
-
-    console.log(potentialFriends)
 
     res.status(200).json(potentialFriends)
 })

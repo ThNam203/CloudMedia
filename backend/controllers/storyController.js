@@ -35,7 +35,7 @@ const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
         const noti = await Notification.create({
             userId: followerId.toString(),
             sender: storyAuthor._id,
-            notificationType: 'Comment', // todo: there is no time for other type, should be changed in future
+            notificationType: 'NewStory', // todo: there is no time for other type, should be changed in future
             content: `${storyAuthor.name} has posted a new story`,
             isRead: false,
             link: storyId,
@@ -121,7 +121,7 @@ exports.getAllStoryOfAUser = asyncCatch(async (req, res, next) => {
 
     // userId is the current request user, the author is post's owner
     const userId = await getUserIdFromJWT(req, next)
-    const statusPosts = storiesRaw.map((story) => {
+    const stories = storiesRaw.map((story) => {
         const isLiked = story.likedUsers.includes(userId)
         const postObject = story.toObject()
         postObject.isLiked = isLiked
@@ -129,7 +129,7 @@ exports.getAllStoryOfAUser = asyncCatch(async (req, res, next) => {
         return postObject
     })
 
-    res.status(200).json(statusPosts)
+    res.status(200).json(stories)
 })
 
 exports.toggleLikeStory = asyncCatch(async (req, res, next) => {
@@ -166,4 +166,36 @@ exports.deleteStory = asyncCatch(async (req, res, next) => {
     )
 
     res.status(204).end()
+})
+
+exports.storyFeed = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const user = await User.findById(userId)
+    const storyFeed = await Story.find({
+        author: userId,
+    })
+        .sort({ createdAt: -1 })
+        .limit(1)
+        .populate('author', '_id name profileImagePath workingPlace')
+
+    const followerFeed = await Story.find({ author: { $in: user.followings } })
+        .sort({ createdAt: -1 }) // Sort by descending createdAt
+        .limit(14)
+        .populate('author', '_id name profileImagePath workingPlace')
+
+    const numberLeft = 14 - followerFeed.length
+    if (numberLeft === 0)
+        return res.status(200).json([...storyFeed, ...followerFeed])
+
+    const randomStories = await Story.find({
+        $and: [
+            { author: { $nin: [...user.followings, user._id] } },
+            { _id: { $nin: followerFeed.map((feed) => feed._id) } },
+        ],
+    })
+        .sort({ likeCount: -1 })
+        .limit(numberLeft)
+        .populate('author', '_id name profileImagePath workingPlace')
+
+    res.status(200).json([...storyFeed, ...followerFeed, ...randomStories])
 })

@@ -45,15 +45,6 @@ export default function VideoCallScreen() {
     ],
   };
 
-  const isVoiceOnlyStream = (stream: MediaStream) => {
-    for (const track of stream.getTracks())
-      if (track.kind === 'audio') {
-        return true;
-      }
-
-    return false;
-  };
-
   const [intervalId, setIntervalId] = useState<null | number>(null);
   const startTimer = () => {
     if (!intervalId) {
@@ -79,14 +70,11 @@ export default function VideoCallScreen() {
 
   function onOpenModal() {
     try {
-      setCallLength(0)
+      setCallLength(0);
       peerConnection.current = new RTCPeerConnection(peerConstraints);
       peerConnection.current!.addEventListener(
         'connectionstatechange',
         event => {
-          console.error(
-            `connectionstatechange ${peerConnection.current!.connectionState}`,
-          );
           switch (peerConnection.current!.connectionState) {
             case 'disconnected':
               Toast('Call ended');
@@ -115,18 +103,13 @@ export default function VideoCallScreen() {
       });
 
       peerConnection.current!.addEventListener('track', (event: any) => {
-        console.warn(`on add tracks `)
         try {
           const rawRemoteStream = new MediaStream(undefined);
-          event.streams[0]
-            .getTracks()
-            .forEach((track: any, index: Number) => {
-              rawRemoteStream.addTrack(track);
-            });
+          event.streams[0].getTracks().forEach((track: any, index: Number) => {
+            rawRemoteStream.addTrack(track);
+          });
           setRemoteStream(rawRemoteStream);
-        } catch (e) {
-          console.error(`addtrack error ${e}`);
-        }
+        } catch (e) {}
       });
 
       if (callMer.data.isCaller)
@@ -145,9 +128,7 @@ export default function VideoCallScreen() {
         setRemoteUserName(callMer.data.callerName);
         setRemoteUserProfileImage(callMer.data.callerProfileImage);
       }
-    } catch (e) {
-      console.error(`on open modal error ${e}`);
-    }
+    } catch (e) {}
   }
 
   function onCloseModal() {
@@ -158,12 +139,12 @@ export default function VideoCallScreen() {
     socket.unsubscribeToEvent('iceCandidate');
     if (callMer.data.isCaller)
       socket.unsubscribeToEvent('answerOfferVideoCall');
-    localStream?.release()
+    localStream?.release();
     remoteStream?.release();
-    setRemoteStream(null)
-    setLocalStream(null)
+    setRemoteStream(null);
+    setLocalStream(null);
     peerConnection.current?.close();
-    endTimer()
+    endTimer();
     setAcceptedCall(false);
   }
 
@@ -175,26 +156,20 @@ export default function VideoCallScreen() {
       } else {
         peerConnection.current!.addIceCandidate(iceCandidate);
       }
-    } catch (e) {
-      console.error(`handleRemoteCandidate ${e}`);
-    }
+    } catch (e) {}
   }
 
   function processCandidates() {
     if (unprocessedRemoteCandidates.current.length < 1) return;
     try {
-      unprocessedRemoteCandidates.current.forEach(candidate =>
-        peerConnection.current!.addIceCandidate(candidate).catch(e => {
-          console.error(`addIceCandidate error ${e}`);
-        }),
-      );
+      unprocessedRemoteCandidates.current.forEach(candidate => {
+        peerConnection.current!.addIceCandidate(candidate).catch(e => {});
+      });
       unprocessedRemoteCandidates.current.splice(
         0,
         unprocessedRemoteCandidates.current.length,
       );
-    } catch (e) {
-      console.error(`processCandidates error ${e}`);
-    }
+    } catch (e) {}
   }
 
   const answerOfferVideoCall = async () => {
@@ -207,26 +182,20 @@ export default function VideoCallScreen() {
       const answerDescription = await peerConnection.current!.createAnswer();
       await peerConnection.current!.setLocalDescription(answerDescription);
 
-      console.error(
-        `answerOfferVideoCall ${unprocessedRemoteCandidates.current.length}`,
-      );
       processCandidates();
       socket.emitEvent('answerOfferVideoCall', {
         answerDescription,
         chatRoomId: callMer.data.chatRoomId,
       });
-    } catch (err) {
-      console.error(`answerOfferVideoCall ${err}`);
-    }
+    } catch (err) {}
   };
 
   const onAnswerOfferVideoCall = async (answer: any) => {
     try {
       const answerDescription = new RTCSessionDescription(answer);
       await peerConnection.current!.setRemoteDescription(answerDescription);
-    } catch (err) {
-      console.error(`onAnswerOfferVideoCall error ${err}`);
-    }
+      processCandidates()
+    } catch (err) {}
   };
 
   const [iconVideo, setIconVideo] = useState('video');
@@ -269,9 +238,7 @@ export default function VideoCallScreen() {
           isVoiceCall: callMer.data.isVoiceCall,
           callerId: uid,
         });
-      } catch (err) {
-        console.error(`sendOfferVoiceCall error ${err}`);
-      }
+      } catch (err) {}
     };
 
     const startCapturing = async () => {
@@ -312,19 +279,15 @@ export default function VideoCallScreen() {
       <React.Fragment>
         {callMer.data.isCaller === true || acceptedCall ? (
           <View style={{flex: 1}}>
-            {localStream && /*!isVoiceOnlyStream(localStream)*/ !callMer.data.isVoiceCall ? (
-              <RTCView
-                streamURL={localStream.toURL()}
-                style={{width: 100, height: 100}}
-              />
-            ) : null}
-            {remoteStream && !callMer.data.isVoiceCall /* !isVoiceOnlyStream(remoteStream)*/ ? (
-              <RTCView
-                streamURL={remoteStream.toURL()}
-                style={{width: 200, height: 200, backgroundColor: 'white'}}
-              />
-            ) : (
-              <View style={{flex: 1, backgroundColor: 'white'}}>
+            <View style={{flex: 1, backgroundColor: 'white'}}>
+              {remoteStream &&
+              !callMer.data
+                .isVoiceCall /* !isVoiceOnlyStream(remoteStream)*/ ? (
+                <RTCView
+                  streamURL={remoteStream.toURL()}
+                  style={{...styles.middleView}}
+                />
+              ) : (
                 <View style={styles.middleView}>
                   <Image
                     style={{
@@ -351,57 +314,75 @@ export default function VideoCallScreen() {
                     {intervalId ? callLength : 'Calling...'}
                   </Text>
                 </View>
-                <View style={styles.bottomView}>
-                  <View style={{flex: 1}}>
-                    <View style={{marginHorizontal: 30}}>
-                      {callMer.data.isVoiceCall ? null : (
-                        <TouchableOpacity onPress={toggleIconVideo}>
-                          <Icon
-                            name={iconVideo}
-                            color="white"
-                            type={Icons.FontAwesome5}
-                          />
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: 'center',
-                    }}>
-                    <TouchableOpacity onPress={toggleIconMic}>
-                      <Icon
-                        name={iconMic}
-                        color="white"
-                        type={Icons.FontAwesome}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{flex: 1}}>
-                    <TouchableOpacity
-                      style={{
-                        marginHorizontal: 30,
-                        height: 46,
-                        width: 46,
-                        borderRadius: 23,
-                        backgroundColor: '#FF3B32',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                      onPress={() => {
-                        dispatch(setCallShow(false));
-                      }}>
-                      <Icon
-                        name="phone-hangup"
-                        color="white"
-                        type={Icons.MaterialCommunityIcons}
-                      />
-                    </TouchableOpacity>
+              )}
+              <View style={styles.bottomView}>
+                <View style={{flex: 1}}>
+                  <View style={{marginHorizontal: 30}}>
+                    {callMer.data.isVoiceCall ? null : (
+                      <TouchableOpacity onPress={toggleIconVideo}>
+                        <Icon
+                          name={iconVideo}
+                          color="white"
+                          type={Icons.FontAwesome5}
+                        />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                  }}>
+                  <TouchableOpacity onPress={toggleIconMic}>
+                    <Icon
+                      name={iconMic}
+                      color="white"
+                      type={Icons.FontAwesome}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={{flex: 1}}>
+                  <TouchableOpacity
+                    style={{
+                      marginHorizontal: 30,
+                      height: 46,
+                      width: 46,
+                      borderRadius: 23,
+                      backgroundColor: '#FF3B32',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    onPress={() => {
+                      dispatch(setCallShow(false));
+                    }}>
+                    <Icon
+                      name="phone-hangup"
+                      color="white"
+                      type={Icons.MaterialCommunityIcons}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
-            )}
+            </View>
+            {/*localStream && !callMer.data.isVoiceCall ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  zIndex: 100,
+                  backgroundColor: 'green'
+                }}>
+                <RTCView
+                  streamURL={localStream.toURL()}
+                  style={{
+                    width: 200,
+                    height: 200,
+                  }}
+                />
+              </View>
+            ) : null*/}
           </View>
         ) : (
           <View
@@ -505,18 +486,11 @@ const CallDeny = (props: any) => (
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  textTopView: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-  },
   middleView: {
     flex: 1,
-    marginTop: 100,
     alignItems: 'center',
+    width: '100%',
+    height: '100%',
   },
   bottomView: {
     position: 'absolute',
@@ -529,9 +503,5 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginHorizontal: 40,
     alignItems: 'center',
-  },
-  remoteStreamOnlyVoice: {
-    width: 0,
-    height: 0,
   },
 });
