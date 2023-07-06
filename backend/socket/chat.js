@@ -4,6 +4,7 @@ const User = require('../models/User')
 const socketIO = require('./socket')
 
 const io = socketIO.getIO()
+console.debug = () => {}
 
 io.use((socket, next) => {
     if (socket.handshake.query) {
@@ -27,8 +28,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('offerVideoCall', async (data) => {
-        console.log('offerVideoCall')
-        console.log(data)
         const { offerDescription, chatRoomId, callerId, isVoiceCall } = data
         const user = await User.findById(callerId)
         const offer = JSON.stringify({
@@ -43,8 +42,6 @@ io.on('connection', (socket) => {
         const chatRoom = await ChatRoom.findById(chatRoomId)
         chatRoom.members.forEach((memberId) => {
             if (memberId.toString() !== callerId) {
-                console.log(memberId)
-                console.log(offer)
                 io.in(memberId.toString()).emit('offerVideoCall', offer)
             }
         })
@@ -53,8 +50,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('answerOfferVideoCall', async (data) => {
-        console.log('answerOfferVideoCall')
-        console.log(data)
         const { answerDescription, chatRoomId } = data
         const chatRoom = await ChatRoom.findById(chatRoomId)
         chatRoom.members.forEach((memberId) => {
@@ -67,11 +62,13 @@ io.on('connection', (socket) => {
     })
 
     socket.on('iceCandidate', async (data) => {
-        console.log('iceCandidate')
-        console.log(data)
         const chatRoom = await ChatRoom.findById(data.chatRoomId)
         chatRoom.members.forEach((memberId) => {
-            io.in(memberId.toString()).emit('iceCandidate', data)
+            if (memberId.toString() !== data.userId)
+                io.in(memberId.toString()).emit(
+                    'iceCandidate',
+                    data.iceCandidate
+                )
         })
         // socket.to(data.chatRoomId).emit('iceCandidate', data)
     })

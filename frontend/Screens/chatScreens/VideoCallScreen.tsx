@@ -5,6 +5,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
 import {setCallShow} from '../../reducers/UtilsReducer';
+import {Toast} from '../../components/ui/Toast';
 import {
   MediaStream,
   RTCIceCandidate,
@@ -18,85 +19,182 @@ import {Path, Svg} from 'react-native-svg';
 
 export default function VideoCallScreen() {
   const callMer = useSelector((state: RootState) => state.Utils.call);
-  // get data from redux
-  // callMer.data is the data that you want to get
-  const props = callMer.data;
   const user = useSelector((state: RootState) => state.userInfo);
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
   const dispatch = useDispatch();
 
   let offer: any = null;
-  offer = useSelector((state: RootState) => state.Utils.call);
+  offer = useSelector((state: RootState) => state.Utils.call.data);
 
-  const {chatRoomId} = props;
+  const [remoteUserName, setRemoteUserName] = useState<string>('');
+  const [remoteUserProfileImage, setRemoteUserProfileImage] =
+    useState<string>('');
 
   let peerConstraints = {
     iceServers: [
-      {
-        urls: 'stun:iphone-stun.strato-iphone.de:3478',
-      },
-      {
-        urls: 'stun:openrelay.metered.ca:80',
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:80',
-        username: 'openrelayproject',
-        credential: 'openrelayproject',
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:443',
-        username: 'openrelayproject',
-        credential: 'openrelayproject',
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-        username: 'openrelayproject',
-        credential: 'openrelayproject',
-      },
+      // {
+      //   urls: 'stun:stun.l.google.com:19302',
+      // },
+      // {
+      //   urls: 'stun:stun1.l.google.com:19302',
+      // },
+      // {
+      //   urls: 'stun:stun2.l.google.com:19302',
+      // },
     ],
   };
+
+  const isVoiceOnlyStream = (stream: MediaStream) => {
+    for (const track of stream.getTracks())
+      if (track.kind === 'audio') {
+        return true;
+      }
+
+    return false;
+  };
+
+  const [intervalId, setIntervalId] = useState<null | number>(null);
+  const startTimer = () => {
+    if (!intervalId) {
+      const id = setInterval(() => {
+        setCallLength(prevTime => prevTime + 1);
+      }, 1000);
+      setIntervalId(id);
+    }
+  };
+  const endTimer = () => {
+    if (intervalId != null) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+    }
+  };
+
+  const [callLength, setCallLength] = useState(0);
   const [acceptedCall, setAcceptedCall] = useState(false);
-  const [remoteAudioStream, setRemoteAudioStream] =
-    useState<MediaStream | null>(null);
-  const [localAudioStream, setLocalAudioStream] = useState<MediaStream | null>(
-    null,
-  );
-  const unprocessedRemoteCandidates: RTCIceCandidate[] = [];
+  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  let unprocessedRemoteCandidates = useRef<RTCIceCandidate[]>([]);
   const peerConnection = useRef<null | RTCPeerConnection>(null);
 
   function onOpenModal() {
-    peerConnection.current = new RTCPeerConnection(peerConstraints);
-    setAcceptedCall(true);
+    try {
+      setCallLength(0)
+      peerConnection.current = new RTCPeerConnection(peerConstraints);
+      peerConnection.current!.addEventListener(
+        'connectionstatechange',
+        event => {
+          console.error(
+            `connectionstatechange ${peerConnection.current!.connectionState}`,
+          );
+          switch (peerConnection.current!.connectionState) {
+            case 'disconnected':
+              Toast('Call ended');
+              dispatch(setCallShow(false));
+              break;
+            case 'failed':
+              Toast('Something went wrong, please try again');
+              dispatch(setCallShow(false));
+              break;
+            case 'connected':
+              startTimer();
+              break;
+          }
+        },
+      );
+
+      peerConnection.current!.addEventListener('icecandidate', (event: any) => {
+        if (!event.candidate) {
+          return;
+        }
+        socket.emitEvent('iceCandidate', {
+          iceCandidate: event.candidate,
+          chatRoomId: callMer.data.chatRoomId,
+          userId: uid,
+        });
+      });
+
+      peerConnection.current!.addEventListener('track', (event: any) => {
+        console.warn(`on add tracks `)
+        try {
+          const rawRemoteStream = new MediaStream(undefined);
+          event.streams[0]
+            .getTracks()
+            .forEach((track: any, index: Number) => {
+              rawRemoteStream.addTrack(track);
+            });
+          setRemoteStream(rawRemoteStream);
+        } catch (e) {
+          console.error(`addtrack error ${e}`);
+        }
+      });
+
+      if (callMer.data.isCaller)
+        socket.subscribeToEvent('answerOfferVideoCall', (data: any) => {
+          onAnswerOfferVideoCall(data);
+        });
+
+      socket.subscribeToEvent('iceCandidate', (data: any) => {
+        handleRemoteCandidate(data);
+      });
+
+      if (callMer.data.isCaller) {
+        setRemoteUserName(callMer.data.calleeName);
+        setRemoteUserProfileImage(callMer.data.calleeImageSource);
+      } else {
+        setRemoteUserName(callMer.data.callerName);
+        setRemoteUserProfileImage(callMer.data.callerProfileImage);
+      }
+    } catch (e) {
+      console.error(`on open modal error ${e}`);
+    }
   }
 
   function onCloseModal() {
-    unprocessedRemoteCandidates.splice(0, unprocessedRemoteCandidates.length);
+    unprocessedRemoteCandidates.current.splice(
+      0,
+      unprocessedRemoteCandidates.current.length,
+    );
     socket.unsubscribeToEvent('iceCandidate');
-    socket.unsubscribeToEvent('answerOfferVideoCall');
-    localAudioStream?.getTracks().forEach(track => track.release());
-    remoteAudioStream?.release();
+    if (callMer.data.isCaller)
+      socket.unsubscribeToEvent('answerOfferVideoCall');
+    localStream?.release()
+    remoteStream?.release();
+    setRemoteStream(null)
+    setLocalStream(null)
     peerConnection.current?.close();
+    endTimer()
+    setAcceptedCall(false);
   }
 
   function handleRemoteCandidate(receivedIceCandidate: any) {
-    const iceCandidate = new RTCIceCandidate(receivedIceCandidate);
-    if (!peerConnection.current) return;
-    if (peerConnection.current.remoteDescription == null)
-      unprocessedRemoteCandidates.push(iceCandidate);
-    else peerConnection.current.addIceCandidate(iceCandidate);
+    try {
+      const iceCandidate = new RTCIceCandidate(receivedIceCandidate);
+      if (peerConnection.current!.remoteDescription == null) {
+        unprocessedRemoteCandidates.current.push(iceCandidate);
+      } else {
+        peerConnection.current!.addIceCandidate(iceCandidate);
+      }
+    } catch (e) {
+      console.error(`handleRemoteCandidate ${e}`);
+    }
   }
 
   function processCandidates() {
-    if (unprocessedRemoteCandidates.length < 1) {
-      return;
+    if (unprocessedRemoteCandidates.current.length < 1) return;
+    try {
+      unprocessedRemoteCandidates.current.forEach(candidate =>
+        peerConnection.current!.addIceCandidate(candidate).catch(e => {
+          console.error(`addIceCandidate error ${e}`);
+        }),
+      );
+      unprocessedRemoteCandidates.current.splice(
+        0,
+        unprocessedRemoteCandidates.current.length,
+      );
+    } catch (e) {
+      console.error(`processCandidates error ${e}`);
     }
-
-    unprocessedRemoteCandidates.map(candidate =>
-      peerConnection.current!.addIceCandidate(candidate),
-    );
-
-    unprocessedRemoteCandidates.splice(0, unprocessedRemoteCandidates.length);
   }
 
   const answerOfferVideoCall = async () => {
@@ -109,16 +207,26 @@ export default function VideoCallScreen() {
       const answerDescription = await peerConnection.current!.createAnswer();
       await peerConnection.current!.setLocalDescription(answerDescription);
 
+      console.error(
+        `answerOfferVideoCall ${unprocessedRemoteCandidates.current.length}`,
+      );
       processCandidates();
-      socket.emitEvent('answerOfferVideoCall', {answerDescription, chatRoomId});
-    } catch (err) {}
+      socket.emitEvent('answerOfferVideoCall', {
+        answerDescription,
+        chatRoomId: callMer.data.chatRoomId,
+      });
+    } catch (err) {
+      console.error(`answerOfferVideoCall ${err}`);
+    }
   };
 
   const onAnswerOfferVideoCall = async (answer: any) => {
     try {
       const answerDescription = new RTCSessionDescription(answer);
       await peerConnection.current!.setRemoteDescription(answerDescription);
-    } catch (err) {}
+    } catch (err) {
+      console.error(`onAnswerOfferVideoCall error ${err}`);
+    }
   };
 
   const [iconVideo, setIconVideo] = useState('video');
@@ -128,9 +236,16 @@ export default function VideoCallScreen() {
     const newIconName = iconVideo === 'video' ? 'video-slash' : 'video';
     setIconVideo(newIconName);
   };
+
   const toggleIconMic = () => {
     const newIconMic =
       iconMic === 'microphone' ? 'microphone-slash' : 'microphone';
+
+    if (localStream != null)
+      if (newIconMic === 'microphone')
+        localStream.getAudioTracks()[0].enabled = true;
+      else localStream.getAudioTracks()[0].enabled = false;
+
     setIconMic(newIconMic);
   };
 
@@ -138,6 +253,7 @@ export default function VideoCallScreen() {
     const sendOfferVoiceCall = async () => {
       let sessionConstraints = {
         mandatory: {
+          OfferToReceiveVideo: !callMer.data.isVoiceCall,
           OfferToReceiveAudio: true,
           VoiceActivityDetection: true,
         },
@@ -149,85 +265,39 @@ export default function VideoCallScreen() {
         await peerConnection.current!.setLocalDescription(offerDescription);
         socket.emitEvent('offerVideoCall', {
           offerDescription,
-          chatRoomId,
-          isVoiceCall: true,
+          chatRoomId: callMer.data.chatRoomId,
+          isVoiceCall: callMer.data.isVoiceCall,
           callerId: uid,
         });
       } catch (err) {
-        // Handle Errors
+        console.error(`sendOfferVoiceCall error ${err}`);
       }
     };
 
     const startCapturing = async () => {
       let mediaConstraints = {
         audio: true,
-        video: false,
+        video: !callMer.data.isVoiceCall,
       };
 
       const mediaStream = await mediaDevices.getUserMedia(mediaConstraints);
 
       // Add our stream to the peer connection.
-      mediaStream.getAudioTracks().forEach(track => {
+      mediaStream.getTracks().forEach(track => {
         peerConnection.current!.addTrack(track, mediaStream);
       });
 
-      setLocalAudioStream(mediaStream);
+      setLocalStream(mediaStream);
     };
 
-    const addEventListeners = () => {
-      socket.subscribeToEvent('answerOfferVideoCall', (data: any) => {
-        onAnswerOfferVideoCall(data);
-      });
-
-      socket.subscribeToEvent('iceCandidate', (data: any) => {
-        handleRemoteCandidate(data);
-      });
-
-      peerConnection.current!.addEventListener(
-        'connectionstatechange',
-        event => {
-          console.error(
-            `connectionstatechange ${peerConnection.current!.connectionState}`,
-          );
-          switch (peerConnection.current!.connectionState) {
-            case 'closed':
-              // You can handle the call being disconnected here.
-
-              break;
-          }
-        },
-      );
-
-      peerConnection.current!.addEventListener('icecandidate', (event: any) => {
-        if (!event.candidate) {
-          return;
-        }
-        socket.emitEvent('iceCandidate', {
-          iceCandidate: event.candidate,
-          chatRoomId,
-        });
-      });
-
-      peerConnection.current!.addEventListener('addtrack', (event: any) => {
-        try {
-          const remoteStream = new MediaStream(undefined);
-          event.streams[0]
-            .getAudioTracks()
-            .forEach((track: any, index: Number) => {
-              remoteStream.addTrack(track);
-            });
-          setRemoteAudioStream(remoteStream);
-        } catch (e) {}
-      });
-    };
-
-    if (!props.visible) onCloseModal();
-    else {
+    const onModalVisible = async () => {
       onOpenModal();
-      addEventListeners();
-    }
+      await startCapturing();
+      if (callMer.data.isCaller) sendOfferVoiceCall();
+    };
 
-    if (callMer.data.isCaller) sendOfferVoiceCall();
+    if (!callMer.visible) onCloseModal();
+    else onModalVisible();
   }, [callMer.visible]);
 
   return (
@@ -240,22 +310,111 @@ export default function VideoCallScreen() {
       animationOut="slideOutDown"
       style={{margin: 0}}>
       <React.Fragment>
-        {props.isCaller === true || acceptedCall ? (
+        {callMer.data.isCaller === true || acceptedCall ? (
           <View style={{flex: 1}}>
-            {remoteAudioStream && (
+            {localStream && /*!isVoiceOnlyStream(localStream)*/ !callMer.data.isVoiceCall ? (
               <RTCView
-                streamURL={remoteAudioStream.toURL()}
-                style={{width: 0, height: 0}}
+                streamURL={localStream.toURL()}
+                style={{width: 100, height: 100}}
               />
-            )}
-            {localAudioStream && (
+            ) : null}
+            {remoteStream && !callMer.data.isVoiceCall /* !isVoiceOnlyStream(remoteStream)*/ ? (
               <RTCView
-                streamURL={localAudioStream.toURL()}
-                style={{width: 0, height: 0}}
+                streamURL={remoteStream.toURL()}
+                style={{width: 200, height: 200, backgroundColor: 'white'}}
               />
+            ) : (
+              <View style={{flex: 1, backgroundColor: 'white'}}>
+                <View style={styles.middleView}>
+                  <Image
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 50,
+                      marginTop: 200,
+                    }}
+                    source={
+                      callMer.data.calleeImageSource ||
+                      require('../../assets/images/Spiderman.jpg')
+                    }
+                  />
+                  <Text
+                    style={{
+                      fontSize: 25,
+                      fontWeight: 'bold',
+                      marginTop: 20,
+                      color: 'black',
+                    }}>
+                    {remoteUserName}
+                  </Text>
+                  <Text style={{fontSize: 18, marginTop: 10, color: 'black'}}>
+                    {intervalId ? callLength : 'Calling...'}
+                  </Text>
+                </View>
+                <View style={styles.bottomView}>
+                  <View style={{flex: 1}}>
+                    <View style={{marginHorizontal: 30}}>
+                      {callMer.data.isVoiceCall ? null : (
+                        <TouchableOpacity onPress={toggleIconVideo}>
+                          <Icon
+                            name={iconVideo}
+                            color="white"
+                            type={Icons.FontAwesome5}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'center',
+                    }}>
+                    <TouchableOpacity onPress={toggleIconMic}>
+                      <Icon
+                        name={iconMic}
+                        color="white"
+                        type={Icons.FontAwesome}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{flex: 1}}>
+                    <TouchableOpacity
+                      style={{
+                        marginHorizontal: 30,
+                        height: 46,
+                        width: 46,
+                        borderRadius: 23,
+                        backgroundColor: '#FF3B32',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      onPress={() => {
+                        dispatch(setCallShow(false));
+                      }}>
+                      <Icon
+                        name="phone-hangup"
+                        color="white"
+                        type={Icons.MaterialCommunityIcons}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
             )}
-            <View style={{flex: 1, backgroundColor: 'white'}}>
-              <View style={styles.middleView}>
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'white',
+            }}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+              }}>
+              {
                 <Image
                   style={{
                     width: 100,
@@ -263,101 +422,48 @@ export default function VideoCallScreen() {
                     borderRadius: 50,
                     marginTop: 200,
                   }}
-                  source={require('../../assets/images/Spiderman.jpg')}
+                  source={
+                    remoteUserProfileImage ||
+                    require('../../assets/images/Spiderman.jpg')
+                  }
                 />
-                <Text
-                  style={{
-                    fontSize: 25,
-                    fontWeight: 'bold',
-                    marginTop: 20,
-                    color: 'black',
-                  }}>
-                  Son truong
-                </Text>
-                <Text style={{fontSize: 18, marginTop: 10, color: 'black'}}>
-                  Calling
-                </Text>
-              </View>
-              <View style={styles.bottomView}>
-                <View style={{flex: 1}}>
-                  <View style={{marginHorizontal: 30}}>
-                    <TouchableOpacity onPress={toggleIconVideo}>
-                      <Icon
-                        name={iconVideo}
-                        color="white"
-                        type={Icons.FontAwesome5}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                  }}>
-                  <TouchableOpacity onPress={toggleIconMic}>
-                    <Icon
-                      name={iconMic}
-                      color="white"
-                      type={Icons.FontAwesome}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <View style={{flex: 1}}>
-                  <TouchableOpacity
-                    style={{
-                      marginHorizontal: 30,
-                      height: 46,
-                      width: 46,
-                      borderRadius: 23,
-                      backgroundColor: '#FF3B32',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    onPress={() => {
-                      dispatch(setCallShow(false));
-                    }}>
-                    <Icon
-                      name="phone-hangup"
-                      color="white"
-                      type={Icons.MaterialCommunityIcons}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </View>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'space-around',
-              backgroundColor: '#050A0E',
-            }}>
-            <View
-              style={{
-                padding: 35,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 14,
-              }}>
+              }
               <Text
                 style={{
-                  fontSize: 36,
-                  marginTop: 12,
-                  color: '#ffff',
+                  fontSize: 25,
+                  fontWeight: 'bold',
+                  marginTop: 20,
+                  color: 'black',
                 }}>
-                is calling..
+                {remoteUserName}
+              </Text>
+              <Text style={{fontSize: 18, marginTop: 10, color: 'black'}}>
+                Calling...
               </Text>
             </View>
             <View
               style={{
-                justifyContent: 'center',
+                justifyContent: 'space-around',
                 alignItems: 'center',
+                flexDirection: 'row',
+                marginBottom: 64,
               }}>
+              <TouchableOpacity
+                onPress={() => {}}
+                style={{
+                  backgroundColor: '#d62828',
+                  borderRadius: 30,
+                  height: 60,
+                  aspectRatio: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <CallDeny height={28} fill={'#fff'} />
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   answerOfferVideoCall();
+                  setAcceptedCall(true);
                 }}
                 style={{
                   backgroundColor: 'green',
@@ -380,12 +486,21 @@ export default function VideoCallScreen() {
 const CallAnswer = (props: any) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={66.667}
-    height={66.667}
+    width={66}
+    height={66}
     viewBox="0 0 50 50"
     {...props}>
     <Path d="M6.4 6.4C4.5 8.3 3 10.6 3 11.6 3.1 21.9 28.1 46.9 38.3 47c2.3 0 8.7-6.2 8.7-8.4 0-.9-2.5-3.2-5.5-5.3-5.5-3.6-5.6-3.6-8.9-2l-3.3 1.5-6.1-6.1-6-6.2 1.6-3.2c1.5-3.2 1.5-3.3-2.1-8.8-2.1-3-4.4-5.5-5.3-5.5-.9 0-3.1 1.5-5 3.4zM25 5.7c0 .5 2.1 1.4 4.6 2.1 6.1 1.6 11 6.5 12.6 12.6 1.5 5.5 3.3 6.2 2.3.8-.9-5.1-4.1-9.9-8.4-12.7C32.3 6 25 4.2 25 5.7z" />
     <Path d="M25 12c0 .5 1.2 1 2.6 1 1.6 0 3.9 1.3 6 3.4 2.1 2.1 3.4 4.4 3.4 6 0 1.4.5 2.6 1 2.6 1.7 0 1.1-4.3-1-7.7-2-3.4-6.6-6.3-10-6.3-1.1 0-2 .4-2 1zM25 17c0 .5.6 1 1.3 1 1.6 0 5.7 4.2 5.7 5.8 0 .7.5 1.2 1 1.2 2 0 1-3.2-1.9-6.1C28.2 16 25 15 25 17z" />
+  </Svg>
+);
+
+const CallDeny = (props: any) => (
+  <Svg width={40} height={24} viewBox="0 0 22.882 7.844" {...props}>
+    <Path
+      d="M11.441 1.771a15.2 15.2 0 00-4.386.637v2.749a.889.889 0 01-.534.8A11.116 11.116 0 003.98 7.595a.991.991 0 01-.667.252.969.969 0 01-.672-.261L.281 5.392a.843.843 0 010-1.257A16.829 16.829 0 0111.441 0 16.829 16.829 0 0122.6 4.134a.846.846 0 01.281.629.836.836 0 01-.281.624l-2.36 2.191a.989.989 0 01-.672.261 1 1 0 01-.667-.252 11.117 11.117 0 00-2.541-1.638.889.889 0 01-.534-.8V2.4a15.349 15.349 0 00-4.385-.629z"
+      fill="#fff"
+    />
   </Svg>
 );
 
@@ -414,5 +529,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginHorizontal: 40,
     alignItems: 'center',
+  },
+  remoteStreamOnlyVoice: {
+    width: 0,
+    height: 0,
   },
 });

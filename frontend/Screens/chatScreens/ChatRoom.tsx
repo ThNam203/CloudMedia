@@ -53,7 +53,7 @@ const ChatRoom = ({navigation, route}: any) => {
   const jwt = useSelector((state: RootState) => state.token.key);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const [isFocused, setIsFocused] = useState(false);
   const [mediaFile, setMediaFile] = useState<MediaItem>();
@@ -63,7 +63,6 @@ const ChatRoom = ({navigation, route}: any) => {
 
   useEffect(() => {
     if (flatListRef.current !== null) {
-      console.log('scroll to end');
       flatListRef.current.scrollToEnd();
     }
   }, [chatMessages]);
@@ -170,10 +169,15 @@ const ChatRoom = ({navigation, route}: any) => {
             <View style={{marginHorizontal: 30}}>
               <TouchableOpacity
                 onPress={() => {
-                  dispatch(setDataCall({
-                    isCaller: true,
-                    chatRoomId: chatRoomId
-                  }));
+                  dispatch(
+                    setDataCall({
+                      isCaller: true,
+                      chatRoomId: chatRoomId,
+                      calleeName: title,
+                      calleeImageSource: imageSource,
+                      isVoiceCall: true,
+                    }),
+                  );
                   // show modal
                   dispatch(setCallShow(true));
                 }}>
@@ -181,7 +185,20 @@ const ChatRoom = ({navigation, route}: any) => {
               </TouchableOpacity>
             </View>
             <View>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(
+                    setDataCall({
+                      isCaller: true,
+                      chatRoomId: chatRoomId,
+                      calleeName: title,
+                      calleeImageSource: imageSource,
+                      isVoiceCall: false,
+                    }),
+                  );
+                  // show modal
+                  dispatch(setCallShow(true));
+                }}>
                 <Icon type={Icons.Ionicons} name="videocam" />
               </TouchableOpacity>
             </View>

@@ -51,12 +51,10 @@ export default function Routers() {
       });
 
       subscribeToEvent('offerVideoCall', (offer: any) => {
-        console.log('offerVoiceCall')
-        console.log(offer)
         // set data
         // view in utilsReducer
         // dispatch(setDataCall({alo: 'ola'}));
-        dispatch(setDataCall(offer));
+        dispatch(setDataCall(JSON.parse(offer)));
         // show modal
         dispatch(setCallShow(true));
       });

@@ -47,7 +47,7 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
     })
 
     const io = socketIO.getIO()
-    if (noti) io.in(senderId.toString()).emit('newNotification', noti)
+    if (noti) io.in(receiverId.toString()).emit('newNotification', noti)
 }
 
 const updateFollow = (requestSender, respondent) => {

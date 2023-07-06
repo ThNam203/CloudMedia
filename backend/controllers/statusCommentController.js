@@ -88,7 +88,7 @@ exports.createNewComment = asyncCatch(async (req, res, next) => {
     sendNotificationOnSomeoneComment(statusPostId, userId)
     await newComment.populate(
         'author',
-        '_id profileImagePath email workingPlace'
+        '_id name profileImagePath email workingPlace'
     )
     res.status(200).json(newComment)
 })

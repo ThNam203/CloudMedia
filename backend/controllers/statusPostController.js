@@ -7,6 +7,7 @@ const User = require('../models/User')
 const StatusPost = require('../models/StatusPost')
 const JWTBlacklist = require('../models/JWTBlacklist')
 const socketIO = require('../socket/socket')
+const Notification = require('../models/Notification')
 
 const getUserIdFromJWT = async (req, next) => {
     if (
@@ -27,6 +28,19 @@ const getUserIdFromJWT = async (req, next) => {
     jwt.verify(token, process.env.JWT_SECRET)
     const data = jwt.decode(token)
     return data.id
+}
+
+const sendNotificationOnPosting = async (statusPostId, statusPostAuthor) => {
+    statusPostAuthor.followers.forEach(async (followerId) => {
+        Notification.create({
+            userId: followerId.toString(),
+            sender: statusPostAuthor._id,
+            notificationType: 'Comment', // todo: there is no time for other type, should be changed in future
+            content: `${statusPostAuthor.name} has posted a new post`,
+            isRead: false,
+            link: statusPostId,
+        })
+    })
 }
 
 exports.getStatusPostById = asyncCatch(async (req, res, next) => {
@@ -51,7 +65,7 @@ exports.getStatusPostById = asyncCatch(async (req, res, next) => {
     postObject.isLiked = isLiked
     delete postObject.likedUsers
 
-    res.status(200).json(statusPost)
+    res.status(200).json(postObject)
 })
 
 exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
@@ -98,6 +112,7 @@ exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
 
     const io = socketIO.getIO()
     User.findById(userId).then((user) => {
+        sendNotificationOnPosting(populatedPost._id, user)
         user.followers.forEach((follower) => {
             io.in(follower._id.toString()).emit('newStatusPost', populatedPost)
         })
