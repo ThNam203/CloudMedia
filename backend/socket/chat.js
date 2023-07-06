@@ -2,9 +2,12 @@ const ChatMessage = require('../models/ChatMessage')
 const ChatRoom = require('../models/ChatRoom')
 const User = require('../models/User')
 const socketIO = require('./socket')
+const s3 = require('../controllers/s3Controller')
 
 const io = socketIO.getIO()
 console.debug = () => {}
+
+const onlineUsers = []
 
 io.use((socket, next) => {
     if (socket.handshake.query) {
@@ -16,6 +19,12 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
     socket.join(socket.handshake.auth.userId)
+    onlineUsers.push(socket.handshake.auth.userId)
+
+    socket.on('disconnect', () => {
+        const idx = onlineUsers.indexOf(socket.handshake.auth.userId)
+        onlineUsers.splice(idx, 1)
+    })
 
     socket.on('joinRoom', (data) => {
         const { chatRoomId } = data
@@ -25,6 +34,11 @@ io.on('connection', (socket) => {
     socket.on('leaveRoom', (data) => {
         const { chatRoomId } = data
         socket.leave(chatRoomId)
+    })
+
+    socket.on('callDenied', (data) => {
+        const { chatRoomId } = data
+        io.in(chatRoomId).emit('callDenied')
     })
 
     socket.on('offerVideoCall', async (data) => {
@@ -40,11 +54,17 @@ io.on('connection', (socket) => {
         })
 
         const chatRoom = await ChatRoom.findById(chatRoomId)
+        let isAllOffline = true
         chatRoom.members.forEach((memberId) => {
             if (memberId.toString() !== callerId) {
-                io.in(memberId.toString()).emit('offerVideoCall', offer)
+                if (onlineUsers.includes(memberId.toString())) {
+                    io.in(memberId.toString()).emit('offerVideoCall', offer)
+                    isAllOffline = false
+                }
             }
         })
+
+        if (isAllOffline) io.in(callerId).emit('noOneInRoom', {})
 
         // socket.to(chatRoomId).emit('offerVideoCall', offer)
     })
@@ -74,7 +94,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('newMessage', async (data) => {
-        const { chatRoomId, message, senderId } = data
+        const { chatRoomId, message, senderId, imageLink } = data
         const chatRoom = await ChatRoom.findById(chatRoomId)
         if (!chatRoom)
             return socket
@@ -84,6 +104,7 @@ io.on('connection', (socket) => {
         const newChatMessage = await ChatMessage.create({
             chatRoomId,
             message,
+            imageLink,
             senderId,
         })
 
@@ -94,6 +115,6 @@ io.on('connection', (socket) => {
         chatRoom.lastMessageTime = Date.now()
         await chatRoom.save()
 
-        io.in(chatRoomId).emit('newMessage', newChatMessage)
+        socket.to(chatRoomId).emit('newMessage', newChatMessage)
     })
 })

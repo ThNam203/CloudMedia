@@ -14,7 +14,7 @@ import {
   RTCView,
   mediaDevices,
 } from 'react-native-webrtc';
-import socket from '../../utils/socket';
+import socket, { emitEvent } from '../../utils/socket';
 import {Path, Svg} from 'react-native-svg';
 
 export default function VideoCallScreen() {
@@ -112,10 +112,21 @@ export default function VideoCallScreen() {
         } catch (e) {}
       });
 
-      if (callMer.data.isCaller)
+      if (callMer.data.isCaller) {
         socket.subscribeToEvent('answerOfferVideoCall', (data: any) => {
           onAnswerOfferVideoCall(data);
         });
+
+        socket.subscribeToEvent('noOneInRoom', (data: any) => {
+          Toast("Other user is not online")
+          dispatch(setCallShow(false))
+        });
+
+        socket.subscribeToEvent('callDenied', (data: any) => {
+          Toast("Other user denied call")
+          dispatch(setCallShow(false))
+        })
+      }
 
       socket.subscribeToEvent('iceCandidate', (data: any) => {
         handleRemoteCandidate(data);
@@ -267,6 +278,23 @@ export default function VideoCallScreen() {
     else onModalVisible();
   }, [callMer.visible]);
 
+  function convertSecondsToTime(seconds: number) {
+    var hours = Math.floor(seconds / 3600);
+    var minutes = Math.floor((seconds % 3600) / 60);
+    var remainingSeconds = seconds % 60;
+  
+    var timeString = '';
+  
+    if (hours > 0) {
+      timeString += hours.toString().padStart(2, '0') + ':';
+    }
+  
+    timeString += minutes.toString().padStart(2, '0') + ':' +
+                  remainingSeconds.toString().padStart(2, '0');
+  
+    return timeString;
+  }
+
   return (
     <Modal
       onBackdropPress={() => dispatch(setCallShow(false))}
@@ -311,7 +339,7 @@ export default function VideoCallScreen() {
                     {remoteUserName}
                   </Text>
                   <Text style={{fontSize: 18, marginTop: 10, color: 'black'}}>
-                    {intervalId ? callLength : 'Calling...'}
+                    {intervalId ? convertSecondsToTime(callLength) : 'Calling...'}
                   </Text>
                 </View>
               )}
@@ -430,7 +458,10 @@ export default function VideoCallScreen() {
                 marginBottom: 64,
               }}>
               <TouchableOpacity
-                onPress={() => {}}
+                onPress={() => {
+                  emitEvent("callDenied", { chatRoomId: callMer.data.chatRoomId })
+                  dispatch(setCallShow(false))
+                }}
                 style={{
                   backgroundColor: '#d62828',
                   borderRadius: 30,

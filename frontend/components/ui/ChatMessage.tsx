@@ -1,11 +1,12 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
+import { Image } from 'react-native-animatable';
 
 export default function ChatMessage({chat, userId}: any) {
   const status = chat.senderId !== userId;
   const rawTime = new Date(chat.createdAt)
   const time = rawTime.toLocaleString()
-
+  console.log(chat.imageLink)
 
   return (
       <View
@@ -21,6 +22,7 @@ export default function ChatMessage({chat, userId}: any) {
               : [styles.mmessage, {backgroundColor: 'rgb(194, 243, 194)'}]
           }>
           <Text>{chat.message}</Text>
+          { chat.imageLink ? <Image source={{uri: chat.imageLink}} style={{width: 150, height: 150}}/> : null}
         </View>
         <Text style={{marginLeft: 8}}>{time}</Text>
       </View>

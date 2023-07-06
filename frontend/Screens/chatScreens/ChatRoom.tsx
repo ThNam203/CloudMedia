@@ -21,21 +21,25 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {Toast} from '../../components/ui/Toast';
 import {emitEvent, subscribeToEvent} from '../../utils/socket';
 import {setCallShow, setDataCall} from '../../reducers/UtilsReducer';
+import { UploadImage } from '../../api/Utils';
 
 class Message {
   public id: string;
   public message: string;
   public senderId: string;
   public createdAt: string;
+  public imageLink: string | null;
 
   constructor(
     id: string,
     message: string,
+    imageLink: string | null,
     senderId: string,
     createdAt: string,
   ) {
     this.id = id;
     this.message = message;
+    this.imageLink = imageLink;
     this.senderId = senderId;
     this.createdAt = createdAt;
   }
@@ -132,6 +136,7 @@ const ChatRoom = ({navigation, route}: any) => {
       const newMessage = new Message(
         newRawMessage._id,
         newRawMessage.message,
+        newRawMessage.imageLink,
         newRawMessage.senderId,
         newRawMessage.createdAt,
       );
@@ -141,18 +146,52 @@ const ChatRoom = ({navigation, route}: any) => {
     getAllMessages();
 
     return () => {
-      emitEvent('leaveRoom', {chatRoomId})
-    }
+      emitEvent('leaveRoom', {chatRoomId});
+    };
   }, []);
 
   const handleNewMessage = () => {
-    const newMessage = {
-      chatRoomId: chatRoomId,
+    const messageObject = new Message(
+      (Math.random() + 1).toString(36).substring(7),
       message,
-      senderId: uid,
-    };
+      null,
+      uid,
+      Date.now().toString(),
+    );
+    setChatMessages(messages => [...messages, messageObject]);
 
-    emitEvent('newMessage', newMessage);
+    if (mediaFile) {
+      const formData = new FormData();
+      formData.append('media-file', mediaFile);
+      console.error('co cai con cac')
+      UploadImage(formData, uid).then((imageLink: any) => {
+        setChatMessages((messages) => 
+          messages.map(message => {
+            emitEvent('newMessage', {
+              chatRoomId: chatRoomId,
+              message,
+              senderId: uid,
+              imageLink,
+            });
+
+            if (message.id === messageObject.id) {
+              message.imageLink = imageLink
+              return message
+            } else return message
+          })
+        )
+      }).catch((e) => {
+        console.error('unable to upload' + e.toString())
+      })
+    } else {
+      emitEvent('newMessage', {
+        chatRoomId: chatRoomId,
+        message,
+        senderId: uid,
+        imageLink: null,
+      });
+    }
+
     setMessage('');
   };
 
@@ -214,19 +253,26 @@ const ChatRoom = ({navigation, route}: any) => {
           <FlatList
             data={chatMessages}
             renderItem={({item}) => (
-              <MessageComponent chat={item} userId={uid} />
+              <MessageComponent
+                chat={item}
+                userId={uid}
+                avatarSource={imageSource}
+              />
             )}
             ref={flatListRef}
             keyExtractor={(item, index) => 'key' + index}
             contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}
           />
         ) : (
-          <Text style={{
-            color: 'black',
-            fontSize: 24,
-            alignSelf: 'center',
-            marginTop: 300  
-          }}>No message yet!</Text>
+          <Text
+            style={{
+              color: 'black',
+              fontSize: 24,
+              alignSelf: 'center',
+              marginTop: 300,
+            }}>
+            No message yet!
+          </Text>
         )}
       </View>
 
