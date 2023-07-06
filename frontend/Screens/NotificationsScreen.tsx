@@ -170,10 +170,22 @@ export default function NotificationsScreen({navigation}: any) {
         backgroundColor: 'white',
       }}>
       {NotificationsData.length === 0 ? (
-        <View>
-          <Text style={{fontSize: 25, alignSelf: 'center', color: 'gray'}}>
-            No notifications
-          </Text>
+        <View
+          style={{
+            backgroundColor: 'transparent',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <Image
+            style={{
+              width: 400,
+              height: 400,
+              marginTop: 500,
+              alignSelf: 'center',
+              backgroundColor: 'transparent',
+            }}
+            source={require('../assets/images/NoNotification-removebg-preview.png')}
+          />
         </View>
       ) : (
         <FlatList
