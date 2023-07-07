@@ -229,44 +229,74 @@ exports.unfriend = asyncCatch(async (req, res, next) => {
 exports.recommendFriends = asyncCatch(async (req, res, next) => {
     // Find the user by ID and populate their connections
     const { userId } = req.params
-    const user = await User.findById(userId)
+    const MAX_RECOMMEND_FRIEND_SIZE = 10
+    const user = await User.findById(userId).populate(
+        'connections',
+        '_id connections'
+    )
 
     if (!user) throw new AppError('User not found', 404)
 
-    const potentialFriends = await User.aggregate([
-        {
-            $match: {
-                _id: { $nin: [...user.connections, user._id] }, // Exclude existing connections and the user itself
-            },
-        },
-        {
-            $lookup: {
-                from: 'FriendRequest',
-                let: { userId: '$_id' },
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $and: [
-                                    { $eq: ['$receiverId', '$$userId'] }, // Match receiverId with the current user's ID
-                                    { $ne: ['$senderId', '$$userId'] }, // Exclude friend requests sent by the current user
-                                ],
-                            },
-                        },
-                    },
+    // get ids of alreay sent a friend request
+    const sentFriendRequestIds = await FriendRequest.find({
+        _id: { $in: [user._id] },
+    }).select('+_id')
+
+    let potentialFriendIds = []
+    user.connections.forEach((connection) => {
+        connection.connections.forEach((friendOfFriendId) => {
+            if (user.connections.find((x) => x.equals(friendOfFriendId))) return
+            if (
+                sentFriendRequestIds.find((x) => x._id.equals(friendOfFriendId))
+            )
+                return
+
+            const existedIdx = potentialFriendIds.findIndex(
+                (friend) =>
+                    friend._id.toString() === friendOfFriendId.toString()
+            )
+
+            if (existedIdx === -1) {
+                potentialFriendIds.push({
+                    _id: friendOfFriendId,
+                    appearCount: 1,
+                })
+            } else {
+                potentialFriendIds[existedIdx].appearCount += 1
+            }
+        })
+    })
+
+    potentialFriendIds.sort((first, sec) => sec.appearCount - first.appearCount)
+    if (potentialFriendIds.length > MAX_RECOMMEND_FRIEND_SIZE)
+        potentialFriendIds.splice(
+            MAX_RECOMMEND_FRIEND_SIZE,
+            potentialFriendIds.length - MAX_RECOMMEND_FRIEND_SIZE
+        )
+
+    potentialFriendIds = potentialFriendIds.map((obj) => obj._id)
+
+    const potentialFriends = await User.find({
+        _id: { $in: potentialFriendIds },
+    })
+
+    // add more friend if not exceeded the max size
+    if (potentialFriends.length < MAX_RECOMMEND_FRIEND_SIZE)
+        await User.find({
+            _id: {
+                $nin: [
+                    ...potentialFriendIds,
+                    ...user.connections,
+                    ...sentFriendRequestIds,
                 ],
-                as: 'friendRequests',
             },
-        },
-        {
-            $match: {
-                friendRequests: { $size: 0 }, // Exclude potential friends who have received friend requests
-            },
-        },
-        {
-            $sample: { size: 20 },
-        },
-    ])
+        })
+            .limit(MAX_RECOMMEND_FRIEND_SIZE - potentialFriends.length)
+            .then((documents) =>
+                documents.forEach((document) => {
+                    potentialFriends.push(document)
+                })
+            )
 
     res.status(200).json(potentialFriends)
 })
