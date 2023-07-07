@@ -32,7 +32,11 @@ const sendNotificationOnSomeoneComment = async (
     if (statusPost.author === commentAuthorId) return
     const noti = await Notification.create({
         userId: statusPost.author,
-        sender: commentor,
+        sender: {
+            _id: commentor._id,
+            name: commentor.name,
+            profileImagePath: commentor.profileImagePath,
+        },
         notificationType: 'Comment',
         content: `${commentor.name} has commented about your status`,
         isRead: false,

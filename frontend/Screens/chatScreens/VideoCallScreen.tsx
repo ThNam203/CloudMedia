@@ -334,7 +334,7 @@ export default function VideoCallScreen() {
                       marginTop: 200,
                     }}
                     source={
-                      callMer.data.calleeImageSource ||
+                      callMer.data.calleeImageSource ? callMer.data.calleeImageSource :
                       require('../../assets/images/Spiderman.jpg')
                     }
                   />

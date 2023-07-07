@@ -34,7 +34,11 @@ const sendNotificationOnReply = async (sender, receiver, isAccept) => {
 
     const noti = await Notification.create({
         userId: sender._id,
-        sender: receiver._id,
+        sender: {
+            _id: receiver._id,
+            name: receiver.name,
+            profileImagePath: receiver.profileImagePath,
+        },
         notificationType: 'FriendRequest',
         content: message,
     })
@@ -49,7 +53,11 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
 
     const noti = await Notification.create({
         userId: receiverId,
-        sender: sender._id,
+        sender: {
+            _id: sender._id,
+            name: sender.name,
+            profileImagePath: sender.profileImagePath,
+        },
         notificationType: 'FriendRequest',
         content,
     })
@@ -212,7 +220,7 @@ exports.recommendFriends = asyncCatch(async (req, res, next) => {
     const potentialFriends = await User.aggregate([
         {
             $match: {
-                _id: { $nin: user.connections, $ne: user._id }, // Exclude existing connections and the user itself
+                _id: { $nin: [...user.connections, user._id] }, // Exclude existing connections and the user itself
             },
         },
         {
