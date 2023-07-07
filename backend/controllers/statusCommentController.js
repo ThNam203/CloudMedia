@@ -29,22 +29,28 @@ const sendNotificationOnSomeoneComment = async (
 ) => {
     const statusPost = await StatusPost.findById(statusPostId)
     const commentor = await User.findById(commentAuthorId)
-    if (statusPost.author === commentAuthorId) return
+    if (statusPost.author.toString() === commentAuthorId) return
+
     const noti = await Notification.create({
         userId: statusPost.author,
-        sender: {
-            _id: commentor._id,
-            name: commentor.name,
-            profileImagePath: commentor.profileImagePath,
-        },
+        sender: commentor._id,
         notificationType: 'Comment',
         content: `${commentor.name} has commented about your status`,
         isRead: false,
         link: statusPostId,
     })
 
+    const notiObject = noti.toObject()
+    notiObject.sender = {
+        _id: commentor._id,
+        name: commentor.name,
+        profileImagePath: commentor.profileImagePath,
+    }
+
+    console.log(JSON.stringify(notiObject))
+
     const io = socketIO.getIO()
-    if (noti) io.in(statusPost.author.toString()).emit('newNotification', noti)
+    if (noti) io.in(statusPost.author.toString()).emit('newNotification', notiObject)
 }
 
 // exports.getCommentById = asyncCatch(async (req, res, next) => {

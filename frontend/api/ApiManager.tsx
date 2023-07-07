@@ -3,7 +3,7 @@ import axios from 'axios';
 // https://workwize.azurewebsites.net/
 // http://10.0.140.194:3000
 
-const baseURL = 'https://workwize.azurewebsites.net';
+const baseURL = 'http://10.0.140.194:3000';
 
 const ApiManager = axios.create({
   baseURL: baseURL,

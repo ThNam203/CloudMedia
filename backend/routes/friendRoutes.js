@@ -8,6 +8,7 @@ const router = new express.Router({
 
 router
     .route('')
+    .get(authController.isUser, friendController.getAllFriendOfUser)
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,

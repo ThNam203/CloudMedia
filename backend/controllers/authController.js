@@ -209,7 +209,6 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log(JSON.stringify(error))
             throw new AppError('Unable to send email', 500)
         } else {
             res.status(200).json(

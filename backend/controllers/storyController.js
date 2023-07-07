@@ -34,19 +34,22 @@ const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
     storyAuthor.followers.forEach(async (followerId) => {
         const noti = await Notification.create({
             userId: followerId.toString(),
-            sender: {
-                _id: storyAuthor._id,
-                name: storyAuthor.name,
-                profileImagePath: storyAuthor.profileImagePath,
-            },
+            sender: storyAuthor._id,
             notificationType: 'NewStory', // todo: there is no time for other type, should be changed in future
             content: `${storyAuthor.name} has posted a new story`,
             isRead: false,
             link: storyId,
         })
 
+        const notiObject = noti.toObject()
+        notiObject.sender = {
+            _id: storyAuthor._id,
+            name: storyAuthor.name,
+            profileImagePath: storyAuthor.profileImagePath,
+        }
+
         const io = socketIO.getIO()
-        if (noti) io.in(followerId.toString()).emit('newNotification', noti)
+        if (noti) io.in(followerId.toString()).emit('newNotification', notiObject)
     })
 }
 

@@ -34,17 +34,20 @@ const sendNotificationOnReply = async (sender, receiver, isAccept) => {
 
     const noti = await Notification.create({
         userId: sender._id,
-        sender: {
-            _id: receiver._id,
-            name: receiver.name,
-            profileImagePath: receiver.profileImagePath,
-        },
+        sender: receiver._id,
         notificationType: 'FriendRequest',
         content: message,
     })
 
+    const notiObject = noti.toObject()
+    notiObject.sender = {
+        _id: receiver._id,
+        name: receiver.name,
+        profileImagePath: receiver.profileImagePath,
+    }
+
     const io = socketIO.getIO()
-    if (noti) io.in(sender._id.toString()).emit('newNotification', noti)
+    if (noti) io.in(sender._id.toString()).emit('newNotification', notiObject)
 }
 
 const sendNotificationOnRequest = async (senderId, receiverId) => {
@@ -53,17 +56,20 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
 
     const noti = await Notification.create({
         userId: receiverId,
-        sender: {
-            _id: sender._id,
-            name: sender.name,
-            profileImagePath: sender.profileImagePath,
-        },
+        sender: sender._id,
         notificationType: 'FriendRequest',
         content,
     })
 
+    const notiObject = noti.toObject()
+    notiObject.sender = {
+        _id: sender._id,
+        name: sender.name,
+        profileImagePath: sender.profileImagePath,
+    }
+
     const io = socketIO.getIO()
-    if (noti) io.in(receiverId.toString()).emit('newNotification', noti)
+    if (noti) io.in(receiverId.toString()).emit('newNotification', notiObject)
 }
 
 const updateFollowOnBeingFriend = (requestSender, respondent) => {
@@ -103,6 +109,16 @@ const updateFollowOnBeingUnfriend = (requestSender, respondent) => {
         respondent.markModified('followings')
     }
 }
+
+exports.getAllFriendOfUser = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const connections = await User.findById(userId).populate(
+        'connections',
+        '_id name profileImagePath backgroundImagePath workingPlace'
+    )
+
+    res.status(200).json(connections)
+})
 
 exports.createNewFriendRequest = asyncCatch(async (req, res, next) => {
     const { userId: senderId } = req.params
