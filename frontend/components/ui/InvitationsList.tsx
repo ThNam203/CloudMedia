@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, Image, View} from 'react-native';
 import ItemRequestUser from './ItemRequestUser';
-import {getAllFrRequestOfUser} from '../../api/friend_api';
+import {getAllFrRequestOfUser} from '../../api/friendApi';
 import {RootState} from '../../reducers/Store';
 import {useDispatch, useSelector} from 'react-redux';
 import {getInfoUser} from '../../api/userApi';
-import {replyRequestFr} from '../../api/friend_api';
+import {replyRequestFr} from '../../api/friendApi';
 import {Toast} from './Toast';
 import {addFriend} from '../../reducers/UserReducer';
 import {Text} from 'react-native-animatable';

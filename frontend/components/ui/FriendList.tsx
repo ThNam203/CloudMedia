@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, Image, Pressable} from 'react-native';
 import ItemRequestUser from './ItemRequestUser';
-import {createRequestByEmail, getRecommendFr} from '../../api/friend_api';
+import {createRequestByEmail, getRecommendFr} from '../../api/friendApi';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
 import {Toast} from './Toast';

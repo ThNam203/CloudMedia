@@ -13,8 +13,9 @@ import {RootState} from '../reducers/Store';
 import {useDispatch, useSelector} from 'react-redux';
 import {Toast} from '../components/ui/Toast';
 import {getInfoUser} from '../api/userApi';
-import {getAllFrOfUser} from '../api/friend_api';
+import {getAllFrOfUser} from '../api/friendApi';
 import {setStatus} from '../reducers/LoadingReducer';
+import {useIsFocused} from '@react-navigation/native';
 
 export default function MyNetworksScreen({navigation}: any) {
   const uid = useSelector((state: RootState) => state.uid.id);
@@ -28,6 +29,8 @@ export default function MyNetworksScreen({navigation}: any) {
     navigation.goBack();
   };
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     const getInfoConnection = async () => {
       // for (const id of connectionsId) {
@@ -35,6 +38,7 @@ export default function MyNetworksScreen({navigation}: any) {
         dispatch(setStatus(true));
         // const response: any = await getInfoUser(id);
         const response: any = await getAllFrOfUser(uid, jwt);
+        console.log(response.data);
         dispatch(setStatus(false));
         if (response.status === 200) {
           setConnection(prev => response.data);
@@ -47,8 +51,8 @@ export default function MyNetworksScreen({navigation}: any) {
       }
       // }
     };
-    getInfoConnection();
-  }, []);
+    if (isFocused) getInfoConnection();
+  }, [isFocused]);
 
   if (connections.length === 0) {
     return (

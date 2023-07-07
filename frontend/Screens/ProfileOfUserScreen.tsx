@@ -19,9 +19,10 @@ import Header from '../components/ui/Header';
 import {RootState} from '../reducers/Store';
 import {SearchUsersByEmail} from '../api/Utils';
 import Icon, {Icons} from '../components/ui/Icons';
-import {createRequestByEmail, unfriendApi} from '../api/friend_api';
+import {createRequestByEmail, unfriendApi} from '../api/friendApi';
 import {clearStorySub, pushStorySub} from '../reducers/StoryReducer';
 import {getAllStory} from '../api/storyApi';
+import {unfriend} from '../reducers/UserReducer';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -232,24 +233,31 @@ export default function ProfileOfUserScreen(props: any) {
         </View>
         <View>
           <Text style={styles.textName}>{user.name}</Text>
-          <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
-            {user.headline}
-          </Text>
-          <Text
-            style={[
-              styles.textName,
-              {fontSize: 18, fontWeight: 'normal', marginTop: 10},
-            ]}>
-            {user.workingPlace}
-          </Text>
+          {user.headline && (
+            <Text
+              style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
+              {user.headline}
+            </Text>
+          )}
+          {user.workingPlace && (
+            <Text
+              style={[
+                styles.textName,
+                {fontSize: 18, fontWeight: 'normal', marginTop: 10},
+              ]}>
+              {user.workingPlace}
+            </Text>
+          )}
           {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
-          <Text
-            style={[
-              styles.textName,
-              {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
-            ]}>
-            {user.location}
-          </Text>
+          {user.location && (
+            <Text
+              style={[
+                styles.textName,
+                {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
+              ]}>
+              {user.location}
+            </Text>
+          )}
           <Text
             style={[
               styles.textName,
