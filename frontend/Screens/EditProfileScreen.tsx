@@ -108,7 +108,7 @@ function EditProfileScreen(props: any) {
 
           <View style={{marginHorizontal: 10}}>
             <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Headline*
+              Headline
             </Text>
             <TextInput
               style={{
@@ -153,7 +153,7 @@ function EditProfileScreen(props: any) {
           </View>
           <View style={{marginHorizontal: 10}}>
             <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Education*
+              Education
             </Text>
             <TextInput
               style={{
@@ -181,7 +181,7 @@ function EditProfileScreen(props: any) {
           </View>
           <View style={{marginHorizontal: 10}}>
             <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Country/Region*
+              Country/Region
             </Text>
             <TextInput
               style={{
@@ -197,7 +197,7 @@ function EditProfileScreen(props: any) {
           </View>
           <View style={{marginHorizontal: 10}}>
             <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Home Town*
+              Home Town
             </Text>
             <TextInput
               style={{

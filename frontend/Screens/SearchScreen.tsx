@@ -13,7 +13,7 @@ import ItemRequestUser from '../components/ui/ItemRequestUser';
 import {useSelector} from 'react-redux';
 import {RootState} from '../reducers/Store';
 import {SearchUsersByEmail, SearchUsersByName} from '../api/Utils';
-import {createRequestByEmail} from '../api/friend_api';
+import {createRequestByEmail} from '../api/friendApi';
 import {Toast} from '../components/ui/Toast';
 import {useIsFocused} from '@react-navigation/native';
 

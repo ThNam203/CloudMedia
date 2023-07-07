@@ -231,24 +231,31 @@ function ProfileScreen({navigation}: any) {
         </View>
         <View>
           <Text style={styles.textName}>{user.name}</Text>
-          <Text style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
-            {user.headline}
-          </Text>
-          <Text
-            style={[
-              styles.textName,
-              {fontSize: 18, fontWeight: 'normal', marginTop: 10},
-            ]}>
-            {user.workingPlace}
-          </Text>
+          {user.headline && (
+            <Text
+              style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
+              {user.headline}
+            </Text>
+          )}
+          {user.workingPlace && (
+            <Text
+              style={[
+                styles.textName,
+                {fontSize: 18, fontWeight: 'normal', marginTop: 10},
+              ]}>
+              {user.workingPlace}
+            </Text>
+          )}
           {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
-          <Text
-            style={[
-              styles.textName,
-              {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
-            ]}>
-            {user.location}
-          </Text>
+          {user.location && (
+            <Text
+              style={[
+                styles.textName,
+                {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
+              ]}>
+              {user.location}
+            </Text>
+          )}
           <Text
             style={[
               styles.textName,
