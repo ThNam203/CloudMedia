@@ -9,7 +9,6 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import CustomFTG from '../components/ui/CustomFGT';
 import CustomCheckBox from '../components/ui/CustomCheckbox';
 import {Dropdown} from 'react-native-element-dropdown';
 import {userSignup} from '../api/userApi';
@@ -39,20 +38,38 @@ function SignUpHrScreen(props: any) {
   }
 
   const checkInfo = () => {
+    let iname = false;
+    let imail = false;
+    let ipass = false;
+    let iphone = false;
+
     if (name === '') {
       setNameWarning(true);
+      iname = true;
     }
     if (!isValidEmail(email)) {
       setEmailWarning(true);
+      imail = true;
     }
     if (password.length < 8) {
       setPasswordWarning(true);
+      ipass = true;
     }
     if (phoneNumber.length < 10) {
       setPhoneWarning(true);
+      iphone = true;
     }
 
-    if (nameWarning || emailWarning || passwordWarning || phoneWarning) {
+    if (
+      nameWarning ||
+      emailWarning ||
+      passwordWarning ||
+      phoneWarning ||
+      iname ||
+      imail ||
+      ipass ||
+      iphone
+    ) {
       return false;
     }
     return true;
@@ -89,12 +106,6 @@ function SignUpHrScreen(props: any) {
         dispatch(setStatus(false));
       });
   };
-
-  const listboxData = [
-    {label: 'Being Idle', value: 'Being Idle'},
-    {label: 'Hiring', value: 'Hiring'},
-    {label: 'Open For Work', value: 'Open For Work'},
-  ];
 
   const renderItem = (item: any) => {
     return (
@@ -210,39 +221,11 @@ function SignUpHrScreen(props: any) {
           keyboardType="number-pad"
         />
       </View>
-      <View style={{marginTop: 15, height: 40}}>
-        <View style={styles.bottomContainer}>
-          <View>
-            <CustomCheckBox
-              isSelected={isSelected}
-              setSelection={setSelection}
-            />
-          </View>
-          <Text
-            style={[
-              styles.fontText,
-              {fontWeight: '400', color: '#808080', marginTop: 8},
-            ]}>
-            I agree to{' '}
-            <Text
-              onPress={() => {}}
-              style={[
-                styles.fontText,
-                {
-                  textDecorationLine: 'underline',
-                  fontWeight: '700',
-                  color: '#416FDF',
-                },
-              ]}>
-              Terms & Conditions
-            </Text>
-          </Text>
-        </View>
-      </View>
+
       <View
         style={[
           styles.textInput,
-          {overflow: 'hidden', borderRadius: 15, marginTop: 0},
+          {overflow: 'hidden', borderRadius: 15, marginTop: 40},
         ]}>
         <Pressable
           style={styles.button}

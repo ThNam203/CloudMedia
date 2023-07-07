@@ -19,10 +19,14 @@ import {setStatus} from '../reducers/LoadingReducer';
 import {RootState} from '../reducers/Store';
 import AppLoader from '../components/ui/AppLoader';
 import {Toast} from '../components/ui/Toast';
+import ForgetPassScreen from './ForgetPassScreen';
+import ChangePassScreen from './ChangePassScreen';
 
 function FirstTimeUseScreen({navigation}: any) {
   const [modalHrVisible, setModalHrVisible] = useState(false);
   const [modalLoginVisible, setModalLoginVisible] = useState(false);
+  const [modalForgetPassVisible, setModalForgetPassVisible] = useState(false);
+  const [modalChangePassVisible, setModalChangePassVisible] = useState(false);
   const isLoading = useSelector((state: RootState) => state.loading.status);
   const dispatch = useDispatch();
   function closeModalLogin() {
@@ -30,6 +34,14 @@ function FirstTimeUseScreen({navigation}: any) {
   }
   function closeModalHr() {
     setModalHrVisible(false);
+  }
+
+  function closeModalForgetPass() {
+    setModalForgetPassVisible(false);
+  }
+
+  function closeModalChangePass() {
+    setModalChangePassVisible(false);
   }
 
   const navigateToMain = (jwt: any) => {
@@ -74,7 +86,7 @@ function FirstTimeUseScreen({navigation}: any) {
             relationships
           </Text>
         </View>
-        <View style={[styles.buttonContainer, {marginTop: 250}]}>
+        <View style={[styles.buttonContainer, {marginTop: 320}]}>
           <RectangleButton
             style={styles.button}
             onPress={() => {
@@ -96,6 +108,16 @@ function FirstTimeUseScreen({navigation}: any) {
               style={[styles.loginText, {textDecorationLine: 'underline'}]}>
               Log in
             </Text>
+          </Text>
+          <Text
+            onPress={() => {
+              setModalChangePassVisible(true);
+            }}
+            style={[
+              styles.loginText,
+              {textDecorationLine: 'underline', marginTop: 10},
+            ]}>
+            Change password
           </Text>
         </View>
         <Modal
@@ -144,7 +166,51 @@ function FirstTimeUseScreen({navigation}: any) {
                 setModalHrVisible(true);
               }}
               handleNavigate={navigateToMain}
+              handleOpenForgetPass={() => {
+                closeModalLogin();
+                setModalForgetPassVisible(true);
+              }}
             />
+          </View>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalForgetPassVisible}
+          onRequestClose={() => {
+            setModalForgetPassVisible(!modalForgetPassVisible);
+          }}>
+          {isLoading ? <AppLoader /> : null}
+          <TouchableOpacity
+            style={{flex: 2}}
+            activeOpacity={1}
+            onPressOut={closeModalForgetPass}
+          />
+          <View style={{flex: 1}}>
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
+              <ForgetPassScreen handleCloseModal={closeModalForgetPass} />
+            </ScrollView>
+          </View>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalChangePassVisible}
+          onRequestClose={() => {
+            setModalChangePassVisible(!modalChangePassVisible);
+          }}>
+          {isLoading ? <AppLoader /> : null}
+          <TouchableOpacity
+            style={{flex: 2}}
+            activeOpacity={1}
+            onPressOut={closeModalChangePass}
+          />
+          <View style={{flex: 3}}>
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
+              <ChangePassScreen handleCloseModal={closeModalChangePass} />
+            </ScrollView>
           </View>
         </Modal>
       </ImageBackground>
@@ -192,7 +258,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: 350,
     alignItems: 'center',
-    marginTop: 50,
+    marginTop: 30,
   },
   loginText: {
     fontSize: 14,
