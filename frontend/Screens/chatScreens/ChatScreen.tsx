@@ -25,7 +25,8 @@ interface ChatRoom {
   lastMessageTime: any;
 }
 
-const ChatScreen = ({navigation}: any) => {
+const ChatScreen = ({navigation, route}: any) => {
+  const {id} = route.params;
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
@@ -46,10 +47,27 @@ const ChatScreen = ({navigation}: any) => {
     getChatRooms();
   }, []);
 
+  useEffect(() => {
+    if (id && chatRooms) {
+      for (const room of chatRooms) {
+        if (room.receiver._id === id) {
+          const imageSource = room.receiver?.profileImagePath
+            ? {uri: room.receiver.profileImagePath}
+            : require('../../assets/images/Spiderman.jpg');
+          navigation.navigate('chatRoom', {
+            chatRoomId: room._id,
+            imageSource: imageSource,
+            title: room.receiver.name,
+          });
+        }
+      }
+    }
+  }, [chatRooms]);
+
   const renderItem = ({item}: any) => {
-    console.log(JSON.stringify(item))
+    console.log(JSON.stringify(item));
     const imageSource = item.logoPath
-      ? { uri: item.logoPath }
+      ? {uri: item.logoPath}
       : item.receiver?.profileImagePath
       ? {uri: item.receiver.profileImagePath}
       : require('../../assets/images/Spiderman.jpg');

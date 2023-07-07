@@ -332,7 +332,9 @@ export default function ProfileOfUserScreen(props: any) {
               }}>
               <Pressable
                 onPress={() => {
-                  navigation.navigate('chat');
+                  if (nameTage1 === 'Unfriend')
+                    navigation.navigate('chat', {id: id});
+                  else Toast('You are not friend with this user');
                 }}
                 android_ripple={{color: '#0d8fe0ff'}}
                 style={{
