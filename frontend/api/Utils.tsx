@@ -43,3 +43,24 @@ export const SearchUsersByName = async (
     return error;
   }
 };
+
+export const UploadImage = async (
+  formData: FormData,
+  token: string,
+) => {
+  try {
+    const result = await ApiManager('/upload-image', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'multipart/form-data'
+      },
+      data: formData
+    });
+
+    return result;
+  } catch (error) {
+    console.log('cai deo gi day ' + JSON.stringify(error))
+    return error;
+  }
+};

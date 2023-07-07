@@ -78,6 +78,7 @@ const StatusPostSlice = createSlice({
     },
     clearStatusPosts: (state: StatusPosts) => {
       state.HomePage = [];
+      console.log('clear');
     },
     clearStatusPostsSub: (state: StatusPosts) => {
       state.sub = [];

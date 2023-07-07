@@ -78,6 +78,8 @@ exports.followUserById = asyncCatch(async (req, res, next) => {
 
     if (!user) throw new AppError('User not found', 404)
     if (!userFollowed) throw new AppError('User followed not found', 404)
+    if (user.followings.includes(userFollowedId))
+        throw new AppError('Already followed', 500)
 
     user.followings.push(userFollowedId)
     userFollowed.followers.push(userId)
@@ -92,6 +94,7 @@ exports.followUserById = asyncCatch(async (req, res, next) => {
 exports.unfollowUserById = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
     const { userUnfollowedId } = req.body
+    console.log(`unfollowUserById ${userId} ${userUnfollowedId}`)
     const user = await User.findById(userId)
     const userUnfollowed = await User.findById(userUnfollowedId)
 
@@ -113,7 +116,7 @@ exports.unfollowUserById = asyncCatch(async (req, res, next) => {
         )
 
     user.followings.splice(firstIdx, 1)
-    userUnfollowed.followings.splice(secondIdx, 1)
+    userUnfollowed.followers.splice(secondIdx, 1)
     user.markModified('followings')
     userUnfollowed.markModified('followers')
 

@@ -2,7 +2,7 @@ import ApiManager from './ApiManager';
 
 export const getStoryById = async (storyId: any, token: any) => {
   try {
-    const result = await ApiManager(`/s/${storyId}`, {
+    const result = await ApiManager(`/story/${storyId}`, {
       method: 'GET',
       headers: {
         Authorization: 'Bearer ' + token,

@@ -51,9 +51,11 @@ exports.globalErrorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500
     err.message = err.message || 'Internal server error'
 
-    if (process.env.NODE_ENV === 'development')
-        sendErrorInDevelopmentEnv(err, res)
-    else sendErrorInProductionEnv(err, res)
+    // if (process.env.NODE_ENV === 'development')
+    //     sendErrorInDevelopmentEnv(err, res)
+    // else
+    console.log(err)
+    sendErrorInProductionEnv(err, res)
 }
 
 exports.invalidUrlHandler = (req, res, next) => {
