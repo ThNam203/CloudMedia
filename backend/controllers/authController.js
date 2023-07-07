@@ -153,7 +153,7 @@ exports.createForgetPasswordRequest = asyncCatch(async (req, res, next) => {
             '<p>You have requested a password reset. If it was you, then click the link below to receive another email with your reset password:</p>' +
             '<a href="' +
             baseUrl +
-            '/password-recover/' +
+            '/reset-password/' +
             resetPasswordRequest._id +
             '">Reset Password</a>',
     }
@@ -174,7 +174,7 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
     )
 
     if (!request) throw new AppError('Unable to find the request', 404)
-    const user = await User.findById(request.userId)
+    const user = await User.findById(request.userId).select('+password')
     if (!user)
         throw new AppError('Unable to find the user with this request', 404)
 
@@ -201,10 +201,15 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
         text:
             'You have reset your password, your new password is ' +
             randomPassword,
+        html:
+            '<p>You have reset your password, your new password is ' +
+            randomPassword +
+            '</p>',
     }
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
+            console.log(JSON.stringify(error))
             throw new AppError('Unable to send email', 500)
         } else {
             res.status(200).json(

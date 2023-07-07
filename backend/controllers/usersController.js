@@ -65,7 +65,7 @@ exports.changePassword = asyncCatch(async (req, res, next) => {
 
     const updatedUser = await User.findOne({
         email: email,
-    })
+    }).select('+password')
 
     if (!updatedUser)
         throw new AppError('Unable to find the user with email', 404)
