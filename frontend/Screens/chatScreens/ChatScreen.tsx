@@ -19,6 +19,7 @@ import Icon, {Icons} from '../../components/ui/Icons';
 
 interface ChatRoom {
   _id: string;
+  chatRoomImage: string;
   receiver: any;
   lastMessage: any;
   lastMessageTime: any;
@@ -46,8 +47,9 @@ const ChatScreen = ({navigation}: any) => {
   }, []);
 
   const renderItem = ({item}: any) => {
+    console.log(JSON.stringify(item))
     const imageSource = item.logoPath
-      ? {uri: item.logoPath}
+      ? { uri: item.logoPath }
       : item.receiver?.profileImagePath
       ? {uri: item.receiver.profileImagePath}
       : {
