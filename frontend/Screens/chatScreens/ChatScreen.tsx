@@ -9,7 +9,7 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
 import chatApi from '../../api/chatApi';
@@ -31,6 +31,8 @@ const ChatScreen = ({navigation, route}: any) => {
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     const getChatRooms = async () => {
       const chatRoomsData = await chatApi.getAllChatRooms(uid, token);
@@ -44,8 +46,8 @@ const ChatScreen = ({navigation, route}: any) => {
       setChatRooms(chatRooms);
     };
 
-    getChatRooms();
-  }, []);
+    if (isFocused) getChatRooms();
+  }, [isFocused]);
 
   useEffect(() => {
     if (id && chatRooms) {
