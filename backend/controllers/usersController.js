@@ -60,6 +60,26 @@ exports.updateUserById = asyncCatch(async (req, res, next) => {
     res.status(200).json(updatedUser)
 })
 
+exports.changePassword = asyncCatch(async (req, res, next) => {
+    const { oldPassword, newPassword, email } = req.body
+
+    const updatedUser = await User.findOne({
+        email: email,
+    })
+
+    if (!updatedUser)
+        throw new AppError('Unable to find the user with email', 404)
+
+    if (!updatedUser.checkPassword(oldPassword, updatedUser.password)) {
+        return next(new AppError('Password does not match', 500))
+    }
+
+    updatedUser.password = newPassword
+    updatedUser.markModified('password')
+    await updatedUser.save()
+    res.status(204).end()
+})
+
 exports.getAllFriends = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
     const userWithFriends = await User.findById(userId).populate({

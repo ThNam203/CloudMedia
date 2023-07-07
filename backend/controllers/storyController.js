@@ -34,7 +34,11 @@ const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
     storyAuthor.followers.forEach(async (followerId) => {
         const noti = await Notification.create({
             userId: followerId.toString(),
-            sender: storyAuthor._id,
+            sender: {
+                _id: storyAuthor._id,
+                name: storyAuthor.name,
+                profileImagePath: storyAuthor.profileImagePath,
+            },
             notificationType: 'NewStory', // todo: there is no time for other type, should be changed in future
             content: `${storyAuthor.name} has posted a new story`,
             isRead: false,

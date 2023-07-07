@@ -43,7 +43,6 @@ app.post(
     '/upload-image',
     s3Controller.uploadMediaFiles.single('media-file'),
     (req, res) => {
-        console.log(req.file.location)
         if (req.file.location) res.status(200).json(req.file.location)
         else res.status(500).json('Unable to upload image')
     }

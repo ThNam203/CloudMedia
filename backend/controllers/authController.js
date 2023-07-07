@@ -1,10 +1,27 @@
+/* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
 
 const User = require('../models/User')
 const JWTBlacklist = require('../models/JWTBlacklist')
 const AppError = require('../utils/AppError')
 const asyncCatch = require('../utils/asyncCatch')
+const RequestPasswordRequest = require('../models/ResetPasswordRequest')
+const ResetPasswordRequest = require('../models/ResetPasswordRequest')
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.NODE_MAILER_USER,
+        pass: process.env.NODE_MAILER_PASSWORD,
+    },
+})
+
+const sendMailForPasswordChangeRequest = (
+    toEmail,
+    changePasswordRequestId
+) => {}
 
 const getJWTToken = (userId) =>
     jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -112,3 +129,87 @@ exports.validateJwt = asyncCatch(async (req, res, next) => {
 //     const oldPassword = req.body.oldPassword
 
 // })
+
+exports.createForgetPasswordRequest = asyncCatch(async (req, res, next) => {
+    const { email } = req.body
+    const user = await User.findOne({ email: email })
+    if (!user) throw new AppError('Unable to find the user', 404)
+
+    const resetPasswordRequest = await ResetPasswordRequest.create({
+        userId: user._id,
+    })
+
+    let baseUrl
+    if (process.env.NODE_ENV === 'development')
+        baseUrl = 'http://10.0.140.194:3000'
+    else baseUrl = 'https://workwize.azurewebsites.net'
+
+    const mailOptions = {
+        from: process.env.NODE_MAILER_USER,
+        to: email,
+        subject: 'Cloud Media Forget Password',
+        text: 'You have requested a password reset. If it was you, then click the link below to receive another email with your reset password.',
+        html:
+            '<p>You have requested a password reset. If it was you, then click the link below to receive another email with your reset password:</p>' +
+            '<a href="' +
+            baseUrl +
+            '/password-recover/' +
+            resetPasswordRequest._id +
+            '">Reset Password</a>',
+    }
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            throw new AppError('Unable to send email', 500)
+        } else {
+            res.status(204).end()
+        }
+    })
+})
+
+exports.resetPassword = asyncCatch(async (req, res, next) => {
+    const { resetPasswordRequestId } = req.params
+    const request = await RequestPasswordRequest.findById(
+        resetPasswordRequestId
+    )
+
+    if (!request) throw new AppError('Unable to find the request', 404)
+    const user = await User.findById(request.userId)
+    if (!user)
+        throw new AppError('Unable to find the user with this request', 404)
+
+    let randomPassword = ''
+    const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const charactersLength = characters.length
+    let counter = 0
+    while (counter < 8) {
+        randomPassword += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+        )
+        counter += 1
+    }
+
+    user.password = randomPassword
+    user.markModified('password')
+    await user.save()
+
+    const mailOptions = {
+        from: process.env.NODE_MAILER_USER,
+        to: request.email,
+        subject: 'Cloud Media Reset Password',
+        text:
+            'You have reset your password, your new password is ' +
+            randomPassword,
+    }
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            throw new AppError('Unable to send email', 500)
+        } else {
+            res.status(200).json(
+                'Your password has been reset, please check your email'
+            )
+        }
+    })
+})

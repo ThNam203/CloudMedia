@@ -34,7 +34,11 @@ const sendNotificationOnPosting = async (statusPostId, statusPostAuthor) => {
     statusPostAuthor.followers.forEach(async (followerId) => {
         Notification.create({
             userId: followerId.toString(),
-            sender: statusPostAuthor._id,
+            sender: {
+                _id: statusPostAuthor._id,
+                name: statusPostAuthor.name,
+                profileImagePath: statusPostAuthor.profileImagePath,
+            },
             notificationType: 'Comment', // todo: there is no time for other type, should be changed in future
             content: `${statusPostAuthor.name} has posted a new post`,
             isRead: false,
