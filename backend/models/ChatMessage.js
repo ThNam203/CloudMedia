@@ -7,10 +7,8 @@ const chatMessageSchema = new mongoose.Schema(
             ref: 'ChatRoom',
             required: true,
         },
-        message: {
-            type: String,
-            required: true,
-        },
+        message: String,
+        imageLink: String,
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

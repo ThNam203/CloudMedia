@@ -14,9 +14,6 @@ import ChatRoom from '../Screens/chatScreens/ChatRoom';
 import LoadingScreen from '../Screens/LoadingScreen';
 import ImagesPostScreen from '../Screens/ImagesPostScreen';
 import DetailStatusScreen from '../Screens/DetailStatusScreen';
-
-import VideoCallScreen from '../Screens/chatScreens/NOTWORKING_VideoCall';
-import TestCallScreen from '../Screens/chatScreens/TestCallScreen';
 import EditPostScreen from '../Screens/EditPostScreen';
 import ProfileOfUserScreen from '../Screens/ProfileOfUserScreen';
 import MyNetworksScreen from '../Screens/MyNetworksScreen';
@@ -38,6 +35,9 @@ import {
 import {getAStatusPostById} from '../api/statusPostApi';
 import PostStoryScreen from '../Screens/PostStoryScreen';
 import StoriesScreen from '../Screens/StoriesScreen';
+import {useNavigation} from '@react-navigation/native';
+import {setCallShow, setDataCall} from '../reducers/UtilsReducer';
+import VideoCallScreen from '../Screens/chatScreens/VideoCallScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -81,6 +81,15 @@ export default function Routers() {
       subscribeToEvent('newNotification', (newNotify: any) => {
         console.log('have new notification');
         dispatch(pushNotification(newNotify));
+      });
+
+      subscribeToEvent('offerVideoCall', (offer: any) => {
+        // set data
+        // view in utilsReducer
+        // dispatch(setDataCall({alo: 'ola'}));
+        dispatch(setDataCall(JSON.parse(offer)));
+        // show modal
+        dispatch(setCallShow(true));
       });
     };
     if (uid) {
@@ -193,6 +202,7 @@ export default function Routers() {
       {/* Post screen */}
       <PostScreen />
       <SharePost />
+      <VideoCallScreen />
     </>
   );
 }

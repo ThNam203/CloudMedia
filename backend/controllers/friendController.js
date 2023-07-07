@@ -9,6 +9,14 @@ const asyncCatch = require('../utils/asyncCatch')
 const socketIO = require('../socket/socket')
 
 const createChatRoomOnAccept = async (firstUser, secondUser) => {
+    const isExisted = await ChatRoom.find({
+        members: {
+            $all: [firstUser._id, secondUser._id],
+        },
+    })
+
+    if (isExisted) return
+
     const newChatRoom = await ChatRoom.create({
         members: [firstUser._id, secondUser._id],
     })
@@ -47,7 +55,7 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
     })
 
     const io = socketIO.getIO()
-    if (noti) io.in(senderId.toString()).emit('newNotification', noti)
+    if (noti) io.in(receiverId.toString()).emit('newNotification', noti)
 }
 
 const updateFollow = (requestSender, respondent) => {
@@ -162,7 +170,7 @@ exports.unfriend = asyncCatch(async (req, res, next) => {
     user.connections.splice(firstIdx, 1)
     unfriendUser.connections.splice(secondIdx, 1)
 
-    await Promise.all(unfriendUser.save(), user.save())
+    await Promise.all([unfriendUser.save(), user.save()])
 
     res.status(204).end()
 })

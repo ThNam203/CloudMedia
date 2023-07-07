@@ -168,21 +168,8 @@ export default function NotificationsScreen({navigation}: any) {
           borderTopColor: 'gray',
           borderTopWidth: 1,
           paddingVertical: 10,
-        }}>
-        <TouchableOpacity
-          onPress={() => {}}
-          style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{color: '#0077B5', fontWeight: 'bold', fontSize: 17}}>
-            Show All
-          </Text>
-          <Icon
-            type={Icons.Ionicons}
-            name="arrow-forward"
-            size={19}
-            color={'#0077B5'}
-          />
-        </TouchableOpacity>
-      </View>
+        }}
+      />
     );
   };
 

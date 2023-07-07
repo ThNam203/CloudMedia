@@ -7,15 +7,14 @@ const statusPostSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        description: {
-            type: String,
-        },
-        // Todo: remove _id for mediaFiles
         mediaFiles: [
             {
                 location: String,
                 name: String,
                 fileType: String,
+            },
+            {
+                _id: false,
             },
         ],
         likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -23,18 +22,10 @@ const statusPostSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        commentCount: {
-            type: Number,
-            default: 0,
-        },
-        sharedLink: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'StatusPost',
-        },
     },
     {
         timestamps: true,
     }
 )
 
-module.exports = mongoose.model('StatusPost', statusPostSchema)
+module.exports = mongoose.model('Story', statusPostSchema)
