@@ -82,6 +82,22 @@ const ChatScreen = ({navigation}: any) => {
 
   return (
     <View style={styles.container}>
+      <View style={{elevation: 5, marginBottom: 5, height: 45}}>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon type={Icons.Ionicons} name="arrow-back" />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 24,
+              fontWeight: 'bold',
+              color: 'black',
+              marginLeft: 110,
+            }}>
+            Chats
+          </Text>
+        </View>
+      </View>
       <FlatList
         style={{width: '100%'}}
         data={chatRooms}
