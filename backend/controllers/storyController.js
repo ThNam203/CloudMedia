@@ -42,7 +42,7 @@ const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
         })
 
         const io = socketIO.getIO()
-        if (noti) io.in(followerId.toString()).emit('newNotifcation ', noti)
+        if (noti) io.in(followerId.toString()).emit('newNotification', noti)
     })
 }
 

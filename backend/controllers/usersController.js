@@ -94,7 +94,6 @@ exports.followUserById = asyncCatch(async (req, res, next) => {
 exports.unfollowUserById = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
     const { userUnfollowedId } = req.body
-    console.log(`unfollowUserById ${userId} ${userUnfollowedId}`)
     const user = await User.findById(userId)
     const userUnfollowed = await User.findById(userUnfollowedId)
 

@@ -2,7 +2,6 @@ const ChatMessage = require('../models/ChatMessage')
 const ChatRoom = require('../models/ChatRoom')
 const User = require('../models/User')
 const socketIO = require('./socket')
-const s3 = require('../controllers/s3Controller')
 
 const io = socketIO.getIO()
 console.debug = () => {}
@@ -19,7 +18,6 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
     socket.join(socket.handshake.auth.userId)
-    console.log(socket.handshake.auth.userId)
     onlineUsers.push(socket.handshake.auth.userId)
 
     socket.on('disconnect', () => {

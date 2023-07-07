@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const baseURL = 'https://workwize.azurewebsites.net';
+const baseURL = 'http://10.0.140.194:3000';
 let socket = null;
 
 const connectSocket = (userId) => {

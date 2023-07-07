@@ -15,7 +15,7 @@ const createChatRoomOnAccept = async (firstUser, secondUser) => {
         },
     })
 
-    if (isExisted) return
+    if (isExisted.length > 0) return
 
     const newChatRoom = await ChatRoom.create({
         members: [firstUser._id, secondUser._id],
@@ -58,15 +58,41 @@ const sendNotificationOnRequest = async (senderId, receiverId) => {
     if (noti) io.in(receiverId.toString()).emit('newNotification', noti)
 }
 
-const updateFollow = (requestSender, respondent) => {
+const updateFollowOnBeingFriend = (requestSender, respondent) => {
     if (requestSender.followings.indexOf(respondent._id) === -1) {
         requestSender.followings.push(respondent._id)
-        requestSender.followers.push(respondent._id)
+        requestSender.markModified('followings')
+        respondent.followers.push(requestSender._id)
+        respondent.markModified('followers')
     }
 
-    if (respondent.followings.indexOf(requestSender._id) === -1) {
+    if (requestSender.followers.indexOf(respondent._id) === -1) {
+        requestSender.followers.push(respondent._id)
+        requestSender.markModified('followers')
         respondent.followings.push(requestSender._id)
-        respondent.followers.push(requestSender._id)
+        respondent.markModified('followings')
+    }
+}
+
+const updateFollowOnBeingUnfriend = (requestSender, respondent) => {
+    if (requestSender.followings.indexOf(respondent._id) > -1) {
+        const firstIdx = requestSender.followings.indexOf(respondent._id)
+        requestSender.followings.splice(firstIdx, 1)
+        requestSender.markModified('followings')
+
+        const secondIdx = respondent.followers.indexOf(requestSender._id)
+        respondent.followers.splice(secondIdx, 1)
+        respondent.markModified('followers')
+    }
+
+    if (requestSender.followers.indexOf(respondent._id) > -1) {
+        const firstIdx = requestSender.followers.indexOf(respondent._id)
+        requestSender.followers.splice(firstIdx, 1)
+        requestSender.markModified('followers')
+
+        const secondIdx = respondent.followings.indexOf(requestSender._id)
+        respondent.followings.splice(secondIdx, 1)
+        respondent.markModified('followings')
     }
 }
 
@@ -146,7 +172,7 @@ exports.replyFriendRequest = asyncCatch(async (req, res, next) => {
 
         createChatRoomOnAccept(respondent, requestSender)
         sendNotificationOnReply(requestSender, respondent, true)
-        updateFollow(requestSender, respondent)
+        updateFollowOnBeingFriend(requestSender, respondent)
 
         await Promise.all([respondent.save(), requestSender.save()])
     } else if (response === 'Decline')
@@ -169,6 +195,7 @@ exports.unfriend = asyncCatch(async (req, res, next) => {
 
     user.connections.splice(firstIdx, 1)
     unfriendUser.connections.splice(secondIdx, 1)
+    updateFollowOnBeingUnfriend(user, unfriendUser)
 
     await Promise.all([unfriendUser.save(), user.save()])
 

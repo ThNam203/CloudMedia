@@ -151,12 +151,13 @@ const ChatRoom = ({navigation, route}: any) => {
   }, []);
 
   const handleNewMessage = () => {
+    const date = new Date()
     const messageObject = new Message(
       (Math.random() + 1).toString(36).substring(7),
       message,
       null,
       uid,
-      Date.now().toString(),
+      date.toISOString(),
     );
     setChatMessages(messages => [...messages, messageObject]);
 

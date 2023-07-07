@@ -73,7 +73,6 @@ exports.getMessagesInChatRoomId = asyncCatch(async (req, res, next) => {
     })
 
     const reverseMessages = messages.reverse()
-    console.log(reverseMessages)
 
     res.status(200).json(reverseMessages)
 })
