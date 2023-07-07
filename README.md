@@ -16,7 +16,8 @@
 
 ## About The Project
 
-![Screen Shot](frontend/assets/images/ScreenShot.jpg | width=100)
+<!-- ![Screen Shot](frontend/assets/images/ScreenShot.jpg) -->
+<img src="frontend/assets/images/ScreenShot.jpg" width=400 height=800>
 
 ## Getting Started
 
