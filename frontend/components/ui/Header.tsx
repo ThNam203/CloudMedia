@@ -44,7 +44,7 @@ export default function Header({navigation}: any) {
           alignItems: 'center',
         }}
         onPress={() => {
-          navigation.navigate('chat');
+          navigation.navigate('chat', {id: ''});
           //navigation.navigate('videoCall', { isCaller: true })\
         }}>
         <Icon type={Icons.Ionicons} name="chatbox-ellipses-outline" />

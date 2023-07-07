@@ -83,7 +83,9 @@ function LoginScreen(props: any) {
             />
           </View>
           <Text
-            onPress={() => {}}
+            onPress={() => {
+              props.handleOpenForgetPass();
+            }}
             style={[
               styles.fontText,
               {

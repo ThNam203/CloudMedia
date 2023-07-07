@@ -9,7 +9,7 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
 import chatApi from '../../api/chatApi';
@@ -25,10 +25,14 @@ interface ChatRoom {
   lastMessageTime: any;
 }
 
-const ChatScreen = ({navigation}: any) => {
+const ChatScreen = ({navigation, route}: any) => {
+  const {id} = route.params;
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
+  const [idGo, setIdGo] = useState(id);
+
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const getChatRooms = async () => {
@@ -43,18 +47,36 @@ const ChatScreen = ({navigation}: any) => {
       setChatRooms(chatRooms);
     };
 
-    getChatRooms();
-  }, []);
+    if (isFocused) {
+      getChatRooms();
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (idGo && chatRooms) {
+      for (const room of chatRooms) {
+        if (room.receiver._id === idGo) {
+          const imageSource = room.receiver?.profileImagePath
+            ? {uri: room.receiver.profileImagePath}
+            : require('../../assets/images/Spiderman.jpg');
+          setIdGo('');
+          navigation.navigate('chatRoom', {
+            chatRoomId: room._id,
+            imageSource: imageSource,
+            title: room.receiver.name,
+          });
+        }
+      }
+    }
+  }, [chatRooms]);
 
   const renderItem = ({item}: any) => {
-    console.log(JSON.stringify(item))
+    console.log(JSON.stringify(item));
     const imageSource = item.logoPath
-      ? { uri: item.logoPath }
+      ? {uri: item.logoPath}
       : item.receiver?.profileImagePath
       ? {uri: item.receiver.profileImagePath}
-      : {
-          uri: 'https://images.unsplash.com/photo-1683339708262-b1208394ffec?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80',
-        };
+      : require('../../assets/images/Spiderman.jpg');
     return (
       <TouchableOpacity
         style={styles.userContainer}

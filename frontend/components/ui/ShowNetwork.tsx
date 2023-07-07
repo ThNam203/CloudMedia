@@ -19,7 +19,7 @@ export default function ShowNetwork(props: any) {
         borderColor: Colors.gray,
         margin: 7,
         width: 160,
-        height: 270,
+        height: 240,
         alignItems: 'center',
       }}>
       <View style={{flex: 1, width: '100%', alignItems: 'center'}}>
@@ -68,16 +68,6 @@ export default function ShowNetwork(props: any) {
             textAlign: 'center',
           }}>
           {item.name}
-        </Text>
-        <Text
-          style={{
-            fontSize: 15,
-            paddingHorizontal: 7,
-            textAlign: 'center',
-            marginBottom: 10,
-            height: 35,
-          }}>
-          {item.userRole}
         </Text>
       </View>
       <View style={{height: 65, alignItems: 'center'}}>

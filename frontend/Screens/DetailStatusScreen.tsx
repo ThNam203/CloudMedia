@@ -351,11 +351,6 @@ export default function DetailStatusScreen({navigation, route}: any) {
                 onPress={choosePhotoFromLibrary}>
                 <Icon type={Icons.Ionicons} name="image-outline" size={30} />
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{marginHorizontal: 10}}
-                onPress={() => {}}>
-                <Icon type={Icons.Ionicons} name="videocam-outline" size={30} />
-              </TouchableOpacity>
             </View>
             <View style={{padding: 10}}>
               <TouchableOpacity onPress={postComment}>
