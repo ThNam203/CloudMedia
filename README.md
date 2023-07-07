@@ -16,7 +16,7 @@
 
 ## About The Project
 
-![Screen Shot](frontend/assets/images/ScreenShot.jpg)
+![Screen Shot](frontend/assets/images/ScreenShot.jpg | width=100)
 
 ## Getting Started
 
