@@ -14,7 +14,7 @@ import {
   RTCView,
   mediaDevices,
 } from 'react-native-webrtc';
-import socket, { emitEvent } from '../../utils/socket';
+import socket, {emitEvent} from '../../utils/socket';
 import {Path, Svg} from 'react-native-svg';
 
 export default function VideoCallScreen() {
@@ -118,14 +118,14 @@ export default function VideoCallScreen() {
         });
 
         socket.subscribeToEvent('noOneInRoom', (data: any) => {
-          Toast("Other user is not online")
-          dispatch(setCallShow(false))
+          Toast('Other user is not online');
+          dispatch(setCallShow(false));
         });
 
         socket.subscribeToEvent('callDenied', (data: any) => {
-          Toast("Other user denied call")
-          dispatch(setCallShow(false))
-        })
+          Toast('Other user denied call');
+          dispatch(setCallShow(false));
+        });
       }
 
       socket.subscribeToEvent('iceCandidate', (data: any) => {
@@ -205,7 +205,7 @@ export default function VideoCallScreen() {
     try {
       const answerDescription = new RTCSessionDescription(answer);
       await peerConnection.current!.setRemoteDescription(answerDescription);
-      processCandidates()
+      processCandidates();
     } catch (err) {}
   };
 
@@ -288,16 +288,18 @@ export default function VideoCallScreen() {
     var hours = Math.floor(seconds / 3600);
     var minutes = Math.floor((seconds % 3600) / 60);
     var remainingSeconds = seconds % 60;
-  
+
     var timeString = '';
-  
+
     if (hours > 0) {
       timeString += hours.toString().padStart(2, '0') + ':';
     }
-  
-    timeString += minutes.toString().padStart(2, '0') + ':' +
-                  remainingSeconds.toString().padStart(2, '0');
-  
+
+    timeString +=
+      minutes.toString().padStart(2, '0') +
+      ':' +
+      remainingSeconds.toString().padStart(2, '0');
+
     return timeString;
   }
 
@@ -345,14 +347,16 @@ export default function VideoCallScreen() {
                     {remoteUserName}
                   </Text>
                   <Text style={{fontSize: 18, marginTop: 10, color: 'black'}}>
-                    {intervalId ? convertSecondsToTime(callLength) : 'Calling...'}
+                    {intervalId
+                      ? convertSecondsToTime(callLength)
+                      : 'Calling...'}
                   </Text>
                 </View>
               )}
               <View style={styles.bottomView}>
-                <View style={{flex: 1}}>
-                  <View style={{marginHorizontal: 30}}>
-                    {callMer.data.isVoiceCall ? null : (
+                {callMer.data.isVoiceCall ? null : (
+                  <View style={{flex: 1}}>
+                    <View style={{marginHorizontal: 30}}>
                       <TouchableOpacity onPress={toggleIconVideo}>
                         <Icon
                           name={iconVideo}
@@ -360,9 +364,9 @@ export default function VideoCallScreen() {
                           type={Icons.FontAwesome5}
                         />
                       </TouchableOpacity>
-                    )}
+                    </View>
                   </View>
-                </View>
+                )}
                 <View
                   style={{
                     flex: 1,
@@ -465,8 +469,10 @@ export default function VideoCallScreen() {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  emitEvent("callDenied", { chatRoomId: callMer.data.chatRoomId })
-                  dispatch(setCallShow(false))
+                  emitEvent('callDenied', {
+                    chatRoomId: callMer.data.chatRoomId,
+                  });
+                  dispatch(setCallShow(false));
                 }}
                 style={{
                   backgroundColor: '#d62828',
@@ -540,5 +546,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginHorizontal: 40,
     alignItems: 'center',
+    justifyContent: 'space-around',
   },
 });

@@ -18,9 +18,7 @@ export default function ChatMessage({chat, userId, avatarSource}: any) {
         {status && (
           <Image
             style={{width: 50, height: 50, borderRadius: 25, marginRight: 10}}
-            source={{
-              uri: avatarSource,
-            }}
+            source={avatarSource}
           />
         )}
         <View
