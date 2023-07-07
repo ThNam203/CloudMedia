@@ -31,9 +31,7 @@ const getUserIdFromJWT = async (req, next) => {
 }
 
 const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
-    console.log(JSON.stringify(storyAuthor))
     storyAuthor.followers.forEach(async (followerId) => {
-        console.log(followerId.toString())
         const noti = await Notification.create({
             userId: followerId.toString(),
             sender: storyAuthor._id,
@@ -44,7 +42,7 @@ const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
         })
 
         const io = socketIO.getIO()
-        if (noti) io.in(followerId.toString()).emit('newStory', noti)
+        if (noti) io.in(followerId.toString()).emit('newNotifcation ', noti)
     })
 }
 

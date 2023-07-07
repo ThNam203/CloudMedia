@@ -19,6 +19,7 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
     socket.join(socket.handshake.auth.userId)
+    console.log(socket.handshake.auth.userId)
     onlineUsers.push(socket.handshake.auth.userId)
 
     socket.on('disconnect', () => {
