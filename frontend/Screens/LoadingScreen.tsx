@@ -29,34 +29,6 @@ export default function LoadingScreen({navigation, route}: any) {
   const user = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
 
-  const saveAllStatusPost = async (jwt: any) => {
-    try {
-      const json = jwt_decode(jwt) as {id: string};
-      const idUser = json.id;
-      const response: any = await getAllStatusPostOfUser(idUser, jwt);
-      if (response.status === 200) {
-        const data = response.data;
-        // console.log(data);
-        for (const post of data) {
-          dispatch(pushStatusPosts(post));
-          if (post.sharedLink) {
-            const res: any = await getAStatusPostById(jwt, post.sharedLink);
-            if (res.status === 200) {
-              // console.log(res.data);
-              dispatch(pushStatusPostsSub(res.data));
-            }
-          }
-        }
-      } else {
-        console.log(response.status);
-        console.log(response.data.errorMessage);
-        throw new Error(response.data.errorMessage);
-      }
-    } catch (error: any) {
-      Toast(error.message);
-    }
-  };
-
   const saveAllStory = async (jwt: any) => {
     try {
       const json = jwt_decode(jwt) as {id: string};

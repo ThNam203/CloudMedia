@@ -5,6 +5,8 @@ import {
   ActivityIndicator,
   ScrollView,
   SectionList,
+  SafeAreaView,
+  RefreshControl,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ShowPosts from '../components/ui/ShowPosts';
@@ -13,6 +15,7 @@ import {RootState} from '../reducers/Store';
 import {Toast} from '../components/ui/Toast';
 import LottieView from 'lottie-react-native';
 import {
+  clearStatusPosts,
   deleteAStatusPost,
   pushStatusPosts,
   pushStatusPostsSub,
@@ -25,6 +28,8 @@ import {
 } from '../api/statusPostApi';
 import {Image} from 'react-native-animatable';
 import StoriesList from '../components/ui/StoriesList';
+import {clearStory, pushStory} from '../reducers/StoryReducer';
+import {getStoryFeed} from '../api/storyApi';
 
 export default function HomeScreen({navigation}: any) {
   const token = useSelector((state: RootState) => state.token.key);
@@ -36,6 +41,7 @@ export default function HomeScreen({navigation}: any) {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -45,14 +51,11 @@ export default function HomeScreen({navigation}: any) {
       const response: any = await getNewsFeed(uid, token, currentPage);
       if (response.status === 200) {
         const data = response.data;
-        // console.log(currentPage);
         for (const post of data) {
-          // console.log(post);
           dispatch(pushStatusPosts(post));
           if (post.sharedLink) {
             const res: any = await getAStatusPostById(token, post.sharedLink);
             if (res.status === 200) {
-              // console.log(res.data);
               dispatch(pushStatusPostsSub(res.data));
             }
           }
@@ -95,6 +98,32 @@ export default function HomeScreen({navigation}: any) {
     }
   };
 
+  const saveAllStory = async () => {
+    try {
+      const response: any = await getStoryFeed(uid, token);
+      if (response.status === 200) {
+        const data = response.data;
+        for (const story of data) {
+          dispatch(pushStory(story));
+        }
+      } else {
+        console.log(response.data.errorMessage);
+        throw new Error(response.data.errorMessage);
+      }
+    } catch (error: any) {
+      Toast(error.message);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch(clearStatusPosts());
+    dispatch(clearStory());
+    saveAllStory();
+    setCurrentPage(0);
+    setRefreshing(false);
+  };
+
   useEffect(() => {
     saveAllStatusPost();
   }, [currentPage]);
@@ -105,37 +134,48 @@ export default function HomeScreen({navigation}: any) {
   ];
 
   return (
-    <SectionList
-      sections={sections}
-      keyExtractor={(item, index) => 'key ' + index}
-      renderItem={({item, section}: any) => {
-        if (section.title === 'Stories') {
-          return <StoriesList navigation={navigation} />;
-        } else {
-          return (
-            <ShowPosts
-              item={item}
-              navigation={navigation}
-              pressComment={() => {
-                navigation.navigate('detailStatus', {idPost: item._id});
-              }}
-              pressDelete={() => {
-                handleDelete(item._id);
-              }}
-            />
-          );
-        }
-      }}
-      renderSectionFooter={({section}) => {
-        if (section.title === 'Posts') {
-          return renderLoader();
-        } else {
-          return null;
-        }
-      }}
-      onEndReached={loadMoreItem}
-      onEndReachedThreshold={0}
-    />
+    <SafeAreaView style={{flex: 1}}>
+      {refreshing ? (
+        <ActivityIndicator />
+      ) : (
+        <SectionList
+          sections={sections}
+          keyExtractor={(item, index) => 'key ' + index}
+          renderItem={({item, section}: any) => {
+            if (section.title === 'Stories') {
+              return <StoriesList navigation={navigation} />;
+            } else {
+              return (
+                <ShowPosts
+                  item={item}
+                  navigation={navigation}
+                  pressComment={() => {
+                    navigation.navigate('detailStatus', {idPost: item._id});
+                  }}
+                  pressDelete={() => {
+                    handleDelete(item._id);
+                  }}
+                />
+              );
+            }
+          }}
+          renderSectionFooter={({section}) => {
+            if (section.title === 'Posts') {
+              return renderLoader();
+            } else {
+              return null;
+            }
+          }}
+          onEndReached={() => {
+            if (!isLoading) loadMoreItem();
+          }}
+          onEndReachedThreshold={0}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
