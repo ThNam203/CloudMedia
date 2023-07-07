@@ -50,9 +50,7 @@ const ChatScreen = ({navigation}: any) => {
       ? {uri: item.logoPath}
       : item.receiver?.profileImagePath
       ? {uri: item.receiver.profileImagePath}
-      : {
-          uri: 'https://images.unsplash.com/photo-1683339708262-b1208394ffec?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80',
-        };
+      : require('../../assets/images/Spiderman.jpg');
     return (
       <TouchableOpacity
         style={styles.userContainer}
