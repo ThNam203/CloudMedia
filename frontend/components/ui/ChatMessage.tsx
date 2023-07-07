@@ -30,6 +30,7 @@ export default function ChatMessage({chat, userId}: any) {
               : [styles.mmessage, {backgroundColor: 'rgb(194, 243, 194)'}]
           }>
           <Text>{chat.message}</Text>
+          { chat.imageLink ? <Image source={{uri: chat.imageLink}} style={{width: 150, height: 150}}/> : null}
         </View>
       </View>
 

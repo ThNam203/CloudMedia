@@ -6,12 +6,20 @@ interface Utils {
     visible: boolean;
     link: string;
   };
+  call: {
+    visible: boolean;
+    data: any;
+  };
 }
 const initialState: Utils = {
   postShow: false,
   share: {
     visible: false,
     link: '',
+  },
+  call: {
+    visible: false,
+    data: {},
   },
 };
 
@@ -28,8 +36,20 @@ const UtilsSlice = createSlice({
     setShareLink: (state: Utils, action: PayloadAction<string>) => {
       state.share.link = action.payload;
     },
+    setCallShow: (state: Utils, action: PayloadAction<boolean>) => {
+      state.call.visible = action.payload;
+    },
+    setDataCall: (state: Utils, action: PayloadAction<any>) => {
+      state.call.data = action.payload;
+    },
   },
 });
 
-export const {setPostShow, setShareShow, setShareLink} = UtilsSlice.actions;
+export const {
+  setPostShow,
+  setShareShow,
+  setShareLink,
+  setCallShow,
+  setDataCall,
+} = UtilsSlice.actions;
 export default UtilsSlice.reducer;

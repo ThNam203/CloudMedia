@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const baseURL = 'https://workwize.azurewebsites.net';
+const baseURL = 'http://10.0.140.194:3000';
 let socket = null;
 
 const connectSocket = (userId) => {
@@ -27,6 +27,10 @@ const disconnectSocket = () => {
   }
 };
 
+const unsubscribeToEvent = (eventName) => {
+  if (socket) socket.off(eventName);
+};
+
 const subscribeToEvent = (eventName, callback) => {
   if (socket)
     socket.on(eventName, callback);
@@ -37,4 +41,5 @@ const emitEvent = (eventName, data) => {
     socket.emit(eventName, data);
 };
 
-export { connectSocket, disconnectSocket, subscribeToEvent, emitEvent };
+export { connectSocket, disconnectSocket, subscribeToEvent, unsubscribeToEvent, emitEvent };
+export default { connectSocket, disconnectSocket, subscribeToEvent, unsubscribeToEvent, emitEvent };
