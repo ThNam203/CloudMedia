@@ -6,11 +6,14 @@ import {createRequestByEmail, getRecommendFr} from '../../api/friend_api';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../reducers/Store';
 import {Toast} from './Toast';
+import {useIsFocused} from '@react-navigation/native';
 
 const FriendList = ({navigation}: any) => {
   const [friends, setFriends] = useState<any[]>();
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((stata: RootState) => stata.uid.id);
+
+  const isFocused = useIsFocused();
 
   const handleAddFr = async (email: any) => {
     // console.log(email);
@@ -55,8 +58,8 @@ const FriendList = ({navigation}: any) => {
         Toast(error.message);
       }
     };
-    getRecomendFriends();
-  }, []);
+    if (isFocused) getRecomendFriends();
+  }, [isFocused]);
 
   return (
     <FlatList
