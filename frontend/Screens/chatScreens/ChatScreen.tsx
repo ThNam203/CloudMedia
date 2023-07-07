@@ -30,6 +30,7 @@ const ChatScreen = ({navigation, route}: any) => {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const token = useSelector((state: RootState) => state.token.key);
   const uid = useSelector((state: RootState) => state.uid.id);
+  const [idGo, setIdGo] = useState(id);
 
   const isFocused = useIsFocused();
 
@@ -46,16 +47,19 @@ const ChatScreen = ({navigation, route}: any) => {
       setChatRooms(chatRooms);
     };
 
-    if (isFocused) getChatRooms();
+    if (isFocused) {
+      getChatRooms();
+    }
   }, [isFocused]);
 
   useEffect(() => {
-    if (id && chatRooms) {
+    if (idGo && chatRooms) {
       for (const room of chatRooms) {
-        if (room.receiver._id === id) {
+        if (room.receiver._id === idGo) {
           const imageSource = room.receiver?.profileImagePath
             ? {uri: room.receiver.profileImagePath}
             : require('../../assets/images/Spiderman.jpg');
+          setIdGo('');
           navigation.navigate('chatRoom', {
             chatRoomId: room._id,
             imageSource: imageSource,
