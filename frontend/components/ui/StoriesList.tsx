@@ -210,7 +210,7 @@ const Story = (props: any) => {
   const uid = useSelector((state: RootState) => state.uid.id);
   const viewProfile = () => {
     if (content.author._id !== uid)
-      navigation.navigate('profileOther', {id: content.author._id});
+      navigation.push('profileOther', {id: content.author._id});
   };
   const viewStory = () => {
     navigation.navigate('story', {index, type: 0});

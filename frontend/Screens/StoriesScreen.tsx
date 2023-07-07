@@ -22,7 +22,7 @@ import {getTimeToNow} from '../utils/Utils';
 import {deleteStoryApi, likeStory} from '../api/storyApi';
 import {deleteStory, toggleLikeStory} from '../reducers/StoryReducer';
 
-export default function StoriesScreen({navigation: {goBack}, route}: any) {
+export default function StoriesScreen({navigation, route}: any) {
   const {index, type} = route.params;
   let {width: windowWidth, height: windowHeight} = useWindowDimensions();
   windowHeight = windowHeight - 150;
@@ -101,6 +101,10 @@ export default function StoriesScreen({navigation: {goBack}, route}: any) {
     index,
   });
 
+  const viewProfile = (authorId: any) => {
+    if (uid !== authorId) navigation.push('profileOther', {id: authorId});
+  };
+
   const Story = ({item, index}: any) => {
     return (
       <View
@@ -133,7 +137,9 @@ export default function StoriesScreen({navigation: {goBack}, route}: any) {
         )}
         <View style={styles.header}>
           <View style={styles.row}>
-            <TouchableOpacity style={styles.row}>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => viewProfile(item.author._id)}>
               <Image
                 source={
                   item.author.profileImagePath
@@ -167,7 +173,9 @@ export default function StoriesScreen({navigation: {goBack}, route}: any) {
                 />
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={() => goBack()} style={{padding: 5}}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{padding: 5}}>
               <Icon
                 type={Icons.AntDesign}
                 name="close"

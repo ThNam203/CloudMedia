@@ -66,7 +66,7 @@ const ActivitySection = (props: any) => {
   const subStory = useSelector((state: RootState) => state.story.Sub);
 
   const viewStories = () => {
-    if (subStory.length > 0) navigation.navigate('story', {index: 0, type: 1});
+    if (subStory.length > 0) navigation.push('story', {index: 0, type: 1});
     else Toast('No story to view');
   };
 

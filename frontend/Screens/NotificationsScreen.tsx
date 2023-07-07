@@ -58,7 +58,7 @@ export default function NotificationsScreen({navigation}: any) {
       if (response.status === 200) {
         const data = response.data;
         await dispatch(pushStorySub(data));
-        navigation.navigate('story', {index: 0, type: 1});
+        navigation.push('story', {index: 0, type: 1});
       } else {
         console.log(response.status);
         console.log(response.data.errorMessage);
