@@ -214,6 +214,12 @@ export default function VideoCallScreen() {
 
   const toggleIconVideo = () => {
     const newIconName = iconVideo === 'video' ? 'video-slash' : 'video';
+
+    if (localStream != null)
+      if (newIconName === 'video')
+        localStream.getVideoTracks()[0].enabled = true;
+      else localStream.getVideoTracks()[0].enabled = false;
+
     setIconVideo(newIconName);
   };
 

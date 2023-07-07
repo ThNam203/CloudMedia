@@ -113,7 +113,9 @@ io.on('connection', (socket) => {
 
         chatRoom.lastMessage = message
         chatRoom.lastMessageTime = Date.now()
-        await chatRoom.save()
+        chatRoom.save()
+
+        console.log(newChatMessage)
 
         socket.to(chatRoomId).emit('newMessage', newChatMessage)
     })

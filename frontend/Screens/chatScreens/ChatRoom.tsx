@@ -21,7 +21,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {Toast} from '../../components/ui/Toast';
 import {emitEvent, subscribeToEvent} from '../../utils/socket';
 import {setCallShow, setDataCall} from '../../reducers/UtilsReducer';
-import { UploadImage } from '../../api/Utils';
+import {UploadImage} from '../../api/Utils';
 
 class Message {
   public id: string;
@@ -124,8 +124,8 @@ const ChatRoom = ({navigation, route}: any) => {
         chatRoomId,
       );
       const messages: Message[] = rawMessages.data.map((rawMessage: any) => {
-        const {_id, message, senderId, createdAt} = rawMessage;
-        return {_id, message, senderId, createdAt};
+        const {_id, message, imageLink, senderId, createdAt} = rawMessage;
+        return {_id, message, imageLink, senderId, createdAt};
       });
       setChatMessages(messages);
     };
@@ -163,26 +163,27 @@ const ChatRoom = ({navigation, route}: any) => {
     if (mediaFile) {
       const formData = new FormData();
       formData.append('media-file', mediaFile);
-      console.error('co cai con cac')
-      UploadImage(formData, uid).then((imageLink: any) => {
-        setChatMessages((messages) => 
-          messages.map(message => {
+      UploadImage(formData, uid)
+        .then((imageLink: any) => {
+          setChatMessages(messages => {
             emitEvent('newMessage', {
               chatRoomId: chatRoomId,
               message,
               senderId: uid,
-              imageLink,
+              imageLink: imageLink.data,
             });
 
-            if (message.id === messageObject.id) {
-              message.imageLink = imageLink
-              return message
-            } else return message
-          })
-        )
-      }).catch((e) => {
-        console.error('unable to upload' + e.toString())
-      })
+            return messages.map(message => {
+              if (message.id === messageObject.id) {
+                message.imageLink = imageLink.data;
+                return message;
+              } else return message;
+            });
+          });
+        })
+        .catch(e => {
+          console.error('unable to upload' + e.toString());
+        });
     } else {
       emitEvent('newMessage', {
         chatRoomId: chatRoomId,
@@ -192,6 +193,7 @@ const ChatRoom = ({navigation, route}: any) => {
       });
     }
 
+    setMediaFile(undefined)
     setMessage('');
   };
 
@@ -357,11 +359,11 @@ const ChatRoom = ({navigation, route}: any) => {
                 onPress={choosePhotoFromLibrary}>
                 <Icon type={Icons.Ionicons} name="image-outline" size={30} />
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={{marginHorizontal: 10}}
                 onPress={() => {}}>
                 <Icon type={Icons.Ionicons} name="videocam-outline" size={30} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View style={{padding: 10}}>
               <TouchableOpacity onPress={handleNewMessage}>
