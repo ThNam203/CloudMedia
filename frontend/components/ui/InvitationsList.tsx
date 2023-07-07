@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Image, View} from 'react-native';
 import ItemRequestUser from './ItemRequestUser';
 import {getAllFrRequestOfUser} from '../../api/friend_api';
 import {RootState} from '../../reducers/Store';
@@ -118,10 +118,16 @@ const InvitationsList = (props: any) => {
 
   if (invitations.length === 0) {
     return (
-      <View>
-        <Text style={{fontSize: 25, alignSelf: 'center', color: 'gray'}}>
-          No invitations
-        </Text>
+      <View style={{flex: 1}}>
+        <Image
+          source={require('../../assets/images/NoRequest.png')}
+          style={{
+            width: 350,
+            height: 350,
+            alignSelf: 'center',
+            marginTop: 100,
+          }}
+        />
       </View>
     );
   } else {
