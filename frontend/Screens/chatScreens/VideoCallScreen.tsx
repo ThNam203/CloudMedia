@@ -121,12 +121,12 @@ export default function VideoCallScreen() {
           Toast('Other user is not online');
           dispatch(setCallShow(false));
         });
-
-        socket.subscribeToEvent('callDenied', (data: any) => {
-          Toast('Other user denied call');
-          dispatch(setCallShow(false));
-        });
       }
+      
+      socket.subscribeToEvent('callDenied', (data: any) => {
+        Toast('Other user denied call');
+        dispatch(setCallShow(false));
+      });
 
       socket.subscribeToEvent('iceCandidate', (data: any) => {
         handleRemoteCandidate(data);
@@ -148,6 +148,7 @@ export default function VideoCallScreen() {
       unprocessedRemoteCandidates.current.length,
     );
     socket.unsubscribeToEvent('iceCandidate');
+    socket.unsubscribeToEvent('callDenied')
     if (callMer.data.isCaller)
       socket.unsubscribeToEvent('answerOfferVideoCall');
     localStream?.release();
@@ -393,6 +394,8 @@ export default function VideoCallScreen() {
                     }}
                     onPress={() => {
                       dispatch(setCallShow(false));
+                      if (peerConnection.current?.remoteDescription === null && callMer.data.isCaller) 
+                        emitEvent('callDenied')
                     }}>
                     <Icon
                       name="phone-hangup"
