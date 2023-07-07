@@ -27,7 +27,11 @@ import {
 } from '../reducers/NotificationReducer';
 import {getAllNotifications} from '../api/notificationApi';
 import {Toast} from '../components/ui/Toast';
-import {connectSocket, subscribeToEvent} from '../utils/socket';
+import {
+  connectSocket,
+  disconnectSocket,
+  subscribeToEvent,
+} from '../utils/socket';
 import {
   pushStatusPosts,
   pushStatusPostsSub,
@@ -93,6 +97,7 @@ export default function Routers() {
       });
     };
     if (uid) {
+      disconnectSocket();
       ConnectSocket();
     }
   }, [uid]);

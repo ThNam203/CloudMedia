@@ -331,7 +331,9 @@ export default function ProfileOfUserScreen(props: any) {
                 marginHorizontal: 10,
               }}>
               <Pressable
-                onPress={() => {}}
+                onPress={() => {
+                  navigation.navigate('chat');
+                }}
                 android_ripple={{color: '#0d8fe0ff'}}
                 style={{
                   backgroundColor: 'transparent',
